@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Carte des antennes 5G</title>
+	<!-- inclusion des styles CSS de Leaflet -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css" integrity="sha512-zwupxtJ/LaJz6ZnU6AZKpOVm+CG8L59Y6y/Wa6mmbU6KsvD2GAV5Z5zH2QfL+5zRfcgYusyIdODpf/ZByw/3cA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<!-- inclusion du script JS de Leaflet -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js" integrity="sha512-sA7lDjjwJd0/PVhTtJchZVzgyZGhLaIBVd9XKjZRuV7M15otwTnV7T8z/AL/cjYZlDkl3+s3KVcgSDXwpG4H/w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<style>
+		#mapid { height: 500px; }
+	</style>
+</head>
+<body>
+	<h1>Carte des antennes 5G</h1>
+	<div id="mapid"></div>
+	<script>
+		// création de la carte centrée sur la France
+		var mymap = L.map('mapid').setView([46.71109, 1.71910], 6);
+
+		// ajout du fond de carte OpenStreetMap
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+		}).addTo(mymap);
+
+		// fonction pour ajouter les marqueurs sur la carte à partir des données du CSV
+		function addMarkersFromCsv(data) {
+			for (var i = 0; i < data.length; i++) {
+				var row = data[i];
+				var latlng = row.coordonnees.split(",");
+				var lat = parseFloat(latlng[0]);
+				var lng = parseFloat(latlng[1]);
+				var marker = L.marker([lat, lng]).addTo(mymap);
+				marker.bindPopup("Support " + row.id_support + " (" + row.adresse0 + " " + row.adresse1 + " " + row.adresse2 + " " + row.adresse3 + " " + row.code_postal + ")<br>Activation " + row.technologie + " [" + row.operateur + "]");
+			}
+		}
+
+		// chargement du fichier CSV et ajout des marqueurs sur la carte
+		Papa.parse("antennes.csv", {
+			download: true,
+			header: true,
+			delimiter: ",",
+			skipEmptyLines: true,
+			complete: function(results) {
+				addMarkersFromCsv(results.data);
+			}
+		});
+	</script>
+</body>
+</html>

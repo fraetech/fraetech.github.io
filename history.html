@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>Historique modifications ANFR hebdomadaires</title>
+
+  <!-- Description générale -->
+  <meta name="description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR. Visualisez les nouvelles installations, activations et modifications par opérateur.">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Historique des mises à jour hebdomadaires ANFR">
+  <meta property="og:description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR. Visualisez les nouvelles installations, activations et modifications par opérateur.">
+  <meta property="og:url" content="https://fraetech.github.io/maj-hebdo/">
+  <meta property="og:site_name" content="MAJ-Hebdo ANFR">
+  <meta property="og:image" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg">
+  <meta property="og:image:alt" content="Logo MAJ-Hebdo ANFR">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:logo" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg"/>
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Historique des mises à jour hebdomadaires ANFR">
+  <meta name="twitter:description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg">
+  <meta name="twitter:image:alt" content="Logo MAJ-Hebdo ANFR">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historique MAJ ANFR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg" type="image/svg+xml">
+  <style>
+    * {
+      font-family: "Didact Gothic", sans-serif !important;
+      font-weight: 500;
+      font-style: normal;
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+    .column {
+      background: white;
+      padding: 20px;
+      width: 300px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    h1 {
+      text-align: center;
+    }
+    .column h2 {
+      text-align: center;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+    }
+    .column h2::after {
+      content: "˅";
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%) rotate(0deg);
+      transition: transform 0.3s ease;
+      font-size: 18px;
+    }
+    .column.active h2::after {
+      transform: translateY(-50%) rotate(180deg);
+    }
+    .column ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.5s ease;
+    }
+    .column li {
+      margin: 10px 0;
+    }
+    .column a {
+      text-decoration: none;
+      color: #007BFF;
+    }
+    .column a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+      .column {
+        width: 90%;
+        max-width: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Historique des MAJ ANFR</h1>
+
+<div class="container" id="columns-container"></div>
+
+<script>
+  async function fetchAndBuildColumns() {
+    const response = await fetch('https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/history.csv');
+    const csvText = await response.text();
+    const rows = csvText.trim().split('\n').slice(1);
+
+    const data = rows.map(row => {
+      const [type, label, path] = row.split(',');
+      return { type, label, path };
+    });
+
+    const grouped = {
+      hebdo: [],
+      mensu: [],
+      trim: []
+    };
+
+    data.forEach(entry => {
+      if (grouped[entry.type]) {
+        grouped[entry.type].push(entry);
+      }
+    });
+
+    const container = document.getElementById('columns-container');
+    for (let type of ['hebdo', 'mensu', 'trim']) {
+      const column = document.createElement('div');
+      column.className = 'column';
+
+      const titleMap = {
+        hebdo: 'Hebdomadaires',
+        mensu: 'Mensuelles',
+        trim: 'Trimestrielles'
+      };
+
+      column.innerHTML = `<h2>${titleMap[type]}</h2><ul></ul>`;
+      const ul = column.querySelector('ul');
+
+      grouped[type]
+        .sort((a, b) => compareRealDates(b.label, a.label)) // Tri décroissant
+        .forEach(item => {
+          const li = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = `https://fraetech.github.io/maj-hebdo/index.html?csv=${item.path}`;
+          link.textContent = item.label;
+          li.appendChild(link);
+          ul.appendChild(li);
+        });
+
+      container.appendChild(column);
+    }
+
+    setupAccordion();
+  }
+
+  function compareRealDates(labelA, labelB) {
+    // Extrait l'année et la semaine/mois
+    const extract = (label) => {
+      const numbers = label.match(/\d+/g);
+      if (!numbers) return { year: 0, week: 0 };
+      if (label.includes('Semaine')) {
+        return { year: parseInt(numbers[1]), week: parseInt(numbers[0]) };
+      } else {
+        return { year: parseInt(numbers[1]), month: parseInt(numbers[0]) };
+      }
+    };
+
+    const a = extract(labelA);
+    const b = extract(labelB);
+
+    if (a.year !== b.year) {
+      return a.year - b.year;
+    }
+    // Semaine ou Mois
+    return (a.week || a.month) - (b.week || b.month);
+  }
+
+  function setupAccordion() {
+    const isMobile = window.innerWidth <= 768;
+    document.querySelectorAll('.column').forEach(column => {
+      const h2 = column.querySelector('h2');
+      const ul = column.querySelector('ul');
+
+      if (isMobile) {
+        ul.style.maxHeight = "0px"; // fermé par défaut
+      } else {
+        ul.style.maxHeight = "1000px"; // ouvert sur desktop
+      }
+
+      h2.addEventListener('click', () => {
+        const isExpanded = column.classList.toggle('active');
+        if (isExpanded) {
+          ul.style.maxHeight = ul.scrollHeight + "px";
+        } else {
+          ul.style.maxHeight = "0px";
+        }
+      });
+    });
+  }
+
+  fetchAndBuildColumns().catch(err => {
+    console.error("Erreur de chargement du CSV :", err);
+  });
+</script>
+<h2>NB : </h2>
+<h3>Pour info, certaines fonctionnalités et bug fix ajoutés à MAJ_HEBDO après la date de génération d'une carte (i.e. déclaration prévisionnelles, tri ZB/non ZB, etc.) peuvent ne pas être présents sur une carte générée avant leur apparition.<br>
+Si toutefois, il fallait regénérer une semaine en particulier pour profiter des dernières fonctionnalités, n'hésitez pas à me le faire savoir.</h3>
+<h2>MAJ manquantes (et raison) : </h2>
+<h3>Hebdomadaires : </h3>
+S18-2025 : MAJ publiée en retard, j'ai tout mis sur la S19. :)<br>
+S17-2025 : Bug sur la MAJ, mois d'avril mouvementé.<br>
+S16-2025 : Bug sur la MAJ, idem.<br>
+S15-2025 : Bug sur la MAJ, idem.<br>
+S01-2025 : Pas de MAJ publiée cette semaine-là, report sur la S2.<br>
+S52-2024 : Pas de MAJ publiée cette semaine-là, report sur la S2-2025.
+<h3>Mensuelles : </h3>
+04-2025 : Bug sur la MAJ, mois d'avril mouvementé..<br>
+<h3>Trimestrielles : </h3>
+T2-2025 : Bug sur la MAJ, mois d'avril mouvementé.<br>
+<h2>Sorry :/</h2>
+</body>
+</html>

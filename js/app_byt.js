@@ -397,7 +397,10 @@ async function main() {
   const urlManager = new URLManager(mapManager, dataStore);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  // run main but don't block initial paint
-  requestIdleCallback ? requestIdleCallback(main) : setTimeout(main, 50);
+document.addEventListener("DOMContentLoaded", () => {
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(main);
+  } else {
+    setTimeout(main, 50);
+  }
 });

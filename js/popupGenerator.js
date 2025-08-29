@@ -77,7 +77,7 @@ export class PopupGenerator {
               const [y, m, d] = a.date_activ.split('-');
               dateBrackets = ` [Activation prévue le : ${d}/${m}/${y}]`;
             }
-            return `${a.technologie}${dateBrackets}`;
+            return `${a.technologie}<br>${dateBrackets}`;
           }).join('<br>')}</div>
         </div>`;
       }

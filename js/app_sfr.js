@@ -169,7 +169,7 @@ async function loadCsvAndInit(dataStore, mapManager) {
       grouped[key].push(row);
     });
 
-    dataStore.createAndStoreMarkersInBatches(grouped, 200);
+    await dataStore.createAndStoreMarkersInBatches(grouped, 200);
 
   } catch (err) {
     console.error('Loading CSV failed', err);
@@ -387,10 +387,8 @@ async function main() {
   createMapControls(map, dataStore, searchManager, filterManager);
 
   // Start loading CSV and building markers in background (non-blocking)
-  loadCsvAndInit(dataStore, mapManager).then(() => {
-    // After initial markers added, initialize filter UI (build lists)
-    filterManager.initFilters();
-  }).catch(e => console.error(e));
+  await loadCsvAndInit(dataStore, mapManager);
+  filterManager.initFilters();
 
   // Ensure controls are wired: searchManager displays results into #searchResults
   // and filterManager will apply filters to the markers already added.

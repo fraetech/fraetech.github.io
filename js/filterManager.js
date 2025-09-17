@@ -33,7 +33,7 @@ export class FilterManager {
 
     // Freqs numeric sort
     const sortedFreqs = [...this.dataStore.filterValues.freqs].map(Number).sort((a,b)=>a-b).map(String);
-    sortedFreqs.forEach(freq => this.createCheckbox(freqContainer, freq, 'freqs', freq));
+    sortedFreqs.forEach(freq => this.createCheckbox(freqContainer, freq, 'freqs', freq + ' MHz'));
 
     // Actions
     [...this.dataStore.filterValues.actions].sort().forEach(action => this.createCheckbox(actionContainer, action, 'actions', window.CONFIG?.actions?.[action] || action));

@@ -12,10 +12,10 @@ export class MapManager {
     if (this.map) return this.map;
     this.map = L.map('map', { preferCanvas: true }).setView(this._initialView, this._initialZoom);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 19
-    }).addTo(this.map);
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
+    });
+    osmLayer.addTo(this.map);
 
     this.markerCluster = L.markerClusterGroup();
     this.map.addLayer(this.markerCluster);

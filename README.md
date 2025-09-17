@@ -50,7 +50,7 @@ En cliquant sur une icône, un popup affiche le détail de la modification :
 - Un **lien Cartoradio** ;
 - Un **lien Google Maps** ;
 - Une **option de partage** pour envoyer la modif à votre fan d'antenne préféré ;
-- Un lien vers le site *très bon* [RNC Mobile](https://rncmobile.net/) (pour Free Mobile, Telco OI ou Free Caraïbes).
+- Un lien vers le *très bon* site [RNC Mobile](https://rncmobile.net/) (pour Free Mobile, Telco OI ou Free Caraïbes).
 
 On retrouve aussi l’adresse du site, le détail de(s) modification(s), le type de support, sa hauteur et son propriétaire.
 
@@ -62,7 +62,7 @@ On retrouve aussi l’adresse du site, le détail de(s) modification(s), le type
 
 ## Code source
 Oui, le code est dispo !
-- Le *front* est sur [ce repo](https://github.com/fraetech/fraetech.github.io)
+- Le *front* est sur [ce repo](https://github.com/fraetech/fraetech.github.io) (où vous êtes en ce moment-même d'ailleurs)
 - Le *back* est par ici -> [anfr_hebdo](https://github.com/fraetech/anfr_hebdo)
 
 ## Contribuer
@@ -81,13 +81,13 @@ Pour toute autre raison (ou juste pour dire coucou :p), vous pouvez me joindre v
 Bonne visite, et n’hésitez pas à partager la bonne adresse si elle vous a rendu service !
 
 ## Avancé
-Pour les plus curieux (ou les data nerds qui veulent faire parler les chiffres), je mets aussi à disposition les fichiers CSV bruts utilisés par le site et générés chaque semaine.
+Pour les plus curieux (ou les *data nerds* qui veulent faire parler les chiffres), je mets aussi à disposition les fichiers CSV bruts utilisés par le site et générés à chaque MAJ ANFR (généralement le jeudi apm, parfois le vendredi midi, plus rarement le lundi (quand une MAJ a été sautée pour x ou y raison)).
 Ils contiennent les différences publiées par l’ANFR, avec un fichier par grand opérateur français et un fichier global qui regroupe toutes les modifs (y compris DROM/COM).
 
 Vous pouvez donc les utiliser pour :
 - faire vos propres cartes,
 - nourrir vos scripts maison,
-- ou simplement les collectionner (chacun son hobby).
+- ou simplement les collectionner (chacun son hobby, qui suis-je pour juger…).
 
 Les fichiers sont disponibles en *raw* :
 - [Index](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/hebdo/index.csv) (toutes les modifs)

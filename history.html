@@ -1,113 +1,126 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <title>Historique modifications ANFR hebdomadaires</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Description générale -->
-  <meta name="description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR. Visualisez les nouvelles installations, activations et modifications par opérateur.">
+<title>Historique modifications ANFR hebdomadaires</title>
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Historique des mises à jour hebdomadaires ANFR">
-  <meta property="og:description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR. Visualisez les nouvelles installations, activations et modifications par opérateur.">
-  <meta property="og:url" content="https://fraetech.github.io/">
-  <meta property="og:site_name" content="MAJ-Hebdo ANFR">
-  <meta property="og:image" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg">
-  <meta property="og:image:alt" content="Logo MAJ-Hebdo ANFR">
-  <meta property="og:locale" content="fr_FR">
-  <meta property="og:logo" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg"/>
+<!-- Description générale -->
+<meta name="description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR. Visualisez les nouvelles installations, activations et modifications par opérateur.">
 
-  <!-- Twitter Cards -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Historique des mises à jour hebdomadaires ANFR">
-  <meta name="twitter:description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR.">
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg">
-  <meta name="twitter:image:alt" content="Logo MAJ-Hebdo ANFR">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Historique MAJ ANFR</title>
+<!-- Couleurs adaptatives -->
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#7ed0ec">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2c3e50">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mise à jour hebdomadaire ANFR">
+<meta property="og:description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR. Visualisez les nouvelles installations, activations et modifications par opérateur.">
+<meta property="og:url" content="https://fraetech.github.io/">
+<meta property="og:site_name" content="MAJ-Hebdo ANFR">
+<meta property="og:image" content="https://fraetech.github.io/og-logo.png">
+<meta property="og:image:alt" content="Logo MAJ-Hebdo ANFR">
+<meta property="og:locale" content="fr_FR">
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mise à jour hebdomadaire ANFR">
+<meta name="twitter:description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR.">
+<meta name="twitter:image" content="https://fraetech.github.io/og-logo.png">
+<meta name="twitter:image:alt" content="Logo MAJ-Hebdo ANFR">
+
+<!-- Google Font non-blocking -->
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" as="style" onload="this.rel='stylesheet'">
+<noscript>
   <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet">
-  <link rel="icon" href="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg" type="image/svg+xml">
-  <style>
-    * {
-      font-family: "Didact Gothic", sans-serif !important;
-      font-weight: 500;
-      font-style: normal;
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #f5f5f5;
-    }
+</noscript>
+
+<!-- Favicons -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+  * {
+    font-family: "Didact Gothic", sans-serif !important;
+    font-weight: 500;
+    font-style: normal;
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f5;
+  }
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+  }
+  .column {
+    background: white;
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  h1 {
+    text-align: center;
+  }
+  .column h2 {
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+  }
+  .column h2::after {
+    content: "˅";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 0.3s ease;
+    font-size: 18px;
+  }
+  .column.active h2::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  .column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s ease;
+  }
+  .column li {
+    margin: 10px 0;
+  }
+  .column a {
+    text-decoration: none;
+    color: #007BFF;
+  }
+  .column a:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 768px) {
     .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
+      flex-direction: column;
+      align-items: center;
     }
     .column {
-      background: white;
-      padding: 20px;
-      width: 300px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      width: 90%;
+      max-width: 400px;
     }
-    h1 {
-      text-align: center;
-    }
-    .column h2 {
-      text-align: center;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 10px;
-      cursor: pointer;
-      position: relative;
-      user-select: none;
-    }
-    .column h2::after {
-      content: "˅";
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%) rotate(0deg);
-      transition: transform 0.3s ease;
-      font-size: 18px;
-    }
-    .column.active h2::after {
-      transform: translateY(-50%) rotate(180deg);
-    }
-    .column ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.5s ease;
-    }
-    .column li {
-      margin: 10px 0;
-    }
-    .column a {
-      text-decoration: none;
-      color: #007BFF;
-    }
-    .column a:hover {
-      text-decoration: underline;
-    }
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        align-items: center;
-      }
-      .column {
-        width: 90%;
-        max-width: 400px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 

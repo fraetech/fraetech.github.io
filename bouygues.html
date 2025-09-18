@@ -14,16 +14,15 @@
 <meta property="og:description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR. Visualisez les nouvelles installations, activations et modifications par opérateur.">
 <meta property="og:url" content="https://fraetech.github.io/">
 <meta property="og:site_name" content="MAJ-Hebdo ANFR">
-<meta property="og:image" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg">
+<meta property="og:image" content="https://fraetech.github.io/og-logo.png">
 <meta property="og:image:alt" content="Logo MAJ-Hebdo ANFR">
 <meta property="og:locale" content="fr_FR">
-<meta property="og:logo" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg"/>
 
 <!-- Twitter Cards -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Mise à jour hebdomadaire ANFR">
 <meta name="twitter:description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR.">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg">
+<meta name="twitter:image" content="https://fraetech.github.io/og-logo.png">
 <meta name="twitter:image:alt" content="Logo MAJ-Hebdo ANFR">
 
 <!-- Préconnect & DNS -->
@@ -48,15 +47,19 @@
 <link rel="stylesheet" href="css/styles.css">
 
 <!-- Favicon et icônes diverses tailles -->
-<link rel="icon" href="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/favicon.svg">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <!-- Meta pour robots/cache -->
 <meta name="robots" content="index,follow">
 
-<!-- Thème couleur pour navigateurs mobiles -->
-<meta name="theme-color" content="#ffffff">
+<!-- Couleurs adaptatives -->
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#7ed0ec">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2c3e50">
 </head>
+
 <body>
 <div id="message" aria-live="polite">
 <button id="closeButton" aria-label="Fermer">×</button>
@@ -64,7 +67,7 @@
 <p>
  Vous pouvez filtrer les supports à afficher à l'aide du bouton "Filtres" (en haut à droite).<br>
  Questions, remarques et suggestions :<br>
-<a href="https://github.com/fraetech/maj-hebdo/issues" target="_blank" rel="noopener">GitHub MAJ-Hebdo</a><br>
+<a href="https://github.com/fraetech/fraetech.github.io" target="_blank" rel="noopener">GitHub</a><br>
  L'historique (sur un an) des mises à jour : <a href="history.html" target="_self">Historique des mises à jour</a><br>
  Cartes par opérateur :
 <a href="index.html" target="_self">Tous</a>,

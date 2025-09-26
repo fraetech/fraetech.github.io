@@ -9,7 +9,7 @@ export class PopupGenerator {
       
       // Récupère ID opérateur et URL logo GitHub
       const opConfig = CONFIG.operators[firstAction.operateur] || CONFIG.operators['MISC'];
-      const logoUrl = `https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/opes/L_${opConfig.id}.avif`;
+      const logoUrl = `https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/opes/L_${opConfig.id}.avif`;
       
       // Retourner directement le contenu sans div wrapper supplémentaire
       const content = `

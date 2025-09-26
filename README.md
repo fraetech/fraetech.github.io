@@ -18,31 +18,31 @@ Vous pouvez filtrer les données par :
 *La couleur de l’icône change selon l’opérateur !*
 
 - **Activation déclarée en avance** : l’opérateur a indiqué qu’une fréquence/un site allait être activé à une date future (par "site", comprendre "station de base") ;
-![Activation déclarée en avance](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt_aav.avif)
+![Activation déclarée en avance](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt_aav.avif)
 
 - **Ajout site/fréquence** : ajout d’une fréquence sur un site existant ou déclaration d’un nouveau site ;
-![Ajout site/fréquence](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt_ajo.avif)
+![Ajout site/fréquence](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt_ajo.avif)
 
 - **Activation site/fréquence** : activation d’une fréquence sur un site existant ou activation d’un nouveau site ;
-![Activation site/fréquence](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt_all.avif)
+![Activation site/fréquence](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt_all.avif)
 
 - **Changement d’adresse** : l’adresse ANFR du site concerné a changé ;
-![Changement d'adresse](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt_cha.avif)
+![Changement d'adresse](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt_cha.avif)
 
 - **Changement de numéro de support** : le numéro de support ANFR a été modifié (souvent synonyme de modification de hauteur, de type de support, ou arrivée prochaine d’un nouvel opérateur) ;
-![Changement de numéro de support](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt_chi.avif)
+![Changement de numéro de support](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt_chi.avif)
 
 - **Changement de position (coordonnées GPS)** : les coordonnées GPS du site ont changé ;
-![Changement de position](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt_chl.avif)
+![Changement de position](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt_chl.avif)
 
 - **Extinction site/fréquence** : une fréquence (ou un site entier) a été éteint ;
-![Extinction site/fréquence](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt_ext.avif)
+![Extinction site/fréquence](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt_ext.avif)
 
 - **Suppression site/fréquence** : une fréquence (ou un site entier) a été supprimé ;
-![Suppression site/fréquence](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt_sup.avif)
+![Suppression site/fréquence](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt_sup.avif)
 
 - **Plusieurs actions à la fois** : quand tout part en vrille ;
-![Plusieurs actions](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/icons/byt.avif)
+![Plusieurs actions](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/icons/byt.avif)
 
 ### Popups et options
 En cliquant sur une icône, un popup affiche le détail de la modification :

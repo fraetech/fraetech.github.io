@@ -96,8 +96,6 @@ Les fichiers sont disponibles en *raw* :
 - [Orange](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/hebdo/orange.csv)
 - [SFR](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/hebdo/sfr.csv) (inclut SRR)
 
-Ce sont des données **brutes** : pas de paillettes ni d’icônes colorées comme sur la carte. À consommer avec modération (ou pas).
-
 Le header, commun aux fichiers est le suivant :
 ```id_support,operateur,action,technologie,adresse,code_insee,coordonnees,type_support,hauteur_support,proprietaire_support,date_activ,is_zb,is_new```
 

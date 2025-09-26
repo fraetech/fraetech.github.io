@@ -81,8 +81,8 @@ Pour toute autre raison (ou juste pour dire coucou :p), vous pouvez me joindre v
 Bonne visite, et n’hésitez pas à partager la bonne adresse si elle vous a rendu service !
 
 ## Avancé
-Pour les plus curieux (ou les *data nerds* qui veulent faire parler les chiffres), je mets aussi à disposition les fichiers CSV bruts utilisés par le site et générés à chaque MAJ ANFR (généralement le jeudi apm, parfois le vendredi midi, plus rarement le lundi (quand une MAJ a été sautée pour x ou y raison)).
-Ils contiennent les différences publiées par l’ANFR, avec un fichier par grand opérateur français et un fichier global qui regroupe toutes les modifs (y compris DROM/COM).
+Pour les plus curieux, je mets aussi à disposition les fichiers CSV bruts utilisés par le site et générés à chaque MAJ ANFR (généralement le jeudi apm, parfois le vendredi midi, plus rarement le lundi (quand une MAJ a été sautée pour x ou y raison)).
+Ils contiennent les différences entre la publication de la semaine x et la semaine x-1, avec un fichier par grand opérateur français et un fichier global qui regroupe toutes les modifs (y compris DROM/COM).
 
 Vous pouvez donc les utiliser pour :
 - faire vos propres cartes,
@@ -90,11 +90,13 @@ Vous pouvez donc les utiliser pour :
 - ou simplement les collectionner (chacun son hobby, qui suis-je pour juger…).
 
 Les fichiers sont disponibles en *raw* :
-- [Index](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/hebdo/index.csv) (toutes les modifs)
-- [Bouygues Telecom](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/hebdo/bouygues.csv)
-- [Free Mobile](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/hebdo/free.csv) (inclut Telco OI, Free Caraïbes)
-- [Orange](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/hebdo/orange.csv)
-- [SFR](https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/hebdo/sfr.csv) (inclut SRR)
+- [Index](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/files/hebdo/index.csv) (toutes les modifs)
+- [Bouygues Telecom](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/files/hebdo/bouygues.csv)
+- [Free Mobile](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/files/hebdo/free.csv) (inclut Telco OI, Free Caraïbes)
+- [Orange](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/files/hebdo/orange.csv)
+- [SFR](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/files/hebdo/sfr.csv) (inclut SRR)
+
+Je propose également des CSV des mises à jour sur un mois ou sur un trimestre, je vous conseille d'aller regarder dans [la branche data](https://github.com/fraetech/fraetech.github.io/tree/data/files) ce qui vous intéresse.
 
 Le header, commun aux fichiers est le suivant :
 ```id_support,operateur,action,technologie,adresse,code_insee,coordonnees,type_support,hauteur_support,proprietaire_support,date_activ,is_zb,is_new```

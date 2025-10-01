@@ -134,7 +134,7 @@
 <script>
   async function fetchAndBuildColumns() {
     const response = await fetch(
-      'https://raw.githubusercontent.com/fraetech/maj-hebdo/refs/heads/data/files/history.csv?nocache=' + Date.now()
+      'https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/files/history.csv?nocache=' + Date.now()
     );
     const csvText = await response.text();
     const rows = csvText.trim().split('\n').slice(1);
@@ -238,7 +238,7 @@
 </script>
 <h1><a href="https://fraetech.github.io/">Retour à la carte principale</a></h1><br>
 <h2>NB : </h2>
-<h3>Pour info, certaines fonctionnalités et bug fix ajoutés à MAJ_HEBDO après la date de génération d'une carte (i.e. déclaration prévisionnelles, tri ZB/non ZB, etc.) peuvent ne pas être présents sur une carte générée avant leur apparition.<br>
+<h3>Pour info, certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte (i.e. déclaration prévisionnelles, tri ZB/non ZB, etc.) peuvent ne pas être présents sur celle-ci.<br>
 Si toutefois, il fallait regénérer une semaine en particulier pour profiter des dernières fonctionnalités, n'hésitez pas à me le faire savoir.</h3>
 <h2>MAJ manquantes (et raison) : </h2>
 <h3>Hebdomadaires : </h3>

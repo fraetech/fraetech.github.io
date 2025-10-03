@@ -16,7 +16,7 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Historique des modifications d'antennes mobiles ANFR">
-<meta property="og:description" content="Retrouvez l'historique des modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l’ANFR.">
+<meta property="og:description" content="Retrouvez l'historique des modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l'ANFR.">
 <meta property="og:url" content="https://fraetech.github.io/">
 <meta property="og:site_name" content="Historique des antennes mobiles ANFR">
 <meta property="og:image" content="https://fraetech.github.io/og-logo.png">
@@ -26,7 +26,7 @@
 <!-- Twitter Cards -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Historique des modifications d'antennes mobiles ANFR">
-<meta name="twitter:description" content="Retrouvez l'historique des modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l’ANFR.">
+<meta name="twitter:description" content="Retrouvez l'historique des modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l'ANFR.">
 <meta name="twitter:image" content="https://fraetech.github.io/og-logo.png">
 <meta name="twitter:image:alt" content="Logo MAJ-Hebdo ANFR">
 
@@ -103,6 +103,9 @@
     max-height: 0;
     transition: max-height 0.5s ease;
   }
+  .column.active ul {
+    max-height: 2000px;
+  }
   .column li {
     margin: 10px 0;
   }
@@ -112,6 +115,27 @@
   }
   .column a:hover {
     text-decoration: underline;
+  }
+  .load-more-btn {
+    margin: 15px 0 0 0;
+    padding: 10px 20px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+    display: none;
+  }
+  .column.active .load-more-btn {
+    display: block;
+  }
+  .load-more-btn:hover {
+    background: #0056b3;
+  }
+  .load-more-btn:active {
+    transform: scale(0.98);
   }
   @media (max-width: 768px) {
     .container {
@@ -132,6 +156,9 @@
 <div class="container" id="columns-container"></div>
 
 <script>
+  const ITEMS_PER_PAGE = 20;
+  const columnStates = {};
+
   async function fetchAndBuildColumns() {
     const response = await fetch(
       'https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/files/history.csv?nocache=' + Date.now()
@@ -170,16 +197,36 @@
       column.innerHTML = `<h2>${titleMap[type]}</h2><ul></ul>`;
       const ul = column.querySelector('ul');
 
-      grouped[type]
-        .sort((a, b) => compareRealDates(b.label, a.label)) // Tri décroissant
-        .forEach(item => {
-          const li = document.createElement('li');
-          const link = document.createElement('a');
-          link.href = `https://fraetech.github.io/index.html?csv=${item.path}`;
-          link.textContent = item.label;
-          li.appendChild(link);
-          ul.appendChild(li);
+      const sortedItems = grouped[type].sort((a, b) => compareRealDates(b.label, a.label));
+      
+      // Initialiser l'état de cette colonne
+      columnStates[type] = {
+        items: sortedItems,
+        visibleCount: ITEMS_PER_PAGE,
+        ul: ul,
+        column: column
+      };
+
+      renderItems(type);
+
+      // Ajouter le bouton "Voir plus" si nécessaire
+      if (sortedItems.length > ITEMS_PER_PAGE) {
+        const btnContainer = document.createElement('div');
+        btnContainer.style.textAlign = 'center';
+        
+        const moreBtn = document.createElement('button');
+        moreBtn.className = 'load-more-btn';
+        moreBtn.textContent = `Voir plus (${sortedItems.length - ITEMS_PER_PAGE} restants)`;
+        moreBtn.dataset.type = type;
+        
+        moreBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); // Empêcher le toggle de l'accordéon
+          loadMore(type);
         });
+        
+        btnContainer.appendChild(moreBtn);
+        column.appendChild(btnContainer);
+      }
 
       container.appendChild(column);
     }
@@ -187,8 +234,48 @@
     setupAccordion();
   }
 
+  function renderItems(type) {
+    const state = columnStates[type];
+    const itemsToShow = state.items.slice(0, state.visibleCount);
+    
+    // Vider la liste
+    state.ul.innerHTML = '';
+    
+    // Ajouter les items visibles
+    itemsToShow.forEach(item => {
+      const li = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `https://fraetech.github.io/index.html?csv=${item.path}`;
+      link.textContent = item.label;
+      li.appendChild(link);
+      state.ul.appendChild(li);
+    });
+
+    // Mettre à jour le bouton
+    const btn = state.column.querySelector('.load-more-btn');
+    if (btn) {
+      const remaining = state.items.length - state.visibleCount;
+      if (remaining > 0) {
+        btn.textContent = `Voir plus (${remaining} restants)`;
+        btn.style.display = 'block';
+      } else {
+        btn.style.display = 'none';
+      }
+    }
+  }
+
+  function loadMore(type) {
+    const state = columnStates[type];
+    state.visibleCount += ITEMS_PER_PAGE;
+    renderItems(type);
+    
+    // Réajuster la hauteur de l'accordéon si ouvert
+    if (state.column.classList.contains('active')) {
+      state.ul.style.maxHeight = state.ul.scrollHeight + 100 + "px";
+    }
+  }
+
   function compareRealDates(labelA, labelB) {
-    // Extrait l'année et la semaine/mois
     const extract = (label) => {
       const numbers = label.match(/\d+/g);
       if (!numbers) return { year: 0, week: 0 };
@@ -205,7 +292,6 @@
     if (a.year !== b.year) {
       return a.year - b.year;
     }
-    // Semaine ou Mois
     return (a.week || a.month) - (b.week || b.month);
   }
 
@@ -216,15 +302,16 @@
       const ul = column.querySelector('ul');
 
       if (isMobile) {
-        ul.style.maxHeight = "0px"; // fermé par défaut
+        ul.style.maxHeight = "0px";
       } else {
-        ul.style.maxHeight = "1000px"; // ouvert sur desktop
+        ul.style.maxHeight = ul.scrollHeight + 100 + "px";
+        column.classList.add('active');
       }
 
       h2.addEventListener('click', () => {
         const isExpanded = column.classList.toggle('active');
         if (isExpanded) {
-          ul.style.maxHeight = ul.scrollHeight + "px";
+          ul.style.maxHeight = ul.scrollHeight + 100 + "px";
         } else {
           ul.style.maxHeight = "0px";
         }

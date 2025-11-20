@@ -20,25 +20,135 @@ export class FilterManager {
     const zbContainer = document.getElementById('zbFilter');
     const newSiteContainer = document.getElementById('newSiteFilter');
 
-    // Operators (sorted)
-    const sortedOps = [...this.dataStore.filterValues.operateurs].sort();
-    sortedOps.forEach(op => this.createCheckbox(opContainer, op, 'operateurs', op));
+    // === OPERATORS: Split into FR Métrop and DROM/COM ===
+    const frMetropOps = ['BOUYGUES TELECOM', 'FREE MOBILE', 'ORANGE', 'SFR'];
+    const sortedAllOps = [...this.dataStore.filterValues.operateurs].sort();
+    const frOps = sortedAllOps.filter(op => frMetropOps.includes(op)).sort();
+    const dromComOps = sortedAllOps.filter(op => !frMetropOps.includes(op)).sort();
+    
+    // Add FR Métrop header and operators
+    if (frOps.length > 0) {
+      const frHeader = document.createElement('div');
+      frHeader.className = 'filter-category-header';
+      const frTitle = document.createElement('span');
+      frTitle.textContent = 'France Métropolitaine';
+      frHeader.appendChild(frTitle);
+      
+      const frToggleBtn = document.createElement('button');
+      frToggleBtn.className = 'toggle-category-btn';
+      frToggleBtn.textContent = 'Tout décocher';
+      frToggleBtn.style.fontSize = '0.8em';
+      frToggleBtn.style.padding = '2px 6px';
+      frToggleBtn.style.cursor = 'pointer';
+      frToggleBtn.style.border = '1px solid #ccc';
+      frToggleBtn.style.background = '#fff';
+      frToggleBtn.style.borderRadius = '3px';
+      frHeader.appendChild(frToggleBtn);
+      opContainer.appendChild(frHeader);
+      
+      const frCheckboxes = [];
+      frOps.forEach(op => {
+        const chk = this.createCheckbox(opContainer, op, 'operateurs', op);
+        if (chk) frCheckboxes.push(chk);
+      });
+      
+      frToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const allChecked = frCheckboxes.every(chk => chk.checked);
+        frCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
+        frToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+      });
+    }
+    
+    // Add DROM/COM header and operators
+    if (dromComOps.length > 0) {
+      const dromHeader = document.createElement('div');
+      dromHeader.className = 'filter-category-header';
+      const dromTitle = document.createElement('span');
+      dromTitle.textContent = 'DROM/COM';
+      dromHeader.appendChild(dromTitle);
+      
+      const dromToggleBtn = document.createElement('button');
+      dromToggleBtn.className = 'toggle-category-btn';
+      dromToggleBtn.textContent = 'Tout décocher';
+      dromToggleBtn.style.fontSize = '0.8em';
+      dromToggleBtn.style.padding = '2px 6px';
+      dromToggleBtn.style.cursor = 'pointer';
+      dromToggleBtn.style.border = '1px solid #ccc';
+      dromToggleBtn.style.background = '#fff';
+      dromToggleBtn.style.borderRadius = '3px';
+      dromHeader.appendChild(dromToggleBtn);
+      opContainer.appendChild(dromHeader);
+      
+      const dromCheckboxes = [];
+      dromComOps.forEach(op => {
+        const chk = this.createCheckbox(opContainer, op, 'operateurs', op);
+        if (chk) dromCheckboxes.push(chk);
+      });
+      
+      dromToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const allChecked = dromCheckboxes.every(chk => chk.checked);
+        dromCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
+        dromToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+      });
+    }
 
-    // Techs in predefined order
+    // === TECHNOLOGIES ===
     const sortedTechs = [...this.dataStore.filterValues.technos].sort((a,b) => {
       const order = this.dataStore.mapManager ? (window.CONFIG?.techOrder || []) : [];
       return order.indexOf(a) - order.indexOf(b);
     });
-    sortedTechs.forEach(tech => this.createCheckbox(techContainer, tech, 'technos', window.CONFIG?.technologies?.[tech] || tech));
+    const techCheckboxes = [];
+    sortedTechs.forEach(tech => {
+      const chk = this.createCheckbox(techContainer, tech, 'technos', window.CONFIG?.technologies?.[tech] || tech);
+      if (chk) techCheckboxes.push(chk);
+    });
+    // Récupérer le bouton du HTML avec data-category
+    const techToggleBtn = document.querySelector('button[data-category="technoFilters"]');
+    if (techToggleBtn && techCheckboxes.length > 0) {
+      techToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const allChecked = techCheckboxes.every(chk => chk.checked);
+        techCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
+        techToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+      });
+    }
 
-    // Freqs numeric sort
+    // === FREQUENCIES ===
     const sortedFreqs = [...this.dataStore.filterValues.freqs].map(Number).sort((a,b)=>a-b).map(String);
-    sortedFreqs.forEach(freq => this.createCheckbox(freqContainer, freq, 'freqs', freq + ' MHz'));
+    const freqCheckboxes = [];
+    sortedFreqs.forEach(freq => {
+      const chk = this.createCheckbox(freqContainer, freq, 'freqs', freq + ' MHz');
+      if (chk) freqCheckboxes.push(chk);
+    });
+    const freqToggleBtn = document.querySelector('button[data-category="freqFilters"]');
+    if (freqToggleBtn && freqCheckboxes.length > 0) {
+      freqToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const allChecked = freqCheckboxes.every(chk => chk.checked);
+        freqCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
+        freqToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+      });
+    }
 
-    // Actions
-    [...this.dataStore.filterValues.actions].sort().forEach(action => this.createCheckbox(actionContainer, action, 'actions', window.CONFIG?.actions?.[action] || action));
+    // === ACTIONS ===
+    const actionCheckboxes = [];
+    [...this.dataStore.filterValues.actions].sort().forEach(action => {
+      const chk = this.createCheckbox(actionContainer, action, 'actions', window.CONFIG?.actions?.[action] || action);
+      if (chk) actionCheckboxes.push(chk);
+    });
+    const actionToggleBtn = document.querySelector('button[data-category="actionFilters"]');
+    if (actionToggleBtn && actionCheckboxes.length > 0) {
+      actionToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const allChecked = actionCheckboxes.every(chk => chk.checked);
+        actionCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
+        actionToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+      });
+    }
 
-    // Radio groups
+    // Radio groups (no toggle needed)
     this.createRadioGroup(zbContainer, 'zoneBlanche', [
       { value: 'all', label: 'Toutes' },
       { value: 'true', label: 'Zone blanche' },
@@ -52,7 +162,7 @@ export class FilterManager {
   }
 
   createCheckbox(container, value, filterType, displayName) {
-    if (!container) return;
+    if (!container) return null;
     const label = document.createElement('label');
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -65,6 +175,8 @@ export class FilterManager {
 
     // Initialize active filters sets
     this.dataStore.activeFilters[filterType].add(value);
+    
+    return checkbox;
   }
 
   createRadioGroup(container, name, options) {
@@ -132,9 +244,17 @@ export class FilterManager {
         e.stopPropagation();
         this.resetAllFilters();
       }
+      // Support old .filter-category for backwards compatibility
       if (e.target.matches('.filter-category')) {
         const group = e.target.nextElementSibling;
         if (group) {
+          group.style.maxHeight = group.style.maxHeight ? null : group.scrollHeight + "px";
+        }
+      }
+      // Support new .filter-category-header for expandable sections (Zone Blanche, Sites Neufs)
+      if (e.target.matches('.filter-category-header') && !e.target.closest('button')) {
+        const group = e.target.nextElementSibling;
+        if (group && group.classList.contains('filter-group')) {
           group.style.maxHeight = group.style.maxHeight ? null : group.scrollHeight + "px";
         }
       }

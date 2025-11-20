@@ -76,15 +76,22 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
     onAdd: function() {
       const div = L.DomUtil.create('div', 'leaflet-control custom-filter-control collapsed');
       div.innerHTML = `<div class="filters-content" style="display:none;">
-          <button class="reset-filters" id="resetFilters" type="button">Réinitialiser tous les filtres</button>
-          <div class="filter-category">Technologies</div><div class="filter-group" id="technoFilters"></div>
-          <div class="filter-category">Fréquences</div><div class="filter-group" id="freqFilters"></div>
-          <div class="filter-category">Opérateurs</div><div class="filter-group" id="opFilters"></div>
-          <div class="filter-category">Actions</div><div class="filter-group" id="actionFilters"></div>
-          <div class="filter-category">Zone Blanche</div><div class="filter-group" id="zbFilter"></div>
-          <div class="filter-category">Sites Neufs</div><div class="filter-group" id="newSiteFilter"></div>
+          <button class="toggle-all-filters" id="toggleAllFilters" type="button">Tout décocher</button>
+          <div class="filter-category-header">Technologies <button class="toggle-category-btn" data-category="technoFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
+          <div class="filter-group" id="technoFilters"></div>
+          <div class="filter-category-header">Fréquences <button class="toggle-category-btn" data-category="freqFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
+          <div class="filter-group" id="freqFilters"></div>
+          <div class="filter-category-header">Opérateurs <button class="toggle-category-btn" data-category="opFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
+          <div class="filter-group" id="opFilters"></div>
+          <div class="filter-category-header">Actions <button class="toggle-category-btn" data-category="actionFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
+          <div class="filter-group" id="actionFilters"></div>
+          <div class="filter-category-header">Zone Blanche</div>
+          <div class="filter-group" id="zbFilter"></div>
+          <div class="filter-category-header">Sites Neufs</div>
+          <div class="filter-group" id="newSiteFilter"></div>
         </div>`;
       L.DomEvent.disableScrollPropagation(div);
+      L.DomEvent.disableClickPropagation(div);
       div.addEventListener('click', (e) => {
             if (e.target === div || e.target.classList.contains('filters-content')) {
               const content = div.querySelector('.filters-content');
@@ -127,6 +134,38 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
       });
     }
 
+    // Global toggle all filters button
+    const toggleAllBtn = document.getElementById('toggleAllFilters');
+    if (toggleAllBtn) {
+      const updateToggleButton = () => {
+        const allCheckboxes = document.querySelectorAll('#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], #opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]');
+        const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+        toggleAllBtn.textContent = allChecked ? 'Tout décocher' : 'Tout cocher';
+      };
+      
+      toggleAllBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const allCheckboxes = document.querySelectorAll('#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], #opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]');
+        const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+        allCheckboxes.forEach(cb => { cb.checked = !allChecked; cb.dispatchEvent(new Event('change')); });
+        // Also toggle radio buttons to their default positions
+        document.querySelectorAll('input[name="zoneBlanche"][value="all"], input[name="siteNeuf"][value="all"]').forEach(r => {
+          r.checked = true;
+          r.dispatchEvent(new Event('change'));
+        });
+        updateToggleButton();
+      });
+      
+      // Update button state when filters change
+      document.addEventListener('change', (e) => {
+        if (e.target.type === 'checkbox') {
+          updateToggleButton();
+        }
+      });
+      
+      updateToggleButton();
+    }
+
     // Hide search on clicking outside
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.search-control') && !e.target.closest('.search-icon-control')) {
@@ -144,9 +183,48 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
         try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
       }
     });
+    
+    // Fermer les filtres quand on clique sur la carte
+    map.on('click', () => {
+      const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
+      if (filterPanel && filterPanel.classList.contains('expanded')) {
+        filterPanel.classList.remove('expanded');
+        filterPanel.classList.add('collapsed');
+        filterPanel.querySelector('.filters-content').style.display='none';
+        try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
+      }
+    });
+    
     map.on('click zoomstart', () => {
       const msg = document.getElementById('message'); if (msg) msg.style.display='none';
     });
+    
+    // Hover behavior for filter button on PC (not on mobile)
+    const isDesktop = () => !window.matchMedia('(max-width: 768px)').matches;
+    if (isDesktop()) {
+      const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
+      if (filterPanel) {
+        // Handle button hover to open filter panel
+        filterPanel.addEventListener('mouseenter', () => {
+          if (filterPanel.classList.contains('collapsed')) {
+            filterPanel.classList.remove('collapsed');
+            filterPanel.classList.add('expanded');
+            filterPanel.querySelector('.filters-content').style.display='block';
+            try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
+          }
+        });
+        
+        // Handle leaving filter panel to close it
+        filterPanel.addEventListener('mouseleave', () => {
+          if (filterPanel.classList.contains('expanded')) {
+            filterPanel.classList.remove('expanded');
+            filterPanel.classList.add('collapsed');
+            filterPanel.querySelector('.filters-content').style.display='none';
+            try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
+          }
+        });
+      }
+    }
   }, 150);
 }
 

@@ -206,6 +206,48 @@ html, body {
   border-radius: 4px;
 }
 
+.filter-category-header {
+  font-weight: bold;
+  margin-top: 10px;
+  background: #f1f1f1;
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filter-category-header:hover {
+  background-color: #e8e8e8;
+}
+
+.toggle-category-btn {
+  font-size: 0.8em;
+  padding: 4px 8px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 3px;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.toggle-category-btn:hover {
+  background-color: #f9f9f9;
+  border-color: #999;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.toggle-category-btn:active {
+  transform: scale(0.98);
+}
+
 .filter-group {
   display: block;
   padding-left: 10px;

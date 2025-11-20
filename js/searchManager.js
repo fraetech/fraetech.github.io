@@ -55,7 +55,7 @@ export class SearchManager {
 
       this.displayResults();
     } catch (err) {
-      console.error('Search error', err);
+      // Recherche échouée - afficher les résultats vides existants
     }
   }
 

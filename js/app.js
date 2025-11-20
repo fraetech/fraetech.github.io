@@ -87,10 +87,18 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
       L.DomEvent.disableScrollPropagation(div);
       div.addEventListener('click', (e) => {
         if (e.target === div || e.target.classList.contains('filters-content')) {
+          const content = div.querySelector('.filters-content');
           if (div.classList.contains('collapsed')) {
-            div.classList.remove('collapsed'); div.classList.add('expanded'); div.querySelector('.filters-content').style.display='block';
+            div.classList.remove('collapsed'); div.classList.add('expanded'); content.style.display='block';
+            // Désactiver le drag/zoom de la carte pour éviter les conflits de scroll sur mobile
+            try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
+            // Empêcher la fermeture lors du scroll interne: bloquer la propagation des événements tactiles depuis le panneau
+            ['touchstart','touchmove','touchend','wheel'].forEach(evt => {
+              content.addEventListener(evt, function(ev){ ev.stopPropagation(); }, { passive: false });
+            });
           } else if (div.classList.contains('expanded')) {
-            div.classList.remove('expanded'); div.classList.add('collapsed'); div.querySelector('.filters-content').style.display='none';
+            div.classList.remove('expanded'); div.classList.add('collapsed'); content.style.display='none';
+            try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
           }
         }
       });
@@ -137,6 +145,7 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
       const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
       if (filterPanel && filterPanel.classList.contains('expanded')) {
         filterPanel.classList.remove('expanded'); filterPanel.classList.add('collapsed'); filterPanel.querySelector('.filters-content').style.display='none';
+        try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
       }
     });
     map.on('click zoomstart', () => {

@@ -86,12 +86,16 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
         </div>`;
       L.DomEvent.disableScrollPropagation(div);
       div.addEventListener('click', (e) => {
-        if (e.target === div || e.target.classList.contains('filters-content')) {
-          if (div.classList.contains('collapsed')) {
-            div.classList.remove('collapsed'); div.classList.add('expanded'); div.querySelector('.filters-content').style.display='block';
-          } else if (div.classList.contains('expanded')) {
-            div.classList.remove('expanded'); div.classList.add('collapsed'); div.querySelector('.filters-content').style.display='none';
-          }
+            if (e.target === div || e.target.classList.contains('filters-content')) {
+              const content = div.querySelector('.filters-content');
+              if (div.classList.contains('collapsed')) {
+                div.classList.remove('collapsed'); div.classList.add('expanded'); content.style.display='block';
+                try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
+                ['touchstart','touchmove','touchend','wheel'].forEach(evt => { content.addEventListener(evt, function(ev){ ev.stopPropagation(); }, { passive: false }); });
+              } else if (div.classList.contains('expanded')) {
+                div.classList.remove('expanded'); div.classList.add('collapsed'); content.style.display='none';
+                try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
+              }
         }
       });
       return div;
@@ -137,6 +141,7 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
       const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
       if (filterPanel && filterPanel.classList.contains('expanded')) {
         filterPanel.classList.remove('expanded'); filterPanel.classList.add('collapsed'); filterPanel.querySelector('.filters-content').style.display='none';
+        try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
       }
     });
     map.on('click zoomstart', () => {

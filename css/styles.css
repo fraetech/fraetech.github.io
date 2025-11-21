@@ -254,6 +254,12 @@ html, body {
   margin-top: 5px;
   max-height: 0;
   overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.filter-group.expanded {
+  max-height: 2000px;
+  overflow: visible;
 }
 
 .filter-group label {
@@ -278,11 +284,6 @@ html, body {
   transition: all 0.3s ease;
   width: 250px;
   padding: 10px;
-}
-    
-.filter-group {
-  transition: max-height 0.3s ease;
-  overflow: hidden;
 }
 
 .reset-filters {

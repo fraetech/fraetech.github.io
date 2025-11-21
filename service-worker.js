@@ -1,4 +1,7 @@
-const CACHE_NAME = 'mh-pwa-v1';
+importScripts('/js/version.js');
+
+const CACHE_NAME = `mh-pwa-${self.APP_VERSION}`;
+
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
@@ -11,6 +14,7 @@ const URLS_TO_CACHE = [
   '/js/popupGenerator.js',
   '/js/searchManager.js',
   '/js/utils.js',
+  '/js/version.js',
   '/favicon.png',
   '/favicon.ico',
   '/favicon.svg',
@@ -27,13 +31,16 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME)
+            .map(key => caches.delete(key))
+      )
     )
   );
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.url.includes('/index.html') || URLS_TO_CACHE.some(url => event.request.url.endsWith(url))) {
+  if (URLS_TO_CACHE.some(url => event.request.url.endsWith(url))) {
     event.respondWith(
       caches.match(event.request).then(response => response || fetch(event.request))
     );

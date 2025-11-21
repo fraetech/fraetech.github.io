@@ -1,0 +1,1 @@
+self.APP_VERSION = "25.11.21r";

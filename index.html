@@ -73,7 +73,11 @@
  Questions, remarques et suggestions :<br>
 <a href="https://github.com/fraetech/fraetech.github.io" target="_blank" rel="noopener">GitHub</a><br>
  L'historique (sur un an) des mises à jour : <br><a href="history.html" target="_self">Historique des mises à jour</a><br>
-<b>Source :</b> <a href="https://data.anfr.fr/visualisation/information/?id=observatoire_2g_3g_4g" target="_blank" rel="noopener">OpenData ANFR</a> | <small>v25.11.20b</small> | <a href="mentions-legales.html" target="_self">Mentions légales</a>
+<script src="/js/version.js"></script>
+<b>Source :</b> <a href="https://data.anfr.fr/visualisation/information/?id=observatoire_2g_3g_4g" target="_blank" rel="noopener">OpenData ANFR</a> | <small id="app-version"></small> | <a href="mentions-legales.html" target="_self">Mentions légales</a>
+<script>
+  document.getElementById("app-version").textContent = "v" + self.APP_VERSION;
+</script>
 </p>
 </div>
 <div id="map" role="region" aria-label="Carte des modifications ANFR"></div>

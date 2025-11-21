@@ -73,69 +73,83 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
 
   // --- Filter Control
   const FilterControl = L.Control.extend({
-      onAdd: function() {
-        const div = L.DomUtil.create('div', 'leaflet-control custom-filter-control collapsed');
-        div.innerHTML = `<div class="filters-content" style="display:none;">
-            <button class="toggle-all-filters" id="toggleAllFilters" type="button">Tout décocher</button>
-            <div class="filter-category-header">Technologies <button class="toggle-category-btn" data-category="technoFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
-            <div class="filter-group" id="technoFilters"></div>
-            <div class="filter-category-header">Fréquences <button class="toggle-category-btn" data-category="freqFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
-            <div class="filter-group" id="freqFilters"></div>
-            <div class="filter-category-header">Opérateurs <button class="toggle-category-btn" data-category="opFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
-            <div class="filter-group" id="opFilters"></div>
-            <div class="filter-category-header">Actions <button class="toggle-category-btn" data-category="actionFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
-            <div class="filter-group" id="actionFilters"></div>
-            <div class="filter-category-header">Zone Blanche</div>
-            <div class="filter-group" id="zbFilter"></div>
-            <div class="filter-category-header">Sites Neufs</div>
-            <div class="filter-group" id="newSiteFilter"></div>
-          </div>`;
-
-        L.DomEvent.disableScrollPropagation(div);
-        L.DomEvent.disableClickPropagation(div);
-        
-        div.addEventListener('click', (e) => {
-          const content = div.querySelector('.filters-content');
-          if (e.target === div || e.target.classList.contains('filters-content')) {
-            if (div.classList.contains('collapsed')) {
-              div.classList.remove('collapsed'); 
-              div.classList.add('expanded'); 
-              content.style.display='block';
-              try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
-              ['touchstart','touchmove','touchend','wheel'].forEach(evt => { 
-                content.addEventListener(evt, function(ev){ ev.stopPropagation(); }, { passive: false }); 
-              });
-            } else if (div.classList.contains('expanded')) {
-              div.classList.remove('expanded'); 
-              div.classList.add('collapsed'); 
-              content.style.display='none';
-              try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
-            }
+    onAdd: function() {
+      const div = L.DomUtil.create('div', 'leaflet-control custom-filter-control collapsed');
+      div.innerHTML = `<div class="filters-content" style="display:none;">
+              <button class="toggle-all-filters" id="toggleAllFilters" type="button">Tout décocher</button>
+              <div class="filter-category-header">Technologies <button class="toggle-category-btn" data-category="technoFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
+              <div class="filter-group" id="technoFilters"></div>
+              <div class="filter-category-header">Fréquences <button class="toggle-category-btn" data-category="freqFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
+              <div class="filter-group" id="freqFilters"></div>
+              <div class="filter-category-header">Opérateurs <button class="toggle-category-btn" data-category="opFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
+              <div class="filter-group" id="opFilters"></div>
+              <div class="filter-category-header">Actions <button class="toggle-category-btn" data-category="actionFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
+              <div class="filter-group" id="actionFilters"></div>
+              <div class="filter-category-header">Zone Blanche</div>
+              <div class="filter-group" id="zbFilter"></div>
+              <div class="filter-category-header">Sites Neufs</div>
+              <div class="filter-group" id="newSiteFilter"></div>
+            </div>`;
+      
+      L.DomEvent.disableScrollPropagation(div);
+      L.DomEvent.disableClickPropagation(div);
+      
+      div.addEventListener('click', (e) => {
+        const content = div.querySelector('.filters-content');
+        if (e.target === div || e.target.classList.contains('filters-content')) {
+          if (div.classList.contains('collapsed')) {
+            div.classList.remove('collapsed'); 
+            div.classList.add('expanded'); 
+            content.style.display='block';
+            try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
+            ['touchstart','touchmove','touchend','wheel'].forEach(evt => { 
+              content.addEventListener(evt, function(ev){ ev.stopPropagation(); }, { passive: false }); 
+            });
+          } else if (div.classList.contains('expanded')) {
+            div.classList.remove('expanded'); 
+            div.classList.add('collapsed'); 
+            content.style.display='none';
+            try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
           }
+        }
+      });
+
+      // Gestion du repli/dépli des catégories
+      setTimeout(() => {
+        // Headers cliquables pour replier/déplier
+        div.querySelectorAll('.filter-category-header').forEach(header => {
+          header.addEventListener('click', (e) => {
+            // Ne pas déclencher si on clique sur le bouton toggle
+            if (e.target.classList.contains('toggle-category-btn')) return;
+            
+            const nextGroup = header.nextElementSibling;
+            if (nextGroup && nextGroup.classList.contains('filter-group')) {
+              nextGroup.classList.toggle('expanded');
+            }
+          });
         });
 
-        // Ajoutez cet écouteur pour les boutons de catégories
-        setTimeout(() => {
-          div.querySelectorAll('.toggle-category-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const category = btn.getAttribute('data-category');
-              const container = document.getElementById(category);
-              const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
-              const allChecked = Array.from(allCheckboxes).every(chk => chk.checked);
-              
-              allCheckboxes.forEach(chk => {
-                chk.checked = !allChecked;
-                chk.dispatchEvent(new Event('change'));
-              });
-              
-              btn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+        // Boutons "Tout cocher/décocher" (uniquement ceux avec data-category)
+        div.querySelectorAll('.toggle-category-btn[data-category]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const category = btn.getAttribute('data-category');
+            const container = document.getElementById(category);
+            const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
+            const allChecked = Array.from(allCheckboxes).every(chk => chk.checked);
+            
+            allCheckboxes.forEach(chk => {
+              chk.checked = !allChecked;
+              chk.dispatchEvent(new Event('change'));
             });
+            
+            btn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
           });
-        }, 100);
+        });
+      }, 100);
 
-        return div;
-      }
+      return div;
+    }
   });
 
   map.addControl(new SearchIconControl({ position: 'topleft' }));

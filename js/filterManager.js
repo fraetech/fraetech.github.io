@@ -12,7 +12,6 @@ export class FilterManager {
   }
 
   createFilterGroups() {
-    // Build DOM containers expected by control (these exist inside the control markup created in app.js)
     const opContainer = document.getElementById('opFilters');
     const techContainer = document.getElementById('technoFilters');
     const freqContainer = document.getElementById('freqFilters');
@@ -30,12 +29,14 @@ export class FilterManager {
     if (frOps.length > 0) {
       const frHeader = document.createElement('div');
       frHeader.className = 'filter-category-header';
+      frHeader.style.fontSize = '0.9em';
+      frHeader.style.marginTop = '5px';
       const frTitle = document.createElement('span');
       frTitle.textContent = 'France Métropolitaine';
       frHeader.appendChild(frTitle);
       
       const frToggleBtn = document.createElement('button');
-      frToggleBtn.className = 'toggle-category-btn';
+      frToggleBtn.className = 'toggle-subcategory-btn';
       frToggleBtn.textContent = 'Tout décocher';
       frToggleBtn.style.fontSize = '0.8em';
       frToggleBtn.style.padding = '2px 6px';
@@ -55,7 +56,10 @@ export class FilterManager {
       frToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const allChecked = frCheckboxes.every(chk => chk.checked);
-        frCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
+        frCheckboxes.forEach(chk => { 
+          chk.checked = !allChecked; 
+          chk.dispatchEvent(new Event('change')); 
+        });
         frToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
       });
     }
@@ -64,12 +68,14 @@ export class FilterManager {
     if (dromComOps.length > 0) {
       const dromHeader = document.createElement('div');
       dromHeader.className = 'filter-category-header';
+      dromHeader.style.fontSize = '0.9em';
+      dromHeader.style.marginTop = '5px';
       const dromTitle = document.createElement('span');
       dromTitle.textContent = 'DROM/COM';
       dromHeader.appendChild(dromTitle);
       
       const dromToggleBtn = document.createElement('button');
-      dromToggleBtn.className = 'toggle-category-btn';
+      dromToggleBtn.className = 'toggle-subcategory-btn';
       dromToggleBtn.textContent = 'Tout décocher';
       dromToggleBtn.style.fontSize = '0.8em';
       dromToggleBtn.style.padding = '2px 6px';
@@ -89,7 +95,10 @@ export class FilterManager {
       dromToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const allChecked = dromCheckboxes.every(chk => chk.checked);
-        dromCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
+        dromCheckboxes.forEach(chk => { 
+          chk.checked = !allChecked; 
+          chk.dispatchEvent(new Event('change')); 
+        });
         dromToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
       });
     }
@@ -99,54 +108,20 @@ export class FilterManager {
       const order = this.dataStore.mapManager ? (window.CONFIG?.techOrder || []) : [];
       return order.indexOf(a) - order.indexOf(b);
     });
-    const techCheckboxes = [];
     sortedTechs.forEach(tech => {
-      const chk = this.createCheckbox(techContainer, tech, 'technos', window.CONFIG?.technologies?.[tech] || tech);
-      if (chk) techCheckboxes.push(chk);
+      this.createCheckbox(techContainer, tech, 'technos', window.CONFIG?.technologies?.[tech] || tech);
     });
-    // Récupérer le bouton du HTML avec data-category
-    const techToggleBtn = document.querySelector('button[data-category="technoFilters"]');
-    if (techToggleBtn && techCheckboxes.length > 0) {
-      techToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const allChecked = techCheckboxes.every(chk => chk.checked);
-        techCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
-        techToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
-      });
-    }
 
     // === FREQUENCIES ===
     const sortedFreqs = [...this.dataStore.filterValues.freqs].map(Number).sort((a,b)=>a-b).map(String);
-    const freqCheckboxes = [];
     sortedFreqs.forEach(freq => {
-      const chk = this.createCheckbox(freqContainer, freq, 'freqs', freq + ' MHz');
-      if (chk) freqCheckboxes.push(chk);
+      this.createCheckbox(freqContainer, freq, 'freqs', freq + ' MHz');
     });
-    const freqToggleBtn = document.querySelector('button[data-category="freqFilters"]');
-    if (freqToggleBtn && freqCheckboxes.length > 0) {
-      freqToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const allChecked = freqCheckboxes.every(chk => chk.checked);
-        freqCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
-        freqToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
-      });
-    }
 
     // === ACTIONS ===
-    const actionCheckboxes = [];
     [...this.dataStore.filterValues.actions].sort().forEach(action => {
-      const chk = this.createCheckbox(actionContainer, action, 'actions', window.CONFIG?.actions?.[action] || action);
-      if (chk) actionCheckboxes.push(chk);
+      this.createCheckbox(actionContainer, action, 'actions', window.CONFIG?.actions?.[action] || action);
     });
-    const actionToggleBtn = document.querySelector('button[data-category="actionFilters"]');
-    if (actionToggleBtn && actionCheckboxes.length > 0) {
-      actionToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const allChecked = actionCheckboxes.every(chk => chk.checked);
-        actionCheckboxes.forEach(chk => { chk.checked = !allChecked; chk.dispatchEvent(new Event('change')); });
-        actionToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
-      });
-    }
 
     // Radio groups (no toggle needed)
     this.createRadioGroup(zbContainer, 'zoneBlanche', [

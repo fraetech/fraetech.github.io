@@ -65,9 +65,15 @@
 </head>
 
 <body>
+<!-- Guirlande avec ampoules clignotantes -->
+<div id="garland"></div>
+<div id="garland-left"></div>
+<div id="garland-right"></div>
+
 <div id="message" aria-live="polite">
 <button id="closeButton" aria-label="Fermer">×</button>
 <h4><strong id="message-status">Chargement… (peut prendre du temps sur les grosses MAJs)</strong></h4>
+<p style="color: #d32f2f; font-weight: bold; margin: 8px 0; font-size: 0.95em;">🎄 Bonnes fêtes de fin d'année à toutes et tous ! 🎅</p>
 <p>
  Vous pouvez filtrer les supports à afficher à l'aide du bouton "Filtres" (en haut à droite).<br>
  Questions, remarques et suggestions :<br>
@@ -101,6 +107,45 @@
 <script>
 // Minimal style hint before CSS loads: ensures map has height quickly
 document.documentElement.style.background = '#fff';
+
+// Créer les ampoules de la guirlande
+document.addEventListener('DOMContentLoaded', () => {
+  // Ampoules horizontales (haut)
+  const garland = document.getElementById('garland');
+  if (garland) {
+    for (let i = 0; i < 10; i++) {
+      const bulb = document.createElement('div');
+      bulb.className = 'bulb';
+      garland.appendChild(bulb);
+    }
+  }
+  
+  // Ampoules verticales (gauche)
+  const garlandLeft = document.getElementById('garland-left');
+  if (garlandLeft) {
+    for (let i = 0; i < 20; i++) {
+      const bulb = document.createElement('div');
+      bulb.className = 'bulb';
+      bulb.style.position = 'absolute';
+      bulb.style.top = (i * 5) + '%';
+      bulb.style.left = '7px';
+      garlandLeft.appendChild(bulb);
+    }
+  }
+  
+  // Ampoules verticales (droite)
+  const garlandRight = document.getElementById('garland-right');
+  if (garlandRight) {
+    for (let i = 0; i < 20; i++) {
+      const bulb = document.createElement('div');
+      bulb.className = 'bulb';
+      bulb.style.position = 'absolute';
+      bulb.style.top = (i * 5) + '%';
+      bulb.style.right = '7px';
+      garlandRight.appendChild(bulb);
+    }
+  }
+});
 </script>
 </body>
 </html>

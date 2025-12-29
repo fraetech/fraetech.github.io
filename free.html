@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Carte des antennes mobiles ANFR – Mises à jour hebdomadaires</title>
+
+<!-- Description générale -->
+<meta name="description" content="Visualisez les modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l’ANFR.">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Carte des antennes mobiles ANFR – Mises à jour hebdomadaires">
+<meta property="og:description" content="Visualisez les modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l’ANFR.">
+<meta property="og:url" content="https://fraetech.github.io/">
+<meta property="og:site_name" content="Carte des antennes mobiles ANFR">
+<meta property="og:image" content="https://fraetech.github.io/og-logo.png">
+<meta property="og:image:alt" content="Logo MAJ-Hebdo ANFR">
+<meta property="og:locale" content="fr_FR">
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Carte des antennes mobiles ANFR – Mises à jour hebdomadaires">
+<meta name="twitter:description" content="Visualisez les modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l’ANFR.">
+<meta name="twitter:image" content="https://fraetech.github.io/og-logo.png">
+<meta name="twitter:image:alt" content="Logo MAJ-Hebdo ANFR">
+
+<!-- Préconnect & DNS -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
+<link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin>
+<link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin>
+<link rel="preconnect" href="https://raw.githubusercontent.com">
+<link rel="dns-prefetch" href="https://nominatim.openstreetmap.org">
+
+<!-- Google Font non-blocking -->
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" as="style" onload="this.rel='stylesheet'">
+<noscript>
+<link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet">
+</noscript>
+
+<!-- Styles principaux (externalisés pour cache) -->
+<link rel="preload" href="css/styles.css" as="style">
+<link rel="preload" href="https://unpkg.com/leaflet/dist/leaflet.css" as="style">
+<link rel="stylesheet" href="css/styles.css">
+
+<!-- Favicon et icônes diverses tailles -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- Meta pour robots/cache -->
+<meta name="robots" content="noindex,follow">
+
+<!-- Couleurs adaptatives -->
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#7ed0ec">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2c3e50">
+</head>
+
+<body>
+<div id="message" aria-live="polite">
+<button id="closeButton" aria-label="Fermer">×</button>
+<h4><strong id="message-status">Chargement… (peut prendre du temps sur les grosses MAJs)</strong></h4>
+<p>
+ Vous pouvez filtrer les supports à afficher à l'aide du bouton "Filtres" (en haut à droite).<br>
+ Questions, remarques et suggestions :<br>
+<a href="https://github.com/fraetech/fraetech.github.io" target="_blank" rel="noopener">GitHub</a><br>
+ L'historique (sur un an) des mises à jour : <br><a href="history.html" target="_self">Historique des mises à jour</a><br>
+<script src="/js/version.js"></script>
+<b>Source :</b> <a href="https://data.anfr.fr/visualisation/information/?id=observatoire_2g_3g_4g" target="_blank" rel="noopener">OpenData ANFR</a> | <small id="app-version"></small> | <a href="mentions-legales.html" target="_self">Mentions légales</a>
+<script>
+  document.getElementById("app-version").textContent = "v" + self.APP_VERSION;
+</script>
+</p>
+</div>
+<div id="map" role="region" aria-label="Carte des modifications ANFR"></div>
+<!-- Application JS: module, lazy-load des dépendances et logique -->
+<script type="module" src="js/app_fmb.js" defer></script>
+<!-- Small inline script to show map container asap (no heavy JS) -->
+<script>
+// Minimal style hint before CSS loads: ensures map has height quickly
+document.documentElement.style.background = '#fff';
+</script>
+</body>
+</html>

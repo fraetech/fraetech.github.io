@@ -1,0 +1,579 @@
+/* Appliquer la police globale identique à l'original */
+* {
+  font-family: "Didact Gothic", sans-serif !important;
+  font-weight: 500;
+  font-style: normal;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+#message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+#closeButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Styles pour l'icône de recherche */
+.leaflet-control.search-icon-control {
+  background: white;
+  width: 30px;
+  height: 30px;
+  margin-left: 11px;
+  border-radius: 2px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
+.leaflet-control.search-icon-control svg {
+  display: block;
+}
+
+.leaflet-control.search-icon-control:hover {
+  background-color: #f4f4f4;
+}
+
+/* Styles pour la search box */
+.leaflet-control.search-control {
+  background: white;
+  padding: 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  width: 320px;
+  position: relative;
+  display: none;
+}
+
+.leaflet-control.search-control.expanded {
+  display: block;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.clear-search-btn:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 40px 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Centrer la search box en haut */
+.leaflet-top.leaflet-center {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.search-result-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+  position: relative;
+}
+
+.search-result-item.has-operator {
+  padding-left: 20px;
+}
+
+.search-result-item.has-operator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--operator-color);
+}
+
+.search-result-item:hover {
+  background-color: #f0f0f0;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-type {
+  font-size: 11px;
+  color: #666;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.search-result-main {
+  margin-top: 2px;
+}
+
+.search-result-detail {
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* Filter control styles */
+.leaflet-control.custom-filter-control {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  font-size: 14px;
+  width: 250px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.filter-category {
+  font-weight: bold;
+  margin-top: 10px;
+  cursor: pointer;
+  background: #f1f1f1;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.filter-category-header {
+  font-weight: bold;
+  margin-top: 10px;
+  background: #f1f1f1;
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filter-category-header:hover {
+  background-color: #e8e8e8;
+}
+
+.toggle-category-btn {
+  font-size: 0.8em;
+  padding: 4px 8px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 3px;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.toggle-category-btn:hover {
+  background-color: #f9f9f9;
+  border-color: #999;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.toggle-category-btn:active {
+  transform: scale(0.98);
+}
+
+.filter-group {
+  display: block;
+  padding-left: 10px;
+  margin-top: 5px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.filter-group.expanded {
+  max-height: 2000px;
+  overflow: visible;
+}
+
+.filter-group label {
+  display: block;
+  margin: 4px 0;
+}
+    
+.leaflet-control.custom-filter-control.collapsed {
+  width: auto;
+  height: auto;
+  padding: 6px 10px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+    
+.leaflet-control.custom-filter-control.collapsed::after {
+  content: "Filtres";
+}
+    
+.leaflet-control.custom-filter-control.expanded {
+  transition: all 0.3s ease;
+  width: 250px;
+  padding: 10px;
+}
+
+.reset-filters {
+  display: block;
+  margin: 10px 0;
+  padding: 6px 10px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+}
+
+.reset-filters:hover {
+  background-color: #e0e0e0;
+}
+
+.leaflet-popup-content {
+  text-align: center;
+  margin: 0 !important; /* Supprimer la marge par défaut de Leaflet */
+  padding: 0 !important; /* Supprimer le padding par défaut */
+  width: auto !important; /* Laisser la largeur s'adapter au contenu */
+  max-width: 280px; /* Limiter la largeur maximale */
+}
+
+/* 2. S'assurer que le wrapper du popup ne déborde pas */
+.leaflet-popup-content-wrapper {
+  padding: 0 !important; /* Supprimer le padding par défaut de Leaflet */
+  margin: 0 !important;
+  background: none !important; /* Laisser le background à popup-operator-bg */
+  border-radius: 6px !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-close-button {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 50% !important;
+  width: 22px !important; /* Légèrement plus petite */
+  height: 22px !important;
+  line-height: 20px !important;
+  text-align: center !important;
+  color: #333 !important;
+  font-weight: bold !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+  border: 1px solid #ccc !important;
+  top: 17px !important; /* Ajusté pour le nouveau bandeau plus petit */
+  right: 10px !important; /* Légèrement plus proche du bord */
+  transform: translateY(-50%) !important;
+  z-index: 1001 !important;
+  font-size: 14px !important; /* Taille de police légèrement réduite */
+}
+
+.leaflet-popup-close-button:hover {
+  background-color: rgba(255, 255, 255, 1) !important;
+  color: #000 !important;
+}
+
+.bandeau {
+  margin: 0;
+  padding: 6px 12px;
+  text-align: center;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.titre, .contenu {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.icone-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bandeau a {
+  text-decoration: none;
+  font-weight: bold;
+  color: #FFFFFF !important;
+}
+
+.bandeau a:hover {
+  text-decoration: underline;
+}
+
+/* Espacement entre les icônes et le contenu */
+.icone-container + .titre {
+  margin-top: 15px;
+}
+
+.icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Réduit de 50px à 40px */
+  height: 40px; /* Réduit de 50px à 40px */
+  border-radius: 6px; /* Réduit de 8px à 6px */
+  background-color: rgba(245, 245, 245, 0.9);
+  padding: 4px; /* Réduit de 5px à 4px */
+  transition: all 0.2s ease;
+}
+
+.icone img {
+  max-width: 32px; /* Réduit de 40px à 32px */
+  max-height: 32px; /* Réduit de 40px à 32px */
+}
+
+.icone:hover {
+  background-color: rgba(224, 224, 224, 0.9);
+  transform: scale(1.05);
+}
+
+.titre {
+  margin: 6px 0; /* Réduit de 8px à 6px */
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px; /* Réduit de 6px 10px à 4px 8px */
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px; /* Légère réduction de la taille de police si nécessaire */
+}
+
+.contenu {
+  margin: 6px 0; /* Réduit de 8px à 6px */
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 8px; /* Réduit de 10px à 8px */
+  border-radius: 4px;
+}
+
+.action-groupe {
+  margin-bottom: 6px; /* Réduit de 8px à 6px */
+}
+
+.action-groupe:last-child {
+  margin-bottom: 0; /* Supprimer la marge du dernier élément */
+}
+
+.action-titre {
+  font-weight: bold;
+  margin-bottom: 2px; /* Réduit de 4px à 2px */
+  font-size: 13px; /* Légère réduction */
+}
+.popup-operator-bg {
+  position: relative;
+  padding: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  min-height: 160px; /* Réduit de 200px à 160px */
+  width: 260px; /* Réduit de 280px à 260px */
+  box-sizing: border-box;
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.popup-operator-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--logo-url);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.popup-operator-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+.popup-content-wrapper {
+  padding: 8px 12px 12px 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+/* Style pour le container des icônes - MANQUANT */
+.icone-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+/* Amélioration de la lisibilité du footer */
+.popup-content-wrapper .titre:last-child {
+  background-color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9em;
+  font-weight: normal;
+  color: #666;
+  text-align: center;
+}
+.leaflet-popup-tip-container {
+  z-index: 999 !important; /* Z-index inférieur à la croix mais supérieur au contenu */
+}
+
+.leaflet-popup-tip {
+  z-index: 999 !important;
+}
+.share-btn {
+  background: rgba(245, 245, 245, 0.9);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+  background: rgba(224, 224, 224, 0.9);
+  transform: scale(1.05);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+strong { font-weight: bold; }
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .popup-operator-bg {
+    width: calc(100vw - 60px);
+    max-width: 260px;
+    min-height: 140px; /* Encore plus compact sur mobile */
+  }
+  
+  .popup-content-wrapper {
+    padding: 6px 10px 10px 10px;
+  }
+  
+  .bandeau {
+    padding: 5px 10px;
+  }
+  
+  .icone-container {
+    margin: 6px 0;
+    gap: 6px;
+  }
+  
+  .icone {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .icone img {
+    max-width: 28px;
+    max-height: 28px;
+  }
+  
+  .titre {
+    font-size: 13px;
+    padding: 3px 6px;
+    margin: 4px 0;
+  }
+  
+  .contenu {
+    padding: 6px;
+    margin: 4px 0;
+  }
+  
+  .action-titre {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .popup-operator-bg {
+    width: calc(100vw - 40px);
+    max-width: 260px;
+  }
+  
+  .popup-content-wrapper {
+    padding: 5px 8px 8px 8px;
+  }
+}
+
+/* small accessibility and motion preferences */
+:focus { outline: none; }
+@media (prefers-reduced-motion: reduce) {
+  .icone, .icone:hover, .leaflet-control.custom-filter-control.expanded { transition: none !important; transform: none !important; }
+}

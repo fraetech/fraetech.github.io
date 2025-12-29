@@ -20,7 +20,10 @@ export const CONFIG = {
     'AAV': 'Activation prévisionnelle',
     'AJO': 'Ajout fréquence',
     'SUP': 'Suppression fréquence',
-    'EXT': 'Extinction fréquence'
+    'EXT': 'Extinction fréquence',
+    'CHA' : 'Changement d\'adresse',
+    'CHI' : 'Changement identifiant support',
+    'CHL' : 'Changement localisation'
   },
   technologies: {
     'GSM': 'GSM (2G)',

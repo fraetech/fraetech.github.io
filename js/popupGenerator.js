@@ -47,7 +47,7 @@ export class PopupGenerator {
       icons.push(`<a href="https://rncmobile.net/site/${lat},${lon}" target="_blank" rel="noopener" class="icone"><img loading="lazy" src="${base}rnc.avif" alt="RNC Mobile"></a>`);
     }
     
-    // NOUVEAU : Bouton partage
+    // Bouton partage
     icons.push(`<button onclick="shareLocation('${lat}', '${lon}', '${firstAction.id_support}')" class="icone share-btn" title="Partager ce support"><img loading="lazy" src="${base}share.avif" alt="Partager"></button>`);
     
     return `<div class="icone-container">${icons.join('')}</div>`;

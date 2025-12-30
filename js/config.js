@@ -32,6 +32,6 @@ export const CONFIG = {
     '5G NR': 'NR (5G)'
   },
   techOrder: ['GSM', 'UMTS', 'LTE', '5G NR'],
-  baseIconUrl: 'https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/',
-  baseDataUrl: 'https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/files/'
+  baseIconUrl: 'https://fraetech.github.io/icons/',
+  baseDataUrl: 'https://fraetech.github.io/files/'
 };

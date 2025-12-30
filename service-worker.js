@@ -5,6 +5,8 @@ const CACHE_NAME = `mh-pwa-${self.APP_VERSION}`;
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
+  '/historique.html',
+  '/stats.html',
   '/css/styles.css',
   '/js/app.js',
   '/js/config.js',

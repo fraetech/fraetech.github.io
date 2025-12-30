@@ -161,7 +161,7 @@
 
   async function fetchAndBuildColumns() {
     const response = await fetch(
-      'https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/data/files/history.csv?nocache=' + Date.now()
+      'https://fraetech.github.io/files/history.csv?nocache=' + Date.now()
     );
     const csvText = await response.text();
     const rows = csvText.trim().split('\n').slice(1);

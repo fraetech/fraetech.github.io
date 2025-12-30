@@ -1,59 +1,59 @@
 type,label,path
-hebdo,Semaine 51 - 2024,hebdo/S51_2024
-hebdo,Semaine 2 - 2025,hebdo/S02_2025
-hebdo,Semaine 3 - 2025,hebdo/S03_2025
-hebdo,Semaine 4 - 2025,hebdo/S04_2025
-hebdo,Semaine 5 - 2025,hebdo/S05_2025
+hebdo,16/12 - 22/12 2024 (S51),hebdo/S51_2024
+hebdo,06/01 - 12/01 2025 (S2),hebdo/S02_2025
+hebdo,13/01 - 19/01 2025 (S3),hebdo/S03_2025
+hebdo,20/01 - 26/01 2025 (S4),hebdo/S04_2025
+hebdo,27/01 - 02/02 2025 (S5),hebdo/S05_2025
 mensu,Janvier - 2025,mensu/01_2025
-hebdo,Semaine 6 - 2025,hebdo/S06_2025
-hebdo,Semaine 7 - 2025,hebdo/S07_2025
-hebdo,Semaine 8 - 2025,hebdo/S08_2025
-hebdo,Semaine 9 - 2025,hebdo/S09_2025
+hebdo,03/02 - 09/02 2025 (S6),hebdo/S06_2025
+hebdo,10/02 - 16/02 2025 (S7),hebdo/S07_2025
+hebdo,17/02 - 23/02 2025 (S8),hebdo/S08_2025
+hebdo,24/02 - 02/03 2025 (S9),hebdo/S09_2025
 mensu,Février - 2025,mensu/02_2025
-hebdo,Semaine 10 - 2025,hebdo/S10_2025
-hebdo,Semaine 11 - 2025,hebdo/S11_2025
-hebdo,Semaine 12 - 2025,hebdo/S12_2025
-hebdo,Semaine 13 - 2025,hebdo/S13_2025
+hebdo,03/03 - 09/03 2025 (S10),hebdo/S10_2025
+hebdo,10/03 - 16/03 2025 (S11),hebdo/S11_2025
+hebdo,17/03 - 23/03 2025 (S12),hebdo/S12_2025
+hebdo,24/03 - 30/03 2025 (S13),hebdo/S13_2025
 mensu,Mars - 2025,mensu/03_2025
 trim,Trimestre 1 - 2025,trim/T1_2025
-hebdo,Semaine 14 - 2025,hebdo/S14_2025
-hebdo,Semaine 19 - 2025,hebdo/S19_2025
-hebdo,Semaine 16 - 2025,hebdo/S16_2025
-hebdo,Semaine 20 - 2025,hebdo/S20_2025
-hebdo,Semaine 21 - 2025,hebdo/S21_2025
+hebdo,31/03 - 06/04 2025 (S14),hebdo/S14_2025
+hebdo,05/05 - 11/05 2025 (S19),hebdo/S19_2025
+hebdo,14/04 - 20/04 2025 (S16),hebdo/S16_2025
+hebdo,12/05 - 18/05 2025 (S20),hebdo/S20_2025
+hebdo,19/05 - 25/05 2025 (S21),hebdo/S21_2025
 mensu,Mai - 2025,mensu/05_2025
-hebdo,Semaine 23 - 2025,hebdo/S23_2025
-hebdo,Semaine 24 - 2025,hebdo/S24_2025
-hebdo,Semaine 25 - 2025,hebdo/S25_2025
-hebdo,Semaine 26 - 2025,hebdo/S26_2025
-hebdo,Semaine 28 - 2025,hebdo/S28_2025
-hebdo,Semaine 29 - 2025,hebdo/S29_2025
-hebdo,Semaine 30 - 2025,hebdo/S30_2025
-hebdo,Semaine 31 - 2025,hebdo/S31_2025
-hebdo,Semaine 32 - 2025,hebdo/S32_2025
+hebdo,02/06 - 08/06 2025 (S23),hebdo/S23_2025
+hebdo,09/06 - 15/06 2025 (S24),hebdo/S24_2025
+hebdo,16/06 - 22/06 2025 (S25),hebdo/S25_2025
+hebdo,23/06 - 29/06 2025 (S26),hebdo/S26_2025
+hebdo,07/07 - 13/07 2025 (S28),hebdo/S28_2025
+hebdo,14/07 - 20/07 2025 (S29),hebdo/S29_2025
+hebdo,21/07 - 27/07 2025 (S30),hebdo/S30_2025
+hebdo,28/07 - 03/08 2025 (S31),hebdo/S31_2025
+hebdo,04/08 - 10/08 2025 (S32),hebdo/S32_2025
 mensu,Juin - 2025,mensu/06_2025
 mensu,Juillet - 2025,mensu/07_2025
-hebdo,Semaine 33 - 2025,hebdo/S33_2025
-hebdo,Semaine 34 - 2025,hebdo/S34_2025
-hebdo,Semaine 35 - 2025,hebdo/S35_2025
+hebdo,11/08 - 17/08 2025 (S33),hebdo/S33_2025
+hebdo,18/08 - 24/08 2025 (S34),hebdo/S34_2025
+hebdo,25/08 - 31/08 2025 (S35),hebdo/S35_2025
 mensu,Août - 2025,mensu/08_2025
-hebdo,Semaine 36 - 2025,hebdo/S36_2025
-hebdo,Semaine 37 - 2025,hebdo/S37_2025
-hebdo,Semaine 38 - 2025,hebdo/S38_2025
-hebdo,Semaine 39 - 2025,hebdo/S39_2025
+hebdo,01/09 - 07/09 2025 (S36),hebdo/S36_2025
+hebdo,08/09 - 14/09 2025 (S37),hebdo/S37_2025
+hebdo,15/09 - 21/09 2025 (S38),hebdo/S38_2025
+hebdo,22/09 - 28/09 2025 (S39),hebdo/S39_2025
 mensu,Septembre - 2025,mensu/09_2025
-hebdo,Semaine 40 - 2025,hebdo/S40_2025
-hebdo,Semaine 41 - 2025,hebdo/S41_2025
-hebdo,Semaine 42 - 2025,hebdo/S42_2025
-hebdo,Semaine 43 - 2025,hebdo/S43_2025
-hebdo,Semaine 44 - 2025,hebdo/S44_2025
+hebdo,29/09 - 05/10 2025 (S40),hebdo/S40_2025
+hebdo,06/10 - 12/10 2025 (S41),hebdo/S41_2025
+hebdo,13/10 - 19/10 2025 (S42),hebdo/S42_2025
+hebdo,20/10 - 26/10 2025 (S43),hebdo/S43_2025
+hebdo,27/10 - 02/11 2025 (S44),hebdo/S44_2025
 mensu,Octobre - 2025,mensu/10_2025
-hebdo,Semaine 45 - 2025,hebdo/S45_2025
-hebdo,Semaine 46 - 2025,hebdo/S46_2025
-hebdo,Semaine 47 - 2025,hebdo/S47_2025
-hebdo,Semaine 48 - 2025,hebdo/S48_2025
+hebdo,03/11 - 09/11 2025 (S45),hebdo/S45_2025
+hebdo,10/11 - 16/11 2025 (S46),hebdo/S46_2025
+hebdo,17/11 - 23/11 2025 (S47),hebdo/S47_2025
+hebdo,24/11 - 30/11 2025 (S48),hebdo/S48_2025
 mensu,Novembre - 2025,mensu/11_2025
-hebdo,Semaine 49 - 2025,hebdo/S49_2025
-hebdo,Semaine 50 - 2025,hebdo/S50_2025
-hebdo,Semaine 51 - 2025,hebdo/S51_2025
-hebdo,Semaine 52 - 2025,hebdo/S52_2025
+hebdo,01/12 - 07/12 2025 (S49),hebdo/S49_2025
+hebdo,08/12 - 14/12 2025 (S50),hebdo/S50_2025
+hebdo,15/12 - 21/12 2025 (S51),hebdo/S51_2025
+hebdo,22/12 - 28/12 2025 (S52),hebdo/S52_2025

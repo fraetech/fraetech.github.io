@@ -1,345 +1,330 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Historique des modifications d'antennes mobiles ANFR</title>
-
-<!-- Description générale -->
-<meta name="description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR. Visualisez les nouvelles installations, activations et modifications par opérateur.">
-
-<!-- Couleurs adaptatives -->
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#7ed0ec">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2c3e50">
-
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="Historique des modifications d'antennes mobiles ANFR">
-<meta property="og:description" content="Retrouvez l'historique des modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l'ANFR.">
-<meta property="og:url" content="https://fraetech.github.io/">
-<meta property="og:site_name" content="Historique des antennes mobiles ANFR">
-<meta property="og:image" content="https://fraetech.github.io/og-logo.png">
-<meta property="og:image:alt" content="Logo MAJ-Hebdo ANFR">
-<meta property="og:locale" content="fr_FR">
-
-<!-- Twitter Cards -->
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Historique des modifications d'antennes mobiles ANFR">
-<meta name="twitter:description" content="Retrouvez l'historique des modifications hebdomadaires, mensuelles et trimestrielles des antennes mobiles (2G à 5G) en France sur une carte interactive, à partir des données ouvertes de l'ANFR.">
-<meta name="twitter:image" content="https://fraetech.github.io/og-logo.png">
-<meta name="twitter:image:alt" content="Logo MAJ-Hebdo ANFR">
-
-<!-- Google Font non-blocking -->
+<meta name="description" content="Carte interactive des modifications hebdomadaires des antennes mobiles en France selon les données ANFR.">
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" as="style" onload="this.rel='stylesheet'">
-<noscript>
-  <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet">
-</noscript>
-
-<!-- Meta pour robots/cache -->
-<meta name="robots" content="index,follow">
-
-<!-- Favicons -->
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <style>
-  * {
-    font-family: "Didact Gothic", sans-serif !important;
-    font-weight: 500;
-    font-style: normal;
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    padding: 20px;
-    background: #f5f5f5;
-  }
-  .container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-  }
-  .column {
-    background: white;
-    padding: 20px;
-    width: 300px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  h1 {
-    text-align: center;
-  }
-  .column h2 {
-    text-align: center;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-    cursor: pointer;
-    position: relative;
-    user-select: none;
-  }
-  .column h2::after {
-    content: "˅";
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%) rotate(0deg);
-    transition: transform 0.3s ease;
-    font-size: 18px;
-  }
-  .column.active h2::after {
-    transform: translateY(-50%) rotate(180deg);
-  }
-  .column ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.5s ease;
-  }
-  .column.active ul {
-    max-height: 2000px;
-  }
-  .column li {
-    margin: 10px 0;
-  }
-  .column a {
-    text-decoration: none;
-    color: #007BFF;
-  }
-  .column a:hover {
-    text-decoration: underline;
-  }
-  .load-more-btn {
-    margin: 15px 0 0 0;
-    padding: 10px 20px;
-    background: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s ease;
-    display: none;
-  }
-  .column.active .load-more-btn {
-    display: block;
-  }
-  .load-more-btn:hover {
-    background: #0056b3;
-  }
-  .load-more-btn:active {
-    transform: scale(0.98);
-  }
-  @media (max-width: 768px) {
-    .container {
-      flex-direction: column;
-      align-items: center;
-    }
-    .column {
-      width: 90%;
-      max-width: 400px;
-    }
-  }
+* { font-family: "Didact Gothic", sans-serif !important; box-sizing: border-box; }
+body { margin: 0; padding: 20px; background: #f5f5f5; transition: background 0.3s; }
+h1 { text-align: center; color: #333; transition: color 0.3s; }
+.container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; align-items: flex-start; }
+.column { background: white; padding: 20px; width: 300px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: background 0.3s, box-shadow 0.3s; }
+
+/* Mode sombre */
+@media (prefers-color-scheme: dark) {
+  body { background: #1a1a1a; }
+  h1 { color: #e0e0e0; }
+  .column { background: #2d2d2d; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+}
+.column h2 { 
+  text-align: center; padding: 12px 16px; margin: -20px -20px 0 -20px; cursor: pointer; user-select: none;
+  background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%); color: white; border-radius: 8px 8px 0 0;
+  font-size: 1.1em; transition: all 0.3s ease; position: relative;
+}
+.column h2:hover { background: linear-gradient(135deg, #0056b3 0%, #003d82 100%); transform: translateY(-2px); }
+.column h2::after { content: "▼"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); transition: transform 0.3s; }
+.column.active h2::after { transform: translateY(-50%) rotate(180deg); }
+.years-wrapper { list-style: none; padding: 10px 0 0 0; margin: 0; display: none; flex-direction: column; gap: 12px; }
+.column.active .years-wrapper { display: flex; }
+.year-item, .month-item { border-radius: 4px; transition: background 0.2s; }
+.year-item { border-left: 4px solid #007BFF; background: #f9f9f9; }
+.year-item:hover { background: #f0f7ff; }
+.month-item { margin-left: 15px; background: #fff9f0; border-left: 3px solid #FF9800; }
+.month-item:hover { background: #ffe8d6; }
+
+@media (prefers-color-scheme: dark) {
+  .year-item { background: #3a3a3a; border-left-color: #4d9fff; }
+  .year-item:hover { background: #404040; }
+  .month-item { background: #3d3520; border-left-color: #ffb347; }
+  .month-item:hover { background: #4a3f28; }
+}
+.year-header, .month-header { 
+  font-weight: 600; cursor: pointer; user-select: none; padding: 10px 12px; display: flex; align-items: center; gap: 10px; transition: color 0.3s;
+}
+.year-header { color: #007BFF; font-size: 0.95em; padding-left: 16px; }
+.month-header { color: #FF9800; font-size: 0.9em; }
+
+@media (prefers-color-scheme: dark) {
+  .year-header { color: #4d9fff; }
+  .month-header { color: #ffb347; }
+}
+.year-header::before, .month-header::before { content: "▶"; transition: transform 0.3s; font-size: 11px; flex-shrink: 0; }
+.year-item.expanded .year-header::before, .month-item.expanded .month-header::before { transform: rotate(90deg); }
+.items-list, .month-items-list { 
+  list-style: none; padding: 0 0 10px 15px; margin: 0; max-height: 0; overflow: hidden;
+  transition: max-height 0.3s, opacity 0.3s; opacity: 0; pointer-events: none;
+}
+.month-items-list { padding: 0 0 8px 20px; }
+.year-item.expanded .items-list, .month-item.expanded .month-items-list { max-height: none; opacity: 1; pointer-events: auto; overflow: visible; }
+.items-list li, .month-items-list li { margin: 5px 0; padding-left: 10px; font-size: 0.9em; }
+.column a { text-decoration: none; color: #007BFF; transition: color 0.2s; }
+.column a:hover { text-decoration: underline; }
+
+@media (prefers-color-scheme: dark) {
+  .column a { color: #4d9fff; }
+  .column a:hover { color: #80b3ff; }
+}
+.back-link { 
+  display: inline-block; margin: 20px 0; padding: 12px 24px;
+  background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%); color: white; text-decoration: none;
+  border-radius: 6px; transition: all 0.3s; font-weight: 600;
+}
+.back-link:hover { background: linear-gradient(135deg, #0056b3 0%, #003d82 100%); transform: translateY(-2px); }
+.info-section { background: white; padding: 30px; border-radius: 8px; max-width: 800px; margin: 30px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: background 0.3s, box-shadow 0.3s; }
+.info-section h2 { border-bottom: 3px solid #007BFF; padding-bottom: 15px; margin-top: 0; color: #333; transition: color 0.3s, border-color 0.3s; }
+.info-section h3 { color: #007BFF; margin-top: 25px; margin-bottom: 15px; transition: color 0.3s; }
+.info-section p { line-height: 1.6; color: #555; transition: color 0.3s; }
+.info-section a { color: #007BFF; text-decoration: none; transition: color 0.2s; }
+.info-section a:hover { text-decoration: underline; }
+
+@media (prefers-color-scheme: dark) {
+  .info-section { background: #2d2d2d; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+  .info-section h2 { border-bottom-color: #4d9fff; color: #e0e0e0; }
+  .info-section h3 { color: #4d9fff; }
+  .info-section p { color: #b0b0b0; }
+  .info-section a { color: #4d9fff; }
+  .info-section a:hover { color: #80b3ff; }
+}
+.sorry-message { text-align: center; font-size: 1.3em; color: #007BFF; font-weight: 600; margin-top: 40px; padding: 20px; }
+@media (max-width: 768px) {
+  .container { flex-direction: column; align-items: center; }
+  .column { width: 90%; max-width: 400px; }
+}
 </style>
 </head>
 <body>
 
 <h1>Historique des MAJ ANFR</h1>
-
 <div class="container" id="columns-container"></div>
 
 <script>
-  const ITEMS_PER_PAGE = 20;
-  const columnStates = {};
+const TITLES = { hebdo: 'Hebdomadaires', mensu: 'Mensuelles', trim: 'Trimestrielles' };
+const MONTH_NAMES = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
-  async function fetchAndBuildColumns() {
-    const response = await fetch(
-      'https://fraetech.github.io/files/history.csv?nocache=' + Date.now()
-    );
-    const csvText = await response.text();
-    const rows = csvText.trim().split('\n').slice(1);
-
-    const data = rows.map(row => {
-      const [type, label, path] = row.split(',');
-      return { type, label, path };
-    });
-
-    const grouped = {
-      hebdo: [],
-      mensu: [],
-      trim: []
-    };
-
-    data.forEach(entry => {
-      if (grouped[entry.type]) {
-        grouped[entry.type].push(entry);
-      }
-    });
-
-    const container = document.getElementById('columns-container');
-    for (let type of ['hebdo', 'mensu', 'trim']) {
-      const column = document.createElement('div');
-      column.className = 'column';
-
-      const titleMap = {
-        hebdo: 'Hebdomadaires',
-        mensu: 'Mensuelles',
-        trim: 'Trimestrielles'
-      };
-
-      column.innerHTML = `<h2>${titleMap[type]}</h2><ul></ul>`;
-      const ul = column.querySelector('ul');
-
-      const sortedItems = grouped[type].sort((a, b) => compareRealDates(b.label, a.label));
-      
-      // Initialiser l'état de cette colonne
-      columnStates[type] = {
-        items: sortedItems,
-        visibleCount: ITEMS_PER_PAGE,
-        ul: ul,
-        column: column
-      };
-
-      renderItems(type);
-
-      // Ajouter le bouton "Voir plus" si nécessaire
-      if (sortedItems.length > ITEMS_PER_PAGE) {
-        const btnContainer = document.createElement('div');
-        btnContainer.style.textAlign = 'center';
-        
-        const moreBtn = document.createElement('button');
-        moreBtn.className = 'load-more-btn';
-        moreBtn.textContent = `Voir plus (${sortedItems.length - ITEMS_PER_PAGE} restants)`;
-        moreBtn.dataset.type = type;
-        
-        moreBtn.addEventListener('click', (e) => {
-          e.stopPropagation(); // Empêcher le toggle de l'accordéon
-          loadMore(type);
-        });
-        
-        btnContainer.appendChild(moreBtn);
-        column.appendChild(btnContainer);
-      }
-
-      container.appendChild(column);
-    }
-
-    setupAccordion();
+// Fonction pour simplifier les labels
+function simplifyLabel(label, type) {
+  if (type === 'hebdo') {
+    // "16/12 - 22/12 2024 (S51)" -> "16/12 - 22/12 (S51)"
+    return label.replace(/\s+\d{4}\s+\(S/, ' (S');
+  } else if (type === 'mensu') {
+    // "Janvier - 2025" -> "Janvier"
+    return label.replace(/\s*-\s*\d{4}/, '');
+  } else if (type === 'trim') {
+    // "Trimestre 1 - 2025" -> "Trimestre 1"
+    return label.replace(/\s*-\s*\d{4}/, '');
   }
+  return label;
+}
 
-  function renderItems(type) {
-    const state = columnStates[type];
-    const itemsToShow = state.items.slice(0, state.visibleCount);
-    
-    // Vider la liste
-    state.ul.innerHTML = '';
-    
-    // Ajouter les items visibles
-    itemsToShow.forEach(item => {
-      const li = document.createElement('li');
-      const link = document.createElement('a');
-      link.href = `https://fraetech.github.io/index.html?csv=${item.path}`;
-      link.textContent = item.label;
-      li.appendChild(link);
-      state.ul.appendChild(li);
-    });
-
-    // Mettre à jour le bouton
-    const btn = state.column.querySelector('.load-more-btn');
-    if (btn) {
-      const remaining = state.items.length - state.visibleCount;
-      if (remaining > 0) {
-        btn.textContent = `Voir plus (${remaining} restants)`;
-        btn.style.display = 'block';
-      } else {
-        btn.style.display = 'none';
-      }
-    }
-  }
-
-  function loadMore(type) {
-    const state = columnStates[type];
-    state.visibleCount += ITEMS_PER_PAGE;
-    renderItems(type);
-    
-    // Réajuster la hauteur de l'accordéon si ouvert
-    if (state.column.classList.contains('active')) {
-      state.ul.style.maxHeight = state.ul.scrollHeight + 100 + "px";
-    }
-  }
-
-  function compareRealDates(labelA, labelB) {
-    const extract = (label) => {
-      const numbers = label.match(/\d+/g);
-      if (!numbers) return { year: 0, week: 0 };
-      if (label.includes('Semaine')) {
-        return { year: parseInt(numbers[1]), week: parseInt(numbers[0]) };
-      } else {
-        return { year: parseInt(numbers[1]), month: parseInt(numbers[0]) };
-      }
-    };
-
-    const a = extract(labelA);
-    const b = extract(labelB);
-
-    if (a.year !== b.year) {
-      return a.year - b.year;
-    }
-    return (a.week || a.month) - (b.week || b.month);
-  }
-
-  function setupAccordion() {
-    const isMobile = window.innerWidth <= 768;
-    document.querySelectorAll('.column').forEach(column => {
-      const h2 = column.querySelector('h2');
-      const ul = column.querySelector('ul');
-
-      if (isMobile) {
-        ul.style.maxHeight = "0px";
-      } else {
-        ul.style.maxHeight = ul.scrollHeight + 100 + "px";
-        column.classList.add('active');
-      }
-
-      h2.addEventListener('click', () => {
-        const isExpanded = column.classList.toggle('active');
-        if (isExpanded) {
-          ul.style.maxHeight = ul.scrollHeight + 100 + "px";
-        } else {
-          ul.style.maxHeight = "0px";
-        }
-      });
-    });
-  }
-
-  fetchAndBuildColumns().catch(err => {
-    console.error("Erreur de chargement du CSV :", err);
+async function init() {
+  const res = await fetch('https://fraetech.github.io/files/history.csv?nocache=' + Date.now());
+  const csv = await res.text();
+  const data = csv.trim().split('\n').slice(1).map(row => {
+    const [type, label, path] = row.split(',');
+    return { type, label, path };
   });
+
+  const grouped = { hebdo: [], mensu: [], trim: [] };
+  data.forEach(e => grouped[e.type]?.push(e));
+
+  const container = document.getElementById('columns-container');
+  ['hebdo', 'mensu', 'trim'].forEach(type => {
+    const col = createColumn(type, grouped[type]);
+    container.appendChild(col);
+  });
+
+  setupAccordions();
+}
+
+function createColumn(type, items) {
+  const col = document.createElement('div');
+  col.className = 'column';
+  col.innerHTML = `<h2>${TITLES[type]}</h2><ul class="years-wrapper"></ul>`;
+  
+  const wrapper = col.querySelector('.years-wrapper');
+  const sorted = items.sort((a, b) => compareDates(a.label, b.label));
+  
+  if (type === 'hebdo') buildHebdo(wrapper, sorted, type);
+  else buildOther(wrapper, sorted, type);
+  
+  return col;
+}
+
+function buildHebdo(wrapper, items, type) {
+  const byYear = groupBy(items, i => extractYear(i.label));
+  Object.keys(byYear).sort((a, b) => b - a).forEach(year => {
+    const yearLi = createExpandable('year', year);
+    const monthsUl = yearLi.querySelector('.items-list');
+    
+    const byMonth = {};
+    byYear[year].forEach(item => {
+      const m = item.label.match(/(\d+)\/(\d+)\s*-.*(\d{4})/);
+      if (m) {
+        const key = `${m[2]}-${m[3]}`;
+        if (!byMonth[key]) byMonth[key] = { items: [], display: `${MONTH_NAMES[+m[2]-1]} ${m[3]}` };
+        byMonth[key].items.push(item);
+      }
+    });
+    
+    Object.keys(byMonth).sort((a, b) => {
+      const [mA, yA] = a.split('-').map(Number);
+      const [mB, yB] = b.split('-').map(Number);
+      return yA !== yB ? yB - yA : mB - mA;
+    }).forEach(key => {
+      const monthLi = createExpandable('month', byMonth[key].display);
+      const itemsUl = monthLi.querySelector('.month-items-list');
+      byMonth[key].items.sort((a, b) => compareDates(b.label, a.label)).forEach(item => {
+        itemsUl.appendChild(createLink(item, type));
+      });
+      monthsUl.appendChild(monthLi);
+    });
+    
+    wrapper.appendChild(yearLi);
+  });
+}
+
+function buildOther(wrapper, items, type) {
+  const byYear = groupBy(items, i => extractYear(i.label));
+  Object.keys(byYear).sort((a, b) => b - a).forEach(year => {
+    const yearLi = createExpandable('year', year);
+    const itemsUl = yearLi.querySelector('.items-list');
+    
+    // Tri décroissant : inverser a et b
+    const sorted = byYear[year].sort((a, b) => compareDates(a.label, b.label));
+    
+    sorted.forEach(item => {
+      itemsUl.appendChild(createLink(item, type));
+    });
+    wrapper.appendChild(yearLi);
+  });
+}
+
+function createExpandable(type, text) {
+  const li = document.createElement('li');
+  li.className = `${type}-item`;
+  const header = document.createElement('div');
+  header.className = `${type}-header`;
+  header.textContent = text;
+  const ul = document.createElement('ul');
+  ul.className = type === 'year' ? 'items-list' : 'month-items-list';
+  
+  header.addEventListener('click', e => {
+    e.stopPropagation();
+    li.classList.toggle('expanded');
+    if (type === 'year' && !li.classList.contains('expanded')) {
+      ul.querySelectorAll('.month-item.expanded').forEach(m => {
+        m.classList.remove('expanded');
+        m.querySelector('.month-items-list').style.maxHeight = '0';
+      });
+    }
+  });
+  
+  li.append(header, ul);
+  return li;
+}
+
+function createLink(item, type) {
+  const li = document.createElement('li');
+  const a = document.createElement('a');
+  a.href = `https://fraetech.github.io/index.html?csv=${item.path}`;
+  a.textContent = simplifyLabel(item.label, type);
+  li.appendChild(a);
+  return li;
+}
+
+function setupAccordions() {
+  const isMobile = window.innerWidth <= 768;
+  document.querySelectorAll('.column').forEach(col => {
+    const h2 = col.querySelector('h2');
+    // Sur PC : ouvrir uniquement les tiroirs principaux (pas les années)
+    if (!isMobile) {
+      col.classList.add('active');
+    }
+    
+    h2.addEventListener('click', () => {
+      col.classList.toggle('active');
+      if (!col.classList.contains('active')) {
+        col.querySelectorAll('.year-item.expanded, .month-item.expanded').forEach(e => {
+          e.classList.remove('expanded');
+        });
+      }
+    });
+  });
+}
+
+function groupBy(arr, fn) {
+  return arr.reduce((acc, item) => {
+    const key = fn(item);
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {});
+}
+
+function extractYear(label) {
+  const m = label.match(/(\d{4})/);
+  return m ? m[1] : '0000';
+}
+
+function compareDates(a, b) {
+  const parse = label => {
+    const nums = label.match(/\d+/g) || [];
+    if (label.includes('Semaine') || label.match(/^\d+\/\d+\s*-/)) {
+      return { year: +nums[nums.length-1], week: +nums[nums.length-2] || +nums[0], type: 'week' };
+    }
+    if (label.includes('Trimestre')) {
+      return { year: +nums[nums.length-1], val: +nums[0], type: 'trim' };
+    }
+    // Pour les mois en texte (Janvier, Février, etc.)
+    const monthIndex = MONTH_NAMES.findIndex(m => label.includes(m));
+    if (monthIndex !== -1) {
+      return { year: +nums[nums.length-1] || 0, val: monthIndex + 1, type: 'month' };
+    }
+    return { year: +nums[nums.length-1] || 0, val: +nums[0] || 0, type: 'month' };
+  };
+  
+  const pA = parse(a), pB = parse(b);
+  if (pA.year !== pB.year) return pB.year - pA.year;
+  return (pB.week || pB.val || 0) - (pA.week || pA.val || 0);
+}
+
+init().catch(console.error);
 </script>
-<h1><a href="https://fraetech.github.io/">Retour à la carte principale</a></h1><br>
-<h2>NB : </h2>
-<h3>Pour info, certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte (i.e. déclaration prévisionnelles, tri ZB/non ZB, etc.) peuvent ne pas être présents sur celle-ci.<br>
-Si toutefois, il fallait regénérer une semaine en particulier pour profiter des dernières fonctionnalités, n'hésitez pas à me le faire savoir.</h3>
-<h2>MAJ manquantes (et raison) : </h2>
-<h3>Hebdomadaires : </h3>
-S27-2025 : Deux MAJs publiées cette semaine-là (S27 et S28, fix à venir (voir issue <a href="https://github.com/fraetech/anfr_hebdo/issues/55">55</a>)).<br>
-S22-2025 : Deux MAJs publiées cette semaine-là (S22 et S23, fix à venir (voir issue <a href="https://github.com/fraetech/anfr_hebdo/issues/55">55</a>)).<br>
-S18-2025 : MAJ publiée en retard, j'ai tout mis sur la S19. :)<br>
-S17-2025 : Bug sur la MAJ, mois d'avril mouvementé.<br>
-S15-2025 : Bug sur la MAJ, idem.<br>
-S01-2025 : Pas de MAJ publiée cette semaine-là, report sur la S2.<br>
-S52-2024 : Pas de MAJ publiée cette semaine-là, report sur la S2-2025.
-<h3>Mensuelles : </h3>
-04-2025 : Bug sur la MAJ, mois d'avril mouvementé..<br>
-<h3>Trimestrielles : </h3>
-T2-2025 : Bug sur la MAJ, mois d'avril mouvementé.<br>
-<h2>Sorry :/</h2>
+
+<div style="text-align: center; margin-top: 60px;">
+  <a href="https://fraetech.github.io/" class="back-link">← Retour à la carte principale</a>
+</div>
+
+<div class="info-section">
+  <h2>ℹ️ Informations</h2>
+  <h3>Note importante :</h3>
+  <p>Certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte peuvent ne pas être présents sur celle-ci. Si une semaine devait être regénérée, n'hésitez pas à me le faire savoir.</p>
+  
+  <h3>⚠️ MAJ manquantes (et raison)</h3>
+  
+  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Hebdomadaires :</h3>
+  <p style="margin: 5px 0; font-size: 0.9em;">
+    S01-2026 : Pas de MAJ publiée, report sur S2-2026.<br>
+    S27-2025 : Deux MAJs cette semaine (S27 et S28, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).<br>
+    S22-2025 : Deux MAJs cette semaine (S22 et S23, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).<br>
+    S18-2025 : MAJ en retard, mise sur S19.<br>
+    S17-2025 : Bug sur la MAJ.<br>
+    S15-2025 : Bug sur la MAJ.<br>
+    S01-2025 : Pas de MAJ, report sur S2.<br>
+    S52-2024 : Pas de MAJ, report sur S2-2025.
+  </p>
+  
+  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Mensuelles :</h3>
+  <p style="margin: 5px 0; font-size: 0.9em;">04-2025 : Bug sur la MAJ.</p>
+  
+  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Trimestrielles :</h3>
+  <p style="margin: 5px 0; font-size: 0.9em;">T2-2025 : Bug sur la MAJ.</p>
+  
+  <div class="sorry-message">Sorry :/</div>
+</div>
+
 </body>
 </html>

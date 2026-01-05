@@ -64,6 +64,16 @@ export class PopupGenerator {
       actionsByType[action.action].push(action);
     });
 
+    // Actions qui affichent le champ "infos" au lieu de "technologie"
+    const infosActions = {
+      'CHI': { label: 'Ancien identifiant', position: 'above' },
+      'CHA': { label: 'Ancienne adresse', position: 'above' },
+      'CHL': { label: 'Ancienne localisation', position: 'above' },
+      'CHT': { label: 'Ancien type', position: 'below' },
+      'CHH': { label: 'Ancienne hauteur', position: 'below' },
+      'CHP': { label: 'Ancien propriétaire', position: 'below' }
+    };
+
     let html = '<div class="contenu">';
     for (const [actionType, actions] of Object.entries(actionsByType)) {
       const actionTitle = CONFIG.actions[actionType] || actionType;
@@ -79,6 +89,18 @@ export class PopupGenerator {
             }
             return `${a.technologie}<br>${dateBrackets}`;
           }).join('<br>')}</div>
+        </div>`;
+      }
+      else if (infosActions[actionType]) {
+        // Pour les actions de changement, afficher le champ "infos" avec meilleure lisibilité
+        const actionInfo = infosActions[actionType];
+        const positionNote = actionInfo.position === 'above' 
+          ? '(Nouvelle valeur juste au-dessus)'
+          : '(Nouvelle valeur juste en-dessous)';
+        
+        html += `<div class="action-groupe">
+          <div class="action-titre">${actionTitle} :</div>
+          <div>${actions.map(a => `${actionInfo.label} :<br><strong>${a.infos || 'N/A'}</strong><br><br><em>${positionNote}</em>`).join('<br>')}</div>
         </div>`;
       }
       else {

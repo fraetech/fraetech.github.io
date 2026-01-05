@@ -52,13 +52,15 @@ export class DataStore {
     supportObj.data.forEach(row => {
       this.filterValues.operateurs.add(row.operateur);
       this.filterValues.actions.add(row.action);
-      row.technologie.split(',').forEach(techRaw => {
-        const tech = techRaw.trim();
-        const baseTech = Utils.extractBaseTech(tech);
-        const freq = Utils.extractFreq(tech);
-        if (baseTech) this.filterValues.technos.add(baseTech);
-        if (freq) this.filterValues.freqs.add(freq);
-      });
+      if (row.technologie) {
+        row.technologie.split(',').forEach(techRaw => {
+          const tech = techRaw.trim();
+          const baseTech = Utils.extractBaseTech(tech);
+          const freq = Utils.extractFreq(tech);
+          if (baseTech) this.filterValues.technos.add(baseTech);
+          if (freq) this.filterValues.freqs.add(freq);
+        });
+      }
     });
   }
 
@@ -105,12 +107,18 @@ export class DataStore {
     const matchZB = this.activeFilters.zb.has(row.is_zb);
     const matchNew = this.activeFilters.new.has(row.is_new);
 
-    const techFreqMatch = row.technologie.split(',').some(techRaw => {
-      const tech = techRaw.trim();
-      const baseTech = Utils.extractBaseTech(tech);
-      const freq = Utils.extractFreq(tech);
-      return this.activeFilters.technos.has(baseTech) && this.activeFilters.freqs.has(freq);
-    });
+    // Pour les actions "changement" (CHI, CHA, CHL, CHT, CHH, CHP), ignorer le filtre technologie/fréquence
+    const changeActions = new Set(['CHI', 'CHA', 'CHL', 'CHT', 'CHH', 'CHP']);
+    let techFreqMatch = true;
+    
+    if (!changeActions.has(row.action) && row.technologie) {
+      techFreqMatch = row.technologie.split(',').some(techRaw => {
+        const tech = techRaw.trim();
+        const baseTech = Utils.extractBaseTech(tech);
+        const freq = Utils.extractFreq(tech);
+        return this.activeFilters.technos.has(baseTech) && this.activeFilters.freqs.has(freq);
+      });
+    }
 
     return matchOp && matchAction && matchZB && matchNew && techFreqMatch;
   }

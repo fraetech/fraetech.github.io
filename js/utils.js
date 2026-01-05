@@ -8,29 +8,30 @@ export const Utils = {
     if (lines.length <= 1) return [];
     const header = lines.shift();
     
-    // Parse header to get column indices dynamically
-    const headerValues = header.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim());
-    const columnIndex = {};
-    headerValues.forEach((col, idx) => {
-      columnIndex[col] = idx;
+    // Parse header to determine column indices dynamically
+    const headers = header.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim());
+    const columnMap = {};
+    headers.forEach((h, i) => {
+      columnMap[h] = i;
     });
     
     return lines.map(line => {
       const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, ''));
       return {
-        id_support: values[columnIndex['id_support']] || '',
-        operateur: values[columnIndex['operateur']] || '',
-        action: values[columnIndex['action']] || '',
-        technologie: values[columnIndex['technologie']] || '',
-        adresse: values[columnIndex['adresse']] || '',
-        code_insee: values[columnIndex['code_insee']] || '',
-        coordonnees: values[columnIndex['coordonnees']] || '',
-        type_support: values[columnIndex['type_support']] || '',
-        hauteur_support: values[columnIndex['hauteur_support']] || '',
-        proprietaire_support: values[columnIndex['proprietaire_support']] || '',
-        date_activ: values[columnIndex['date_activ']] || '',
-        is_zb: (values[columnIndex['is_zb']] || 'false').toLowerCase().trim(),
-        is_new: (values[columnIndex['is_new']] || 'false').toLowerCase().trim()
+        id_support: values[columnMap['id_support']],
+        operateur: values[columnMap['operateur']],
+        action: values[columnMap['action']],
+        technologie: values[columnMap['technologie']],
+        adresse: values[columnMap['adresse']],
+        code_insee: values[columnMap['code_insee']],
+        coordonnees: values[columnMap['coordonnees']],
+        type_support: values[columnMap['type_support']],
+        hauteur_support: values[columnMap['hauteur_support']],
+        proprietaire_support: values[columnMap['proprietaire_support']],
+        date_activ: values[columnMap['date_activ']] || '',
+        infos: values[columnMap['infos']] || '',
+        is_zb: values[columnMap['is_zb']]?.toLowerCase().trim() || 'false',
+        is_new: values[columnMap['is_new']]?.toLowerCase().trim() || 'false'
       };
     });
   },

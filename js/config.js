@@ -21,9 +21,12 @@ export const CONFIG = {
     'AJO': 'Ajout fréquence',
     'SUP': 'Suppression fréquence',
     'EXT': 'Extinction fréquence',
-    'CHA' : 'Changement d\'adresse',
-    'CHI' : 'Changement identifiant support',
-    'CHL' : 'Changement localisation'
+    'CHI': 'Changement identifiant support',
+    'CHA': 'Changement adresse',
+    'CHL': 'Changement localisation',
+    'CHT': 'Changement type support',
+    'CHH': 'Changement hauteur support',
+    'CHP': 'Changement propriétaire support'
   },
   technologies: {
     'GSM': 'GSM (2G)',

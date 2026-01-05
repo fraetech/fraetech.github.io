@@ -7,22 +7,30 @@ export const Utils = {
     const lines = clean.split(/\r?\n/);
     if (lines.length <= 1) return [];
     const header = lines.shift();
+    
+    // Parse header to get column indices dynamically
+    const headerValues = header.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim());
+    const columnIndex = {};
+    headerValues.forEach((col, idx) => {
+      columnIndex[col] = idx;
+    });
+    
     return lines.map(line => {
       const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, ''));
       return {
-        id_support: values[0],
-        operateur: values[1],
-        action: values[2],
-        technologie: values[3],
-        adresse: values[4],
-        code_insee: values[5],
-        coordonnees: values[6],
-        type_support: values[7],
-        hauteur_support: values[8],
-        proprietaire_support: values[9],
-        date_activ: values[10],
-        is_zb: values[11]?.toLowerCase().trim() || 'false',
-        is_new: values[12]?.toLowerCase().trim() || 'false'
+        id_support: values[columnIndex['id_support']] || '',
+        operateur: values[columnIndex['operateur']] || '',
+        action: values[columnIndex['action']] || '',
+        technologie: values[columnIndex['technologie']] || '',
+        adresse: values[columnIndex['adresse']] || '',
+        code_insee: values[columnIndex['code_insee']] || '',
+        coordonnees: values[columnIndex['coordonnees']] || '',
+        type_support: values[columnIndex['type_support']] || '',
+        hauteur_support: values[columnIndex['hauteur_support']] || '',
+        proprietaire_support: values[columnIndex['proprietaire_support']] || '',
+        date_activ: values[columnIndex['date_activ']] || '',
+        is_zb: (values[columnIndex['is_zb']] || 'false').toLowerCase().trim(),
+        is_new: (values[columnIndex['is_new']] || 'false').toLowerCase().trim()
       };
     });
   },

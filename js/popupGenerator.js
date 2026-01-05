@@ -64,17 +64,18 @@ export class PopupGenerator {
       actionsByType[action.action].push(action);
     });
 
-    // Actions qui affichent le champ "infos" au lieu de "technologie"
+    // Labels + messages souhaités
     const infosActions = {
-      'CHI': { label: 'Ancien identifiant', position: 'above' },
-      'CHA': { label: 'Ancienne adresse', position: 'above' },
-      'CHL': { label: 'Ancienne localisation', position: 'above' },
-      'CHT': { label: 'Ancien type', position: 'below' },
-      'CHH': { label: 'Ancienne hauteur', position: 'below' },
-      'CHP': { label: 'Ancien propriétaire', position: 'below' }
+      'CHI': { label: 'Ancien identifiant', message: 'Nouvel identifiant support en haut du pop-up.' },
+      'CHA': { label: 'Ancienne adresse', message: 'Nouvelle adresse ci-dessus.' },
+      'CHL': { label: 'Ancienne localisation', message: '' },
+      'CHT': { label: 'Ancien type', message: 'Nouveau type de support ci-dessous.' },
+      'CHH': { label: 'Ancienne hauteur', message: 'Nouvelle hauteur ci-dessous.' },
+      'CHP': { label: 'Ancien propriétaire', message: 'Nouveau propriétaire ci-dessous.' }
     };
 
     let html = '<div class="contenu">';
+
     for (const [actionType, actions] of Object.entries(actionsByType)) {
       const actionTitle = CONFIG.actions[actionType] || actionType;
 
@@ -91,18 +92,23 @@ export class PopupGenerator {
           }).join('<br>')}</div>
         </div>`;
       }
+
       else if (infosActions[actionType]) {
-        // Pour les actions de changement, afficher le champ "infos" avec meilleure lisibilité
+
         const actionInfo = infosActions[actionType];
-        const positionNote = actionInfo.position === 'above' 
-          ? '(Nouvelle valeur juste au-dessus)'
-          : '(Nouvelle valeur juste en-dessous)';
-        
+
         html += `<div class="action-groupe">
           <div class="action-titre">${actionTitle} :</div>
-          <div>${actions.map(a => `${actionInfo.label} :<br><strong>${a.infos || 'N/A'}</strong><br><br><em>${positionNote}</em>`).join('<br>')}</div>
+          <div>
+            ${actions.map(a => `
+              ${actionInfo.label} :<br>
+              <strong>${a.infos || 'N/A'}</strong>
+              ${actionInfo.message ? `<br><br><em>${actionInfo.message}</em>` : ``}
+            `).join('<br>')}
+          </div>
         </div>`;
       }
+
       else {
         html += `<div class="action-groupe">
           <div class="action-titre">${actionTitle} :</div>
@@ -110,8 +116,8 @@ export class PopupGenerator {
         </div>`;
       }
     }
-    html += '</div>';
 
+    html += '</div>';
     return html;
   }
 

@@ -25,7 +25,6 @@ export class FilterManager {
     const frOps = sortedAllOps.filter(op => frMetropOps.includes(op)).sort();
     const dromComOps = sortedAllOps.filter(op => !frMetropOps.includes(op)).sort();
     
-    // Add FR Métrop header and operators
     if (frOps.length > 0) {
       const frHeader = document.createElement('div');
       frHeader.className = 'filter-category-header';
@@ -64,7 +63,6 @@ export class FilterManager {
       });
     }
     
-    // Add DROM/COM header and operators
     if (dromComOps.length > 0) {
       const dromHeader = document.createElement('div');
       dromHeader.className = 'filter-category-header';
@@ -119,11 +117,77 @@ export class FilterManager {
     });
 
     // === ACTIONS ===
-    [...this.dataStore.filterValues.actions].sort().forEach(action => {
-      this.createCheckbox(actionContainer, action, 'actions', window.CONFIG?.actions?.[action] || action);
+    const baseActions = ['AJO','ALL','EXT','SUP','AAV'];
+
+    const changeActions = [...this.dataStore.filterValues.actions]
+      .filter(a => a.startsWith('CH'))
+      .sort();
+
+    const otherActions = [...this.dataStore.filterValues.actions]
+      .filter(a => !baseActions.includes(a) && !a.startsWith('CH'))
+      .sort();
+
+    // Base actions visible directement
+    baseActions.forEach(action => {
+      if (this.dataStore.filterValues.actions.has(action)) {
+        this.createCheckbox(
+          actionContainer,
+          action,
+          'actions',
+          window.CONFIG?.actions?.[action] || action
+        );
+      }
     });
 
-    // Radio groups (no toggle needed)
+    // Sous-catégorie Changements divers (CH…)
+    if (changeActions.length > 0) {
+      const chHeader = document.createElement('div');
+      chHeader.className = 'filter-category-header';
+      chHeader.textContent = 'Changements divers';
+      actionContainer.appendChild(chHeader);
+
+      const chToggle = document.createElement('button');
+      chToggle.className = 'toggle-subcategory-btn';
+      chToggle.textContent = 'Tout décocher';
+      chHeader.appendChild(chToggle);
+
+      const chGroup = document.createElement('div');
+      chGroup.className = 'filter-group';
+      actionContainer.appendChild(chGroup);
+
+      const chCheckboxes = [];
+      changeActions.forEach(action => {
+        const chk = this.createCheckbox(
+          chGroup,
+          action,
+          'actions',
+          window.CONFIG?.actions?.[action] || action
+        );
+        if (chk) chCheckboxes.push(chk);
+      });
+
+      chToggle.addEventListener('click', e => {
+        e.stopPropagation();
+        const allChecked = chCheckboxes.every(c => c.checked);
+        chCheckboxes.forEach(c => {
+          c.checked = !allChecked;
+          c.dispatchEvent(new Event('change'));
+        });
+        chToggle.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+      });
+    }
+
+    // Autres actions éventuelles
+    otherActions.forEach(action => {
+      this.createCheckbox(
+        actionContainer,
+        action,
+        'actions',
+        window.CONFIG?.actions?.[action] || action
+      );
+    });
+
+    // Radio groups
     this.createRadioGroup(zbContainer, 'zoneBlanche', [
       { value: 'all', label: 'Toutes' },
       { value: 'true', label: 'Zone blanche' },
@@ -148,7 +212,6 @@ export class FilterManager {
     label.append(' ' + displayName);
     container.appendChild(label);
 
-    // Initialize active filters sets
     this.dataStore.activeFilters[filterType].add(value);
     
     return checkbox;
@@ -176,7 +239,6 @@ export class FilterManager {
   }
 
   _doUpdateFilters() {
-    // Collect checkboxes
     const opVals = new Set();
     document.querySelectorAll('#opFilters input:checked').forEach(cb => opVals.add(cb.value));
     this.dataStore.updateActiveFilters('operateurs', opVals);
@@ -193,7 +255,6 @@ export class FilterManager {
     document.querySelectorAll('#actionFilters input:checked').forEach(cb => actionVals.add(cb.value));
     this.dataStore.updateActiveFilters('actions', actionVals);
 
-    // Radio groups
     const zbRadio = document.querySelector('input[name="zoneBlanche"]:checked');
     const zbVals = zbRadio?.value === 'all' ? new Set(['true','false']) : new Set([zbRadio.value]);
     this.dataStore.updateActiveFilters('zb', zbVals);
@@ -202,7 +263,6 @@ export class FilterManager {
     const newVals = newRadio?.value === 'all' ? new Set(['true','false']) : new Set([newRadio.value]);
     this.dataStore.updateActiveFilters('new', newVals);
 
-    // Apply filters to map
     const filtered = this.dataStore.getFilteredSupports();
     this.mapManager.updateMarkers(filtered);
   }
@@ -219,14 +279,12 @@ export class FilterManager {
         e.stopPropagation();
         this.resetAllFilters();
       }
-      // Support old .filter-category for backwards compatibility
       if (e.target.matches('.filter-category')) {
         const group = e.target.nextElementSibling;
         if (group) {
           group.style.maxHeight = group.style.maxHeight ? null : group.scrollHeight + "px";
         }
       }
-      // Support new .filter-category-header for expandable sections (Zone Blanche, Sites Neufs)
       if (e.target.matches('.filter-category-header') && !e.target.closest('button')) {
         const group = e.target.nextElementSibling;
         if (group && group.classList.contains('filter-group')) {

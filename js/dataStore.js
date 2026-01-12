@@ -148,7 +148,7 @@ export class DataStore {
 
           const opConfig = CONFIG.operators[firstRow.operateur] || CONFIG.operators['MISC'];
           const actionId = supportRows.length > 1 ? '' : `_${firstRow.action?.toLowerCase?.() || ''}`;
-          const iconUrl = `${CONFIG.baseIconUrl}${opConfig.id}${actionId}.avif`;
+          const iconUrl = `${CONFIG.baseIconUrl}${opConfig.id}${actionId}.svg`;
 
           const icon = L.icon({
             iconUrl,

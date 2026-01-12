@@ -360,10 +360,12 @@ html, body {
 .icone-container {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   margin: 8px 0;
   width: 100%;
   box-sizing: border-box;
+  flex-wrap: nowrap;
+  overflow: visible;
 }
 
 .bandeau a {
@@ -385,17 +387,21 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px; /* Réduit de 50px à 40px */
-  height: 40px; /* Réduit de 50px à 40px */
-  border-radius: 6px; /* Réduit de 8px à 6px */
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 6px;
   background-color: rgba(245, 245, 245, 0.9);
-  padding: 4px; /* Réduit de 5px à 4px */
+  padding: 3px;
   transition: all 0.2s ease;
 }
 
 .icone img {
-  max-width: 32px; /* Réduit de 40px à 32px */
-  max-height: 32px; /* Réduit de 40px à 32px */
+  max-width: 30px; /* Ajusté proportionnellement */
+  max-height: 30px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .icone:hover {
@@ -449,7 +455,7 @@ html, body {
   position: absolute;
   inset: 0;
   background-image: var(--logo-url);
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0.15;
@@ -532,17 +538,17 @@ strong { font-weight: bold; }
   
   .icone-container {
     margin: 6px 0;
-    gap: 6px;
+    gap: 5px;
   }
   
   .icone {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
   
   .icone img {
-    max-width: 28px;
-    max-height: 28px;
+    max-width: 26px;
+    max-height: 26px;
   }
   
   .titre {
@@ -562,6 +568,20 @@ strong { font-weight: bold; }
 }
 
 @media (max-width: 480px) {
+  .icone-container {
+    gap: 4px;
+  }
+
+  .icone {
+    width: 30px;
+    height: 30px;
+  }
+
+  .icone img {
+    max-width: 24px;
+    max-height: 24px;
+  }
+
   .popup-operator-bg {
     width: calc(100vw - 40px);
     max-width: 260px;

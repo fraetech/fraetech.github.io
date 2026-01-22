@@ -16,31 +16,40 @@ Vous pouvez filtrer les données par :
 *La couleur de l’icône change selon l’opérateur !*
 
 - **Activation déclarée en avance** : l’opérateur a indiqué qu’une fréquence/un site allait être activé à une date future (par "site", comprendre "station de base") ;
-![Activation déclarée en avance](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt_aav.avif)
+![Activation déclarée en avance](https://fraetech.github.io/icons/byt_aav.svg)
 
 - **Ajout site/fréquence** : ajout d’une fréquence sur un site existant ou déclaration d’un nouveau site ;
-![Ajout site/fréquence](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt_ajo.avif)
+![Ajout site/fréquence](https://fraetech.github.io/icons/byt_ajo.svg)
 
 - **Activation site/fréquence** : activation d’une fréquence sur un site existant ou activation d’un nouveau site ;
-![Activation site/fréquence](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt_all.avif)
+![Activation site/fréquence](https://fraetech.github.io/icons/byt_all.svg)
 
-- **Changement d’adresse** : l’adresse ANFR du site concerné a changé ;
-![Changement d'adresse](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt_cha.avif)
+- **Changement d'adresse du support** : l'adresse ANFR du site concerné a changé ;
+![Changement d'adresse](https://fraetech.github.io/icons/byt_cha.svg)
 
-- **Changement de numéro de support** : le numéro de support ANFR a été modifié (souvent synonyme de modification de hauteur, de type de support, ou arrivée prochaine d’un nouvel opérateur) ;
-![Changement de numéro de support](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt_chi.avif)
+- **Changement de hauteur du support** : la hauteur déclarée à l'ANFR a été modifiée ;
+![Changement de hauteur du support](https://fraetech.github.io/icons/byt_chh.svg)
 
-- **Changement de position (coordonnées GPS)** : les coordonnées GPS du site ont changé ;
-![Changement de position](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt_chl.avif)
+- **Changement de numéro du support** : le numéro de support ANFR a été modifié (souvent synonyme de modification de hauteur, de type de support, ou arrivée prochaine d'un nouvel opérateur) ;
+![Changement de numéro du support](https://fraetech.github.io/icons/byt_chi.svg)
+
+- **Changement de position du support (coordonnées GPS)** : les coordonnées GPS du site ont changé ;
+![Changement de position](https://fraetech.github.io/icons/byt_chl.svg)
+
+- **Changement du propriétaire du support** : le propriétaire déclaré à l'ANFR a été modifié ;
+![Changement du propriétaire du support](https://fraetech.github.io/icons/byt_chp.svg)
+
+- **Changement de type du support** : le type de support déclaré à l'ANFR a été modifié ;
+![Changement de type du support](https://fraetech.github.io/icons/byt_cht.svg)
 
 - **Extinction site/fréquence** : une fréquence (ou un site entier) a été éteint ;
-![Extinction site/fréquence](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt_ext.avif)
+![Extinction site/fréquence](https://fraetech.github.io/icons/byt_ext.svg)
 
 - **Suppression site/fréquence** : une fréquence (ou un site entier) a été supprimé ;
-![Suppression site/fréquence](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt_sup.avif)
+![Suppression site/fréquence](https://fraetech.github.io/icons/byt_sup.svg)
 
 - **Plusieurs actions à la fois** ;
-![Plusieurs actions](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/icons/byt.avif)
+![Plusieurs actions](https://fraetech.github.io/icons/byt.svg)
 
 ### Popups et options
 En cliquant sur une icône, un popup affiche le détail de la modification :
@@ -87,11 +96,11 @@ Pour les plus curieux, je mets aussi à disposition les fichiers CSV bruts utili
 Ils contiennent les différences entre la publication de la semaine x et la semaine x-1, avec un fichier par grand opérateur français et un fichier global qui regroupe toutes les modifs (y compris DROM/COM).
 
 Les fichiers sont disponibles aux adresses suivantes :
-- [Index](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/files/hebdo/index.csv) (toutes les modifs)
-- [Bouygues Telecom](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/files/hebdo/bouygues.csv)
-- [Free Mobile](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/files/hebdo/free.csv) (inclut Telco OI, Free Caraïbes)
-- [Orange](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/files/hebdo/orange.csv)
-- [SFR](https://raw.githubusercontent.com/fraetech/fraetech.github.io/refs/heads/main/files/hebdo/sfr.csv) (inclut SRR)
+- [Index](https://fraetech.github.io/files/hebdo/index.csv) (toutes les modifs)
+- [Bouygues Telecom](https://fraetech.github.io/files/hebdo/bouygues.csv)
+- [Free Mobile](https://fraetech.github.io/files/hebdo/free.csv) (inclut Telco OI, Free Caraïbes)
+- [Orange](https://fraetech.github.io/files/hebdo/orange.csv)
+- [SFR](https://fraetech.github.io/files/hebdo/sfr.csv) (inclut SRR)
 
 Je propose également des CSV des mises à jour sur un mois ou sur un trimestre, je vous conseille d'aller regarder dans [la partie files de la branche main](https://github.com/fraetech/fraetech.github.io/tree/main/files) ce qui vous intéresse.
 
@@ -105,9 +114,12 @@ Le header, commun aux fichiers est le suivant :
   - AAV = déclaration en avance
   - AJO = ajout site/fréquence
   - ACT = activation site/fréquence
-  - CHA = changement d’adresse
+  - CHA = changement d’adresse support
+  - CHH = changement hauteur support
   - CHI = changement support id
   - CHL = changement coordonnées GPS
+  - CHP = changement propriétaire support
+  - CHT = changement type support
   - EXT = extinction site/fréquence
   - SUP = suppression site/fréquence
 - `technologie` : fréquence(s) concernée(s) *(str)*

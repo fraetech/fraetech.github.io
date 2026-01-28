@@ -123,12 +123,6 @@
 			navigator.serviceWorker.register('/service-worker.js', {scope: '/'}).then(function(registration) {
 				console.log('SW registered successfully');
 
-				// Vérifie les mises à jour toutes les 60 secondes
-				setInterval(() => {
-					console.log('Checking for SW updates...');
-					registration.update();
-				}, 60000);
-
 				// Écoute les mises à jour
 				registration.addEventListener('updatefound', () => {
 					const newWorker = registration.installing;

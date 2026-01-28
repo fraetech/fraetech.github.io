@@ -3,6 +3,9 @@ importScripts('/js/version.js');
 const STATIC_CACHE = `mh-static-${self.APP_VERSION}`;
 const ICONS_CACHE = `mh-icons-${self.APP_VERSION}`;
 
+// Flag pour indiquer si une mise à jour est en cours
+let updateInProgress = false;
+
 // Uniquement les ressources critiques (chargement initial)
 const URLS_TO_CACHE = [
   '/',
@@ -27,44 +30,64 @@ const URLS_TO_CACHE = [
 
 // Installation : cache uniquement les ressources critiques
 self.addEventListener('install', event => {
-  self.skipWaiting();
+  console.log('SW installing version:', self.APP_VERSION);
+  
   event.waitUntil(
-    Promise.all([
-      // Crée le cache pour les icônes (vide au départ)
-      caches.open(ICONS_CACHE),
-      // Cache les ressources statiques critiques
-      caches.open(STATIC_CACHE).then(async cache => {
-        await Promise.all(
-          URLS_TO_CACHE.map(async url => {
-            try {
-              await cache.add(url);
-            } catch (e) {
-              console.warn('Cache failed:', url, e);
-            }
-          })
-        );
-      })
-    ])
+    // D'abord, supprime TOUS les anciens caches
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.map(key => {
+          if (key !== STATIC_CACHE && key !== ICONS_CACHE) {
+            console.log('SW install: Deleting old cache:', key);
+            return caches.delete(key);
+          }
+        })
+      );
+    }).then(() => {
+      // Puis crée les nouveaux caches
+      return Promise.all([
+        caches.open(ICONS_CACHE),
+        caches.open(STATIC_CACHE).then(async cache => {
+          await Promise.all(
+            URLS_TO_CACHE.map(async url => {
+              try {
+                await cache.add(url);
+              } catch (e) {
+                console.warn('Cache failed:', url, e);
+              }
+            })
+          );
+        })
+      ]);
+    }).then(() => {
+      self.skipWaiting();
+      console.log('SW install complete, version:', self.APP_VERSION);
+    })
   );
 });
 
 // Activation : nettoie les anciens caches
 self.addEventListener('activate', event => {
+  console.log('SW activating, current version:', self.APP_VERSION);
+  
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => {
-            // Garde uniquement les caches de la version actuelle
-            const isCurrentCache = (key === STATIC_CACHE || key === ICONS_CACHE);
-            if (!isCurrentCache) {
-              console.log('Deleting old cache:', key);
-            }
-            return !isCurrentCache;
-          })
-          .map(key => caches.delete(key))
-      )
-    ).then(() => self.clients.claim())
+    caches.keys().then(keys => {
+      console.log('Activating - existing caches:', keys);
+      return Promise.all(
+        keys.map(key => {
+          const isCurrentCache = (key === STATIC_CACHE || key === ICONS_CACHE);
+          if (!isCurrentCache) {
+            console.log('SW activate: Deleting old cache:', key);
+            return caches.delete(key);
+          }
+          console.log('SW activate: Keeping cache:', key);
+          return Promise.resolve();
+        })
+      );
+    }).then(() => {
+      console.log('Cache cleanup complete, claiming clients');
+      return self.clients.claim();
+    })
   );
 });
 
@@ -73,6 +96,10 @@ self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     console.log('SW: Skip waiting requested');
     self.skipWaiting();
+  }
+  if (event.data && event.data.type === 'UPDATE_DETECTED') {
+    console.log('SW: Update detected, switching to Network-First strategy');
+    updateInProgress = true;
   }
 });
 
@@ -109,20 +136,42 @@ self.addEventListener('fetch', event => {
     return;
   }
   
-  // Stratégie pour les ressources statiques : Cache-First
+  // Stratégie pour les ressources statiques : Cache-First par défaut, Network-First si mise à jour
   if (url.origin === self.location.origin && 
       URLS_TO_CACHE.includes(url.pathname)) {
-    event.respondWith(
-      caches.match(event.request).then(response => 
-        response || fetch(event.request).then(fetchResponse => {
-          // Cache les nouvelles ressources statiques
-          return caches.open(STATIC_CACHE).then(cache => {
-            cache.put(event.request, fetchResponse.clone());
+    
+    if (updateInProgress) {
+      // Network-First pendant une mise à jour
+      event.respondWith(
+        fetch(event.request).then(fetchResponse => {
+          if (fetchResponse && fetchResponse.ok) {
+            return caches.open(STATIC_CACHE).then(cache => {
+              cache.put(event.request, fetchResponse.clone());
+              return fetchResponse;
+            });
+          }
+          return caches.match(event.request);
+        }).catch(() => caches.match(event.request))
+      );
+    } else {
+      // Cache-First en temps normal
+      event.respondWith(
+        caches.match(event.request).then(cached => {
+          if (cached) {
+            return cached;
+          }
+          return fetch(event.request).then(fetchResponse => {
+            if (fetchResponse && fetchResponse.ok) {
+              return caches.open(STATIC_CACHE).then(cache => {
+                cache.put(event.request, fetchResponse.clone());
+                return fetchResponse;
+              });
+            }
             return fetchResponse;
           });
         })
-      )
-    );
+      );
+    }
     return;
   }
   

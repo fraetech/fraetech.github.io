@@ -106,9 +106,9 @@
 		
 		document.body.appendChild(notification);
 		
-		// Rafraîchit la page après 2 secondes
+		// Rafraîchit la page après 2 secondes (le SW aura le temps de s'activer)
 		setTimeout(() => {
-			window.location.reload();
+			window.location.reload(true);
 		}, 2000);
 	};
 
@@ -125,22 +125,32 @@
 
 				// Vérifie les mises à jour toutes les 60 secondes
 				setInterval(() => {
+					console.log('Checking for SW updates...');
 					registration.update();
 				}, 60000);
 
 				// Écoute les mises à jour
 				registration.addEventListener('updatefound', () => {
 					const newWorker = registration.installing;
-					console.log('SW update found, installing...');
+					console.log('SW update found, installing new version...');
 
 					newWorker.addEventListener('statechange', () => {
 						if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
 							// Une nouvelle version est prête
 							console.log('SW update ready to activate');
+							
+							// Envoie un message au SW pour qu'il passe en Network-First
+							if (navigator.serviceWorker.controller) {
+								navigator.serviceWorker.controller.postMessage({
+									type: 'UPDATE_DETECTED'
+								});
+							}
+							
 							updateAvailableResolve({
 								registration: registration,
 								isUpdateAvailable: true
 							});
+							
 							// Affiche une notification à l'utilisateur
 							if (window.showUpdateNotification) {
 								window.showUpdateNotification();
@@ -151,12 +161,12 @@
 			}, function(err) {
 				console.error('SW registration failed:', err);
 			});
-
-			// Écoute les messages du SW
+			
+			// Écoute les changements de contrôleur SW
 			navigator.serviceWorker.addEventListener('controllerchange', () => {
-				console.log('SW controller changed, page update may be needed');
-				// Optionnel: recharger la page si une nouvelle version est activée
-				// window.location.reload();
+				console.log('SW controller changed - new version activated');
+				// Recharge la page pour utiliser la nouvelle version
+				window.location.reload(true);
 			});
 		});
 	}

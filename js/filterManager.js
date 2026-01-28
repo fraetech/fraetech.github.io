@@ -27,11 +27,21 @@ export class FilterManager {
     
     if (frOps.length > 0) {
       const frHeader = document.createElement('div');
-      frHeader.className = 'filter-category-header';
+      frHeader.className = 'filter-subcategory-header';
       frHeader.style.fontSize = '0.9em';
-      frHeader.style.marginTop = '5px';
+      frHeader.style.marginTop = '10px';
+      frHeader.style.marginBottom = '5px';
+      frHeader.style.display = 'flex';
+      frHeader.style.justifyContent = 'space-between';
+      frHeader.style.alignItems = 'center';
+      frHeader.style.cursor = 'default';
+      frHeader.style.backgroundColor = '#f5f5f5';
+      frHeader.style.padding = '8px 10px';
+      frHeader.style.borderRadius = '4px';
+      
       const frTitle = document.createElement('span');
       frTitle.textContent = 'France Métropolitaine';
+      frTitle.style.fontWeight = '500';
       frHeader.appendChild(frTitle);
       
       const frToggleBtn = document.createElement('button');
@@ -46,30 +56,53 @@ export class FilterManager {
       frHeader.appendChild(frToggleBtn);
       opContainer.appendChild(frHeader);
       
+      const frGroup = document.createElement('div');
+      frGroup.className = 'filter-subgroup';
+      frGroup.style.marginBottom = '10px';
+      opContainer.appendChild(frGroup);
+      
       const frCheckboxes = [];
       frOps.forEach(op => {
-        const chk = this.createCheckbox(opContainer, op, 'operateurs', op);
+        const chk = this.createCheckbox(frGroup, op, 'operateurs', op);
         if (chk) frCheckboxes.push(chk);
       });
       
       frToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const allChecked = frCheckboxes.every(chk => chk.checked);
+        const newState = !allChecked;
+        
+        // Mise à jour groupée sans déclencher les événements individuels
+        clearTimeout(this.updateTimeout);
+        
         frCheckboxes.forEach(chk => { 
-          chk.checked = !allChecked; 
-          chk.dispatchEvent(new Event('change')); 
+          chk.checked = newState;
         });
-        frToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+        
+        // Une seule mise à jour après modification de toutes les checkboxes
+        this.updateFilters();
+        
+        frToggleBtn.textContent = newState ? 'Tout décocher' : 'Tout cocher';
       });
     }
     
     if (dromComOps.length > 0) {
       const dromHeader = document.createElement('div');
-      dromHeader.className = 'filter-category-header';
+      dromHeader.className = 'filter-subcategory-header';
       dromHeader.style.fontSize = '0.9em';
-      dromHeader.style.marginTop = '5px';
+      dromHeader.style.marginTop = '10px';
+      dromHeader.style.marginBottom = '5px';
+      dromHeader.style.display = 'flex';
+      dromHeader.style.justifyContent = 'space-between';
+      dromHeader.style.alignItems = 'center';
+      dromHeader.style.cursor = 'default';
+      dromHeader.style.backgroundColor = '#f5f5f5';
+      dromHeader.style.padding = '8px 10px';
+      dromHeader.style.borderRadius = '4px';
+      
       const dromTitle = document.createElement('span');
       dromTitle.textContent = 'DROM/COM';
+      dromTitle.style.fontWeight = '500';
       dromHeader.appendChild(dromTitle);
       
       const dromToggleBtn = document.createElement('button');
@@ -84,20 +117,33 @@ export class FilterManager {
       dromHeader.appendChild(dromToggleBtn);
       opContainer.appendChild(dromHeader);
       
+      const dromGroup = document.createElement('div');
+      dromGroup.className = 'filter-subgroup';
+      dromGroup.style.marginBottom = '10px';
+      opContainer.appendChild(dromGroup);
+      
       const dromCheckboxes = [];
       dromComOps.forEach(op => {
-        const chk = this.createCheckbox(opContainer, op, 'operateurs', op);
+        const chk = this.createCheckbox(dromGroup, op, 'operateurs', op);
         if (chk) dromCheckboxes.push(chk);
       });
       
       dromToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const allChecked = dromCheckboxes.every(chk => chk.checked);
+        const newState = !allChecked;
+        
+        // Mise à jour groupée sans déclencher les événements individuels
+        clearTimeout(this.updateTimeout);
+        
         dromCheckboxes.forEach(chk => { 
-          chk.checked = !allChecked; 
-          chk.dispatchEvent(new Event('change')); 
+          chk.checked = newState;
         });
-        dromToggleBtn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+        
+        // Une seule mise à jour après modification de toutes les checkboxes
+        this.updateFilters();
+        
+        dromToggleBtn.textContent = newState ? 'Tout décocher' : 'Tout cocher';
       });
     }
 
@@ -116,64 +162,95 @@ export class FilterManager {
       this.createCheckbox(freqContainer, freq, 'freqs', freq + ' MHz');
     });
 
-    // === ACTIONS ===
-    const baseActions = ['AJO','ALL','EXT','SUP','AAV'];
-
-    const changeActions = [...this.dataStore.filterValues.actions]
+    // === ACTIONS: Split into Habituelles and Spéciales ===
+    const habituellesActions = ['AJO','ALL','EXT','SUP','AAV'];
+    
+    const specialesActions = [...this.dataStore.filterValues.actions]
       .filter(a => a.startsWith('CH'))
       .sort();
 
     const otherActions = [...this.dataStore.filterValues.actions]
-      .filter(a => !baseActions.includes(a) && !a.startsWith('CH'))
+      .filter(a => !habituellesActions.includes(a) && !a.startsWith('CH'))
       .sort();
 
-    // Base actions visible directement
-    baseActions.forEach(action => {
+    // Sous-catégorie Actions habituelles
+    const habCheckboxes = [];
+    habituellesActions.forEach(action => {
       if (this.dataStore.filterValues.actions.has(action)) {
-        this.createCheckbox(
+        const chk = this.createCheckbox(
           actionContainer,
           action,
           'actions',
           window.CONFIG?.actions?.[action] || action
         );
+        if (chk) habCheckboxes.push(chk);
       }
     });
 
-    // Sous-catégorie Changements divers (CH…)
-    if (changeActions.length > 0) {
-      const chHeader = document.createElement('div');
-      chHeader.className = 'filter-category-header';
-      chHeader.textContent = 'Changements divers';
-      actionContainer.appendChild(chHeader);
-
-      const chToggle = document.createElement('button');
-      chToggle.className = 'toggle-subcategory-btn';
-      chToggle.textContent = 'Tout décocher';
-      chHeader.appendChild(chToggle);
-
-      const chGroup = document.createElement('div');
-      chGroup.className = 'filter-group';
-      actionContainer.appendChild(chGroup);
-
-      const chCheckboxes = [];
-      changeActions.forEach(action => {
+    // Sous-catégorie Spéciales (CH…)
+    if (specialesActions.length > 0) {
+      const specHeader = document.createElement('div');
+      specHeader.className = 'filter-subcategory-header';
+      specHeader.style.fontSize = '0.9em';
+      specHeader.style.marginTop = '10px';
+      specHeader.style.marginBottom = '5px';
+      specHeader.style.display = 'flex';
+      specHeader.style.justifyContent = 'space-between';
+      specHeader.style.alignItems = 'center';
+      specHeader.style.cursor = 'default';
+      specHeader.style.backgroundColor = '#f5f5f5';
+      specHeader.style.padding = '8px 10px';
+      specHeader.style.borderRadius = '4px';
+      
+      const specTitle = document.createElement('span');
+      specTitle.textContent = 'Spéciales';
+      specTitle.style.fontWeight = '500';
+      specHeader.appendChild(specTitle);
+      
+      const specToggleBtn = document.createElement('button');
+      specToggleBtn.className = 'toggle-subcategory-btn';
+      specToggleBtn.textContent = 'Tout décocher';
+      specToggleBtn.style.fontSize = '0.8em';
+      specToggleBtn.style.padding = '2px 6px';
+      specToggleBtn.style.cursor = 'pointer';
+      specToggleBtn.style.border = '1px solid #ccc';
+      specToggleBtn.style.background = '#fff';
+      specToggleBtn.style.borderRadius = '3px';
+      specHeader.appendChild(specToggleBtn);
+      actionContainer.appendChild(specHeader);
+      
+      const specGroup = document.createElement('div');
+      specGroup.className = 'filter-subgroup';
+      specGroup.style.marginBottom = '10px';
+      actionContainer.appendChild(specGroup);
+      
+      const specCheckboxes = [];
+      specialesActions.forEach(action => {
         const chk = this.createCheckbox(
-          chGroup,
+          specGroup,
           action,
           'actions',
           window.CONFIG?.actions?.[action] || action
         );
-        if (chk) chCheckboxes.push(chk);
+        if (chk) specCheckboxes.push(chk);
       });
-
-      chToggle.addEventListener('click', e => {
+      
+      specToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const allChecked = chCheckboxes.every(c => c.checked);
-        chCheckboxes.forEach(c => {
-          c.checked = !allChecked;
-          c.dispatchEvent(new Event('change'));
+        const allChecked = specCheckboxes.every(chk => chk.checked);
+        const newState = !allChecked;
+        
+        // Mise à jour groupée sans déclencher les événements individuels
+        clearTimeout(this.updateTimeout);
+        
+        specCheckboxes.forEach(chk => { 
+          chk.checked = newState;
         });
-        chToggle.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+        
+        // Une seule mise à jour après modification de toutes les checkboxes
+        this.updateFilters();
+        
+        specToggleBtn.textContent = newState ? 'Tout décocher' : 'Tout cocher';
       });
     }
 
@@ -282,12 +359,6 @@ export class FilterManager {
       if (e.target.matches('.filter-category')) {
         const group = e.target.nextElementSibling;
         if (group) {
-          group.style.maxHeight = group.style.maxHeight ? null : group.scrollHeight + "px";
-        }
-      }
-      if (e.target.matches('.filter-category-header') && !e.target.closest('button')) {
-        const group = e.target.nextElementSibling;
-        if (group && group.classList.contains('filter-group')) {
           group.style.maxHeight = group.style.maxHeight ? null : group.scrollHeight + "px";
         }
       }

@@ -364,8 +364,8 @@ html, body {
   margin: 8px 0;
   width: 100%;
   box-sizing: border-box;
-  flex-wrap: nowrap;
-  overflow: visible;
+  flex-wrap: wrap;
+  overflow: hidden;
 }
 
 .bandeau a {

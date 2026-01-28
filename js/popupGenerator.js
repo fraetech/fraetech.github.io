@@ -64,7 +64,6 @@ export class PopupGenerator {
     const icons = [];
     const base = CONFIG.baseIconUrl;
     
-    // Icônes existantes
     icons.push(`<a href="https://cartoradio.fr/index.html#/cartographie/lonlat/${lon}/${lat}" target="_blank" rel="noopener" class="icone"><img loading="lazy" src="${base}cartoradio.svg" alt="Cartoradio"></a>`);
     icons.push(`<a href="https://www.google.fr/maps/place/${lat},${lon}" target="_blank" rel="noopener" class="icone"><img loading="lazy" src="${base}maps.svg" alt="Google Maps"></a>`);
     
@@ -72,16 +71,13 @@ export class PopupGenerator {
       icons.push(`<a href="https://rncmobile.net/site/${lat},${lon}" target="_blank" rel="noopener" class="icone"><img loading="lazy" src="${base}rnc.avif" alt="RNC Mobile"></a>`);
     }
     
-    // Nouveau bouton Cellmapper (LTE par défaut)
     const { mcc, mnc } = this.getCellmapperMccMnc(firstAction.operateur, firstAction.adresse);
     const cellmapperUrl = `https://www.cellmapper.net/map?MCC=${mcc}&MNC=${mnc}&type=LTE&latitude=${lat}&longitude=${lon}&zoom=16`;
     icons.push(`<a href="${cellmapperUrl}" target="_blank" rel="noopener" class="icone"><img loading="lazy" src="${base}cellmapper.avif" alt="Cellmapper"></a>`);
     
-    // Nouveau bouton Carte-FH
     const carteFhUrl = `https://carte-fh.lafibre.info/index.php?no_sup_init=${firstAction.id_support}`;
     icons.push(`<a href="${carteFhUrl}" target="_blank" rel="noopener" class="icone"><img loading="lazy" src="${base}carte-fh.avif" alt="Carte-FH"></a>`);
     
-    // Bouton partage (dernier)
     icons.push(`<a href="#" onclick="shareLocation('${lat}', '${lon}', '${firstAction.id_support}'); return false;" class="icone" title="Partager ce support"><img loading="lazy" src="${base}share.svg" alt="Partager"></a>`);
     
     return `<div class="icone-container">${icons.join('')}</div>`;

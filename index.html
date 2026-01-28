@@ -83,14 +83,80 @@
 <!-- Application JS: module, lazy-load des dépendances et logique -->
 <script type="module" src="js/app.js" defer></script>
 
-<!-- Enregistrement du service worker PWA (index uniquement) -->
+<!-- Enregistrement du service worker PWA avec gestion des mises à jour -->
 <script>
+	// Fonction pour afficher une notification de mise à jour et rafraîchir
+	window.showUpdateNotification = function() {
+		const notification = document.createElement('div');
+		notification.className = 'notification notification-success';
+		notification.textContent = 'Une nouvelle version est disponible, actualisation en cours...';
+		notification.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: #4CAF50;
+			color: white;
+			padding: 12px 20px;
+			border-radius: 4px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+			z-index: 10000;
+			font-family: inherit;
+			animation: slideIn 0.3s ease;
+		`;
+		
+		document.body.appendChild(notification);
+		
+		// Rafraîchit la page après 2 secondes
+		setTimeout(() => {
+			window.location.reload();
+		}, 2000);
+	};
+
 	if ('serviceWorker' in navigator) {
 		window.addEventListener('load', function() {
-			navigator.serviceWorker.register('/service-worker.js', {scope: '/index.html'}).then(function(registration) {
-				// Registration successful
+			let updateAvailableResolve = null;
+			const updateAvailablePromise = new Promise(resolve => {
+				updateAvailableResolve = resolve;
+			});
+			window.updateAvailable = updateAvailablePromise;
+
+			navigator.serviceWorker.register('/service-worker.js', {scope: '/'}).then(function(registration) {
+				console.log('SW registered successfully');
+
+				// Vérifie les mises à jour toutes les 60 secondes
+				setInterval(() => {
+					registration.update();
+				}, 60000);
+
+				// Écoute les mises à jour
+				registration.addEventListener('updatefound', () => {
+					const newWorker = registration.installing;
+					console.log('SW update found, installing...');
+
+					newWorker.addEventListener('statechange', () => {
+						if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+							// Une nouvelle version est prête
+							console.log('SW update ready to activate');
+							updateAvailableResolve({
+								registration: registration,
+								isUpdateAvailable: true
+							});
+							// Affiche une notification à l'utilisateur
+							if (window.showUpdateNotification) {
+								window.showUpdateNotification();
+							}
+						}
+					});
+				});
 			}, function(err) {
-				// Registration failed
+				console.error('SW registration failed:', err);
+			});
+
+			// Écoute les messages du SW
+			navigator.serviceWorker.addEventListener('controllerchange', () => {
+				console.log('SW controller changed, page update may be needed');
+				// Optionnel: recharger la page si une nouvelle version est activée
+				// window.location.reload();
 			});
 		});
 	}

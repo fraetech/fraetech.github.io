@@ -29,17 +29,22 @@ const URLS_TO_CACHE = [
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(STATIC_CACHE).then(async cache => {
-      await Promise.all(
-        URLS_TO_CACHE.map(async url => {
-          try {
-            await cache.add(url);
-          } catch (e) {
-            console.warn('Cache failed:', url, e);
-          }
-        })
-      );
-    })
+    Promise.all([
+      // Crée le cache pour les icônes (vide au départ)
+      caches.open(ICONS_CACHE),
+      // Cache les ressources statiques critiques
+      caches.open(STATIC_CACHE).then(async cache => {
+        await Promise.all(
+          URLS_TO_CACHE.map(async url => {
+            try {
+              await cache.add(url);
+            } catch (e) {
+              console.warn('Cache failed:', url, e);
+            }
+          })
+        );
+      })
+    ])
   );
 });
 
@@ -61,6 +66,14 @@ self.addEventListener('activate', event => {
       )
     ).then(() => self.clients.claim())
   );
+});
+
+// Message handler pour les mises à jour
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('SW: Skip waiting requested');
+    self.skipWaiting();
+  }
 });
 
 // Fetch : stratégies différentes selon le type de ressource

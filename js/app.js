@@ -122,7 +122,7 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
             // Ne pas déclencher si on clique sur le bouton toggle
             if (e.target.classList.contains('toggle-category-btn')) return;
             
-            const nextGroup = headerF.nextElementSibling;
+            const nextGroup = header.nextElementSibling;
             if (nextGroup && nextGroup.classList.contains('filter-group')) {
               nextGroup.classList.toggle('expanded');
             }
@@ -496,6 +496,13 @@ async function main() {
   // Start loading CSV and building markers in background (non-blocking)
   await loadCsvAndInit(dataStore, mapManager);
   filterManager.initFilters();
+
+  // Filtre opérateur via ?ope=
+  const initParams = new URLSearchParams(window.location.search);
+  const opeParam = initParams.get('ope');
+  if (opeParam) {
+    filterManager.applyOperatorFilter(opeParam.toUpperCase());
+  }
 
   const urlManager = new URLManager(mapManager, dataStore);
   urlManager.checkURLOnLoad();

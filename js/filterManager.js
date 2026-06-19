@@ -310,6 +310,30 @@ export class FilterManager {
     });
   }
 
+  applyOperatorFilter(operateur) {
+    const checkboxes = document.querySelectorAll('#opFilters input[type="checkbox"]');
+    if (!checkboxes.length) return;
+
+    // Vérifier que l'opé demandé existe bien dans les filtres
+    const exists = [...checkboxes].some(cb => cb.value === operateur);
+    if (!exists) return;
+
+    checkboxes.forEach(cb => {
+      cb.checked = (cb.value === operateur);
+    });
+
+    // Mettre à jour les labels "Tout cocher/décocher" des sous-catégories
+    document.querySelectorAll('.toggle-subcategory-btn').forEach(btn => {
+      const group = btn.closest('.filter-subcategory-header')?.nextElementSibling;
+      if (!group) return;
+      const groupCheckboxes = group.querySelectorAll('input[type="checkbox"]');
+      const allChecked = [...groupCheckboxes].every(cb => cb.checked);
+      btn.textContent = allChecked ? 'Tout décocher' : 'Tout cocher';
+    });
+
+    this.updateFilters();
+  }
+
   updateFilters() {
     clearTimeout(this.updateTimeout);
     this.updateTimeout = setTimeout(() => this._doUpdateFilters(), 120);

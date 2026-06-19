@@ -272,39 +272,100 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
 }
 
 async function loadCsvAndInit(dataStore, mapManager) {
+  const statusElem = document.querySelector("#message-status");
+
+  const setStatus = (message, color = '') => {
+    if (!statusElem) return;
+
+    statusElem.textContent = message;
+    statusElem.style.color = color;
+  };
+
   try {
     const params = new URLSearchParams(window.location.search);
-    const csvPath = params.get('csv');
-    const base = csvPath ? csvPath : 'hebdo/index';
-    const csvUrl = `${CONFIG.baseDataUrl}${base}.csv?t=${Date.now()}`;
-    const timestampUrl = `${CONFIG.baseDataUrl}${base.replace('index','timestamp')}.txt?t=${Date.now()}`;
+    const base = params.get('csv') || 'hebdo/index';
 
+    const cacheBuster = Date.now();
+
+    const csvUrl =
+      `${CONFIG.baseDataUrl}${base}.csv?t=${cacheBuster}`;
+
+    const timestampUrl =
+      `${CONFIG.baseDataUrl}${base.replace('index', 'timestamp')}.txt?t=${cacheBuster}`;
+
+    // CSV (bloquant)
     const csvResp = await fetch(csvUrl);
-    const csvText = await csvResp.text();
-    const rows = (await import('./utils.js')).Utils.csvToRows(csvText);
 
-    fetch(timestampUrl).then(r => r.text()).then(ts => {
-      const strongElem = document.querySelector("#message-status");
-      if (strongElem && ts) strongElem.textContent = `MAJ ANFR du ${ts.trim()}`;
-    }).catch(() => {});
+    if (!csvResp.ok) {
+      throw new Error(`CSV inaccessible (HTTP ${csvResp.status})`);
+    }
 
-    const grouped = {};
-    rows.forEach(row => {
+    const csvText = (await csvResp.text()).trim();
+
+    if (!csvText) {
+      throw new Error("CSV vide");
+    }
+
+    // Détection d'une page HTML renvoyée 
+    if (/^\s*</.test(csvText)) {
+      throw new Error("Le serveur a renvoyé du HTML au lieu du CSV");
+    }
+
+    const { Utils } = await import('./utils.js');
+    const rows = Utils.csvToRows(csvText);
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      throw new Error("Aucune donnée exploitable dans le CSV");
+    }
+
+    // Timestamp (optionnel, ne bloque jamais)
+    (async () => {
+      try {
+        const tsResp = await fetch(timestampUrl);
+
+        if (!tsResp.ok) {
+          throw new Error(`HTTP ${tsResp.status}`);
+        }
+
+        const ts = (await tsResp.text()).trim();
+
+        if (!ts || /^\s*</.test(ts)) {
+          throw new Error("Timestamp invalide");
+        }
+
+        setStatus(`MAJ ANFR du ${ts}`);
+      } catch (err) {
+        console.warn("Timestamp indisponible :", err);
+
+        setStatus(
+          "Date de mise à jour indisponible",
+          "orange"
+        );
+      }
+    })();
+
+    // Initialisation de l'application
+    const grouped = Object.create(null);
+
+    for (const row of rows) {
       const key = `${row.id_support}_${row.operateur}`;
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(row);
-    });
+      (grouped[key] ??= []).push(row);
+    }
 
     await dataStore.createAndStoreMarkersInBatches(grouped, 200);
 
   } catch (err) {
-    console.error('Loading CSV failed', err);
-    const strongElem = document.querySelector("#message-status");
-    if (strongElem) { 
-      strongElem.textContent = "Erreur de chargement des données"; 
-      strongElem.style.color = 'red'; 
-    }
+    console.error("Erreur chargement CSV :", err);
+
+    setStatus(
+      "Erreur : impossible de charger les données",
+      "red"
+    );
+
+    return false;
   }
+
+  return true;
 }
 
 window.shareLocation = function(lat, lon, supportId) {

@@ -84,7 +84,39 @@ export class PopupGenerator {
   }
 
   static generateTitle(firstAction) {
-    return `<div class="titre"><strong>${firstAction.adresse}</strong></div>`;
+    const badges = [];
+    if (firstAction.is_zb === 'true') {
+      badges.push(`<span style="
+        display:inline-block;
+        border:1.5px solid #1a6fc4;
+        color:#1a6fc4;
+        border-radius:4px;
+        padding:1px 6px;
+        font-size:0.72em;
+        font-weight:600;
+        letter-spacing:0.03em;
+        vertical-align:middle;
+        line-height:1.4;
+      ">ZB</span>`);
+    }
+    if (firstAction.is_new === 'true') {
+      badges.push(`<span style="
+        display:inline-block;
+        border:1.5px solid #2a9d4e;
+        color:#2a9d4e;
+        border-radius:4px;
+        padding:1px 6px;
+        font-size:0.72em;
+        font-weight:600;
+        letter-spacing:0.03em;
+        vertical-align:middle;
+        line-height:1.4;
+      ">Site neuf</span>`);
+    }
+    const badgeHtml = badges.length
+      ? `<br><span style="display:inline-flex;gap:5px;margin-top:3px;">${badges.join('')}</span>`
+      : '';
+    return `<div class="titre"><strong>${firstAction.adresse}</strong>${badgeHtml}</div>`;
   }
 
   static generateActions(actionsData) {

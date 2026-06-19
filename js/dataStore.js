@@ -6,6 +6,7 @@ import { CONFIG } from './config.js';
 // DataStore holds supports and indexes
 export class DataStore {
   constructor(mapManager) {
+    this.supportsById = new Map();
     this.mapManager = mapManager;
     this.supports = new Map(); // key -> { marker, data, coords }
     this.searchIndex = new Map(); // support/address => Map(key -> [entries])
@@ -28,11 +29,15 @@ export class DataStore {
   addSupport(supportKey, supportObj) {
     this.supports.set(supportKey, supportObj);
 
-    // Index support id and address (lowercase)
     const firstRow = supportObj.data[0];
     const supportId = firstRow.id_support?.toString() || '';
     const address = firstRow.adresse || '';
 
+    if (supportId) {
+        this.supportsById.set(supportId, supportObj);
+    }
+
+    // Index support id and address (lowercase)
     if (!this.searchIndex.has('support')) this.searchIndex.set('support', new Map());
     if (!this.searchIndex.has('address')) this.searchIndex.set('address', new Map());
 
@@ -62,6 +67,10 @@ export class DataStore {
         });
       }
     });
+  }
+
+  findSupportById(supportId) {
+  return this.supportsById.get(String(supportId)) || null;
   }
 
   search(query, type) {

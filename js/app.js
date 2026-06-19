@@ -122,7 +122,7 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
             // Ne pas déclencher si on clique sur le bouton toggle
             if (e.target.classList.contains('toggle-category-btn')) return;
             
-            const nextGroup = header.nextElementSibling;
+            const nextGroup = headerF.nextElementSibling;
             if (nextGroup && nextGroup.classList.contains('filter-group')) {
               nextGroup.classList.toggle('expanded');
             }
@@ -407,17 +407,8 @@ function fallbackCopyToClipboard(text) {
 
 class URLManager {
   constructor(mapManager, dataStore) {
-    this.mapManager = mapManager;
-    this.dataStore = dataStore;
-    // Attendre que les données soient chargées avant de vérifier l'URL
-    this.checkURLOnLoadDelayed();
-  }
-  
-  checkURLOnLoadDelayed() {
-    // Vérifier l'URL après un délai pour s'assurer que les markers sont chargés
-    setTimeout(() => {
-      this.checkURLOnLoad();
-    }, 1000); // Délai plus long pour laisser le temps aux markers de se charger
+  this.mapManager = mapManager;
+  this.dataStore = dataStore;
   }
   
   checkURLOnLoad() {
@@ -429,93 +420,29 @@ class URLManager {
     const lat = parseFloat(params.get('lat'));
     const lon = parseFloat(params.get('lon'));
     
-    if (supportId && lat && lon) {
+    if (supportId && Number.isFinite(lat) && Number.isFinite(lon)) {
       this.openSupportFromURL(supportId, lat, lon);
     }
   }
   
   openSupportFromURL(supportId, lat, lon) {
-    // Centre la carte d'abord
     this.mapManager.map.setView([lat, lon], 16);
-    
-    // Trouve et ouvre le popup correspondant avec plusieurs stratégies
-    setTimeout(() => {
-      let markerFound = false;
-      
-      // Stratégie 1 : Recherche par ID support dans les données
-      if (this.dataStore && this.dataStore.allData) {
-        const matchingData = this.dataStore.allData.find(item => 
-          item.id_support === supportId
-        );
-        
-        if (matchingData) {
-          const [itemLat, itemLon] = matchingData.coordonnees.split(',').map(s => parseFloat(s.trim()));
-          
-          // Chercher le marker correspondant
-          this.mapManager.markersLayer.eachLayer(marker => {
-            if (!markerFound) {
-              const markerLat = marker.getLatLng().lat;
-              const markerLon = marker.getLatLng().lng;
-              
-              // Comparaison avec une tolérance plus large
-              if (Math.abs(markerLat - itemLat) < 0.0001 && Math.abs(markerLon - itemLon) < 0.0001) {
-                marker.openPopup();
-                markerFound = true;
-                console.log('Popup ouvert via stratégie 1 (ID support)');
-                return;
-              }
-            }
-          });
-        }
+    const support = this.dataStore.findSupportById(supportId);
+
+    if (!support?.marker) {
+      showNotification(
+        'Support non trouvé sur la carte',
+        'error'
+      );
+      return;
+    }
+
+    this.mapManager.markerCluster.zoomToShowLayer(
+      support.marker,
+      () => {
+        support.marker.openPopup();
       }
-      
-      // Stratégie 2 : Si pas trouvé, chercher par coordonnées avec tolérance
-      if (!markerFound) {
-        this.mapManager.markersLayer.eachLayer(marker => {
-          if (!markerFound) {
-            const markerLat = marker.getLatLng().lat;
-            const markerLon = marker.getLatLng().lng;
-            
-            // Tolérance élargie pour les coordonnées
-            if (Math.abs(markerLat - lat) < 0.001 && Math.abs(markerLon - lon) < 0.001) {
-              marker.openPopup();
-              markerFound = true;
-              console.log('Popup ouvert via stratégie 2 (coordonnées)');
-              return;
-            }
-          }
-        });
-      }
-      
-      // Stratégie 3 : Si toujours pas trouvé, chercher le marker le plus proche
-      if (!markerFound) {
-        let closestMarker = null;
-        let minDistance = Infinity;
-        
-        this.mapManager.markersLayer.eachLayer(marker => {
-          const markerLat = marker.getLatLng().lat;
-          const markerLon = marker.getLatLng().lng;
-          const distance = Math.sqrt(
-            Math.pow(markerLat - lat, 2) + Math.pow(markerLon - lon, 2)
-          );
-          
-          if (distance < minDistance && distance < 0.01) { // Dans un rayon raisonnable
-            minDistance = distance;
-            closestMarker = marker;
-          }
-        });
-        
-        if (closestMarker) {
-          closestMarker.openPopup();
-          markerFound = true;
-        }
-      }
-      
-      if (!markerFound) {
-        showNotification('Support non trouvé sur la carte', 'error');
-      }
-      
-    }, 800); // Délai pour laisser le temps à la carte de se centrer
+    );
   }
 }
 
@@ -578,6 +505,7 @@ async function main() {
   // Ensure controls are wired: searchManager displays results into #searchResults
   // and filterManager will apply filters to the markers already added.
   const urlManager = new URLManager(mapManager, dataStore);
+  urlManager.checkURLOnLoad();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

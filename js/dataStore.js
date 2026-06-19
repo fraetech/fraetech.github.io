@@ -73,6 +73,11 @@ export class DataStore {
   return this.supportsById.get(String(supportId)) || null;
   }
 
+  findSupportByIdAndOperator(supportId, operateur) {
+    const key = `${supportId}_${operateur}`;
+    return this.supports.get(key) || null;
+  }
+
   search(query, type) {
     const results = [];
     const q = (query || '').toLowerCase();

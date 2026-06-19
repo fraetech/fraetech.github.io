@@ -368,16 +368,13 @@ async function loadCsvAndInit(dataStore, mapManager) {
   return true;
 }
 
-window.shareLocation = function(lat, lon, supportId) {
-  const url = `${window.location.origin}${window.location.pathname}#support=${supportId}&lat=${lat}&lon=${lon}`;
+window.shareLocation = function(supportId, operateur) {
+  const url = `${window.location.origin}${window.location.pathname}?support=${supportId}&op=${encodeURIComponent(operateur)}`;
   
-  // Copier dans le presse-papiers
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(url).then(() => {
       showNotification('Lien copié dans le presse-papiers !', 'success');
-    }).catch(() => {
-      fallbackCopyToClipboard(url);
-    });
+    }).catch(() => fallbackCopyToClipboard(url));
   } else {
     fallbackCopyToClipboard(url);
   }
@@ -412,22 +409,21 @@ class URLManager {
   }
   
   checkURLOnLoad() {
-    const hash = window.location.hash.substring(1);
-    if (!hash) return;
-    
-    const params = new URLSearchParams(hash);
+    const params = new URLSearchParams(window.location.search);
+
     const supportId = params.get('support');
-    const lat = parseFloat(params.get('lat'));
-    const lon = parseFloat(params.get('lon'));
-    
-    if (supportId && Number.isFinite(lat) && Number.isFinite(lon)) {
-      this.openSupportFromURL(supportId, lat, lon);
+    const operateur = params.get('op');
+
+    if (supportId && operateur) {
+      this.openSupportFromURL(supportId, operateur);
     }
   }
   
-  openSupportFromURL(supportId, lat, lon) {
-    this.mapManager.map.setView([lat, lon], 16);
-    const support = this.dataStore.findSupportById(supportId);
+  openSupportFromURL(supportId, operateur) {
+    const support = this.dataStore.findSupportByIdAndOperator(
+      supportId,
+      operateur
+    );
 
     if (!support?.marker) {
       showNotification(
@@ -499,11 +495,8 @@ async function main() {
 
   // Start loading CSV and building markers in background (non-blocking)
   await loadCsvAndInit(dataStore, mapManager);
-  // After initial markers added, initialize filter UI (build lists)
   filterManager.initFilters();
 
-  // Ensure controls are wired: searchManager displays results into #searchResults
-  // and filterManager will apply filters to the markers already added.
   const urlManager = new URLManager(mapManager, dataStore);
   urlManager.checkURLOnLoad();
 }

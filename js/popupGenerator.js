@@ -78,7 +78,7 @@ export class PopupGenerator {
     const carteFhUrl = `https://carte-fh.lafibre.info/index.php?no_sup_init=${firstAction.id_support}`;
     icons.push(`<a href="${carteFhUrl}" target="_blank" rel="noopener" class="icone"><img loading="lazy" src="${base}carte-fh.avif" alt="Carte-FH"></a>`);
     
-    icons.push(`<a href="#" onclick="shareLocation('${lat}', '${lon}', '${firstAction.id_support}'); return false;" class="icone" title="Partager ce support"><img loading="lazy" src="${base}share.svg" alt="Partager"></a>`);
+    icons.push(`<a href="#" onclick="shareLocation('${row.id_support}', '${row.operateur}') ; return false;" class="icone" title="Partager ce support"><img loading="lazy" src="${base}share.svg" alt="Partager"></a>`);
     
     return `<div class="icone-container">${icons.join('')}</div>`;
   }

@@ -77,6 +77,12 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
       const div = L.DomUtil.create('div', 'leaflet-control custom-filter-control collapsed');
       div.innerHTML = `<div class="filters-content" style="display:none;">
               <button class="toggle-all-filters" id="toggleAllFilters" type="button">Tout décocher</button>
+              <div class="filter-category-header">Mode de filtrage</div>
+              <div class="filter-group expanded">
+              <label><input type="radio" name="filterMode" value="simple" checked>Simple</label>
+              <label><input type="radio" name="filterMode" value="advanced">Avancé</label>
+              </div>
+              <div class="filter-group" id="advancedFilters"></div>
               <div class="filter-category-header">Technologies <button class="toggle-category-btn" data-category="technoFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
               <div class="filter-group" id="technoFilters"></div>
               <div class="filter-category-header">Fréquences <button class="toggle-category-btn" data-category="freqFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
@@ -101,6 +107,14 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
             div.classList.remove('collapsed'); 
             div.classList.add('expanded'); 
             content.style.display='block';
+            setTimeout(() => {
+              const adv = document.getElementById('advancedFilters');
+              if (adv) {
+                adv.offsetHeight; // force reflow
+              }
+
+              window.dispatchEvent(new Event('resize'));
+            }, 0);
             try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
             ['touchstart','touchmove','touchend','wheel'].forEach(evt => { 
               content.addEventListener(evt, function(ev){ ev.stopPropagation(); }, { passive: false }); 

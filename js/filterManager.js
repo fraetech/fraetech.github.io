@@ -18,6 +18,7 @@ export class FilterManager {
     const actionContainer = document.getElementById('actionFilters');
     const zbContainer = document.getElementById('zbFilter');
     const newSiteContainer = document.getElementById('newSiteFilter');
+    const advancedContainer = document.getElementById('advancedFilters');
 
     // === OPERATORS: Split into FR Métrop and DROM/COM ===
     const frMetropOps = ['BOUYGUES TELECOM', 'FREE MOBILE', 'ORANGE', 'SFR'];
@@ -310,6 +311,88 @@ export class FilterManager {
     });
   }
 
+  createAdvancedMatrix() {
+    const container = document.getElementById('advancedFilters');
+    if (!container) return;
+
+    const pairs = [...this.dataStore.filterValues.techFreqPairs];
+    const techs = new Set();
+    const freqs = new Set();
+
+    pairs.forEach(pair => {
+      const [tech, freq] = pair.split('_');
+      techs.add(tech);
+      freqs.add(freq);
+    });
+
+    const sortedTechs = CONFIG.techOrder.filter(
+      tech => techs.has(tech)
+    );
+    const sortedFreqs = [...freqs].sort((a, b) => Number(a) - Number(b));
+
+    let html = `
+      <div class="filter-category-header">
+        Filtres avancés
+        <span class="tooltip-icon"
+          title="Sélectionnez les couples technologie/fréquence souhaités. Les filtres Technologie et Fréquence classiques sont ignorés dans ce mode.">
+          ⓘ
+        </span>
+      </div>
+      <div class="advanced-help">
+        Sélectionnez les couples technologie / fréquence à rechercher.
+      </div>
+      <table class="advanced-matrix">
+        <thead>
+          <tr><th></th>
+          ${sortedFreqs.map(freq => `<th title="${freq} MHz">${freq}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${sortedTechs.map(tech => `
+            <tr><th>${tech}</th>
+              ${sortedFreqs.map(freq => {
+                const pair = `${tech}_${freq}`;
+                return `<td>${pairs.includes(pair)
+                  ? `<input type="checkbox" class="advanced-pair" data-pair="${pair}">`
+                  : ''}</td>`;
+              }).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div class="advanced-match-mode">
+        <div class="filter-category-header">Correspondance</div>
+        <label>
+          <input type="radio" name="advancedMatchMode" value="contains" checked>
+          Contient tous les couples
+        </label>
+        <span class="tooltip-icon"
+          title="Le site doit contenir tous les couples sélectionnés mais peut en contenir d'autres.">ⓘ</span>
+        <br>
+        <label>
+          <input type="radio" name="advancedMatchMode" value="exact">
+          Correspondance exacte
+        </label>
+        <span class="tooltip-icon"
+          title="Le site doit contenir exactement les couples sélectionnés.">ⓘ</span>
+      </div>
+    `;
+
+    // Injection d'abord...
+    container.innerHTML = html;
+
+    // ...PUIS lecture de l'état et attachement des listeners
+    this.dataStore.activeAdvancedPairs = new Set(
+      [...container.querySelectorAll('.advanced-pair:checked')]
+        .map(cb => cb.dataset.pair)
+    );
+    this.dataStore.advancedMatchMode =
+      container.querySelector('input[name="advancedMatchMode"]:checked')?.value ?? 'contains';
+
+    container.querySelectorAll('.advanced-pair, input[name="advancedMatchMode"]')
+      .forEach(el => el.addEventListener('change', () => this.updateFilters()));
+  }
+
   applyOperatorFilter(operateur) {
     const checkboxes = document.querySelectorAll('#opFilters input[type="checkbox"]');
     if (!checkboxes.length) return;
@@ -341,31 +424,67 @@ export class FilterManager {
 
   _doUpdateFilters() {
     const opVals = new Set();
-    document.querySelectorAll('#opFilters input:checked').forEach(cb => opVals.add(cb.value));
+    document.querySelectorAll('#opFilters input:checked')
+      .forEach(cb => opVals.add(cb.value));
     this.dataStore.updateActiveFilters('operateurs', opVals);
 
     const technoVals = new Set();
-    document.querySelectorAll('#technoFilters input:checked').forEach(cb => technoVals.add(cb.value));
+    document.querySelectorAll('#technoFilters input:checked')
+      .forEach(cb => technoVals.add(cb.value));
     this.dataStore.updateActiveFilters('technos', technoVals);
 
     const freqVals = new Set();
-    document.querySelectorAll('#freqFilters input:checked').forEach(cb => freqVals.add(cb.value));
+    document.querySelectorAll('#freqFilters input:checked')
+      .forEach(cb => freqVals.add(cb.value));
     this.dataStore.updateActiveFilters('freqs', freqVals);
 
     const actionVals = new Set();
-    document.querySelectorAll('#actionFilters input:checked').forEach(cb => actionVals.add(cb.value));
+    document.querySelectorAll('#actionFilters input:checked')
+      .forEach(cb => actionVals.add(cb.value));
     this.dataStore.updateActiveFilters('actions', actionVals);
 
     const zbRadio = document.querySelector('input[name="zoneBlanche"]:checked');
-    const zbVals = zbRadio?.value === 'all' ? new Set(['true','false']) : new Set([zbRadio.value]);
-    this.dataStore.updateActiveFilters('zb', zbVals);
+    this.dataStore.updateActiveFilters('zb',
+      zbRadio?.value === 'all' ? new Set(['true', 'false']) : new Set([zbRadio.value])
+    );
 
     const newRadio = document.querySelector('input[name="siteNeuf"]:checked');
-    const newVals = newRadio?.value === 'all' ? new Set(['true','false']) : new Set([newRadio.value]);
-    this.dataStore.updateActiveFilters('new', newVals);
+    this.dataStore.updateActiveFilters('new',
+      newRadio?.value === 'all' ? new Set(['true', 'false']) : new Set([newRadio.value])
+    );
 
-    const filtered = this.dataStore.getFilteredSupports();
-    this.mapManager.updateMarkers(filtered);
+    const advancedMode =
+      document.querySelector('input[name="filterMode"]:checked')?.value === 'advanced';
+
+    this.dataStore.advancedFilterMode = advancedMode;
+
+    const advancedContainer = document.getElementById('advancedFilters');
+
+    if (advancedMode) {
+      advancedContainer.classList.remove('hidden');
+      advancedContainer.classList.add('expanded');
+      if (!this._matrixBuilt) {
+        this._matrixBuilt = true;
+        setTimeout(() => this.createAdvancedMatrix(), 0);
+      } else {
+        this.dataStore.activeAdvancedPairs = new Set(
+          [...document.querySelectorAll('.advanced-pair:checked')]
+            .map(cb => cb.dataset.pair)
+        );
+        this.dataStore.advancedMatchMode =
+          document.querySelector('input[name="advancedMatchMode"]:checked')?.value ?? 'contains';
+      }
+    } else {
+      advancedContainer.classList.add('hidden');
+      advancedContainer.classList.remove('expanded');
+      this.dataStore.activeAdvancedPairs = new Set();
+      this.dataStore.advancedMatchMode = 'contains';
+    }
+
+    document.querySelectorAll('#technoFilters input, #freqFilters input')
+      .forEach(el => { el.disabled = advancedMode; });
+
+    this.mapManager.updateMarkers(this.dataStore.getFilteredSupports());
   }
 
   resetAllFilters() {
@@ -375,6 +494,7 @@ export class FilterManager {
   }
 
   attachEvents() {
+    // Listener global pour reset et collapse des catégories
     document.addEventListener('click', (e) => {
       if (e.target.matches('#resetFilters')) {
         e.stopPropagation();
@@ -385,6 +505,12 @@ export class FilterManager {
         if (group) {
           group.style.maxHeight = group.style.maxHeight ? null : group.scrollHeight + "px";
         }
+      }
+    });
+
+    document.addEventListener('change', (e) => {
+      if (e.target.matches('input[name="filterMode"]')) {
+        this._doUpdateFilters();  // direct, sans debounce, pour réactivité immédiate
       }
     });
   }

@@ -129,13 +129,10 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
       });
 
       // Gestion du repli/dépli des catégories
-      setTimeout(() => {
-        // Headers cliquables pour replier/déplier
+      Promise.resolve().then(() => {
         div.querySelectorAll('.filter-category-header').forEach(header => {
           header.addEventListener('click', (e) => {
-            // Ne pas déclencher si on clique sur le bouton toggle
             if (e.target.classList.contains('toggle-category-btn')) return;
-            
             const nextGroup = header.nextElementSibling;
             if (nextGroup && nextGroup.classList.contains('filter-group')) {
               nextGroup.classList.toggle('expanded');
@@ -143,24 +140,22 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
           });
         });
 
-        // Boutons "Tout cocher/décocher" (uniquement ceux avec data-category)
         div.querySelectorAll('.toggle-category-btn[data-category]').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const category = btn.getAttribute('data-category');
             const container = document.getElementById(category);
             const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
-            const allChecked = Array.from(allCheckboxes).every(chk => chk.checked);
-            
+            // Tout décocher si au moins une est cochée, tout cocher seulement si tout est décoché
+            const newState = !Array.from(allCheckboxes).some(chk => chk.checked);
             allCheckboxes.forEach(chk => {
-              chk.checked = !allChecked;
+              chk.checked = newState;
               chk.dispatchEvent(new Event('change'));
             });
-            
-            btn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+            btn.textContent = newState ? 'Tout décocher' : 'Tout cocher';
           });
         });
-      }, 100);
+      });
 
       return div;
     }
@@ -171,118 +166,126 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
   map.addControl(new FilterControl({ position: 'topright' }));
 
   // Attach simple DOM behavior (clear search)
-  setTimeout(() => {
-    const clearButton = document.getElementById('clearSearch');
-    if (clearButton) {
-      clearButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const input = document.getElementById('searchInput');
-        if (input) { input.value = ''; searchManager.hideResults(); input.focus(); }
-        clearButton.style.display = 'none';
-      });
-    }
-
-    const input = document.getElementById('searchInput');
-    if (input) {
-      input.addEventListener('input', (ev) => {
-        const v = ev.target.value.trim();
-        clearButton.style.display = v ? 'flex' : 'none';
-        searchManager.handleInput(v);
-      });
-    }
-
-    // Global toggle all filters button
-    const toggleAllBtn = document.getElementById('toggleAllFilters');
-    if (toggleAllBtn) {
-      const updateToggleButton = () => {
-        const allCheckboxes = document.querySelectorAll('#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], #opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]');
-        const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
-        toggleAllBtn.textContent = allChecked ? 'Tout décocher' : 'Tout cocher';
-      };
-      
-      toggleAllBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const allCheckboxes = document.querySelectorAll('#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], #opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]');
-        const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
-        allCheckboxes.forEach(cb => { cb.checked = !allChecked; cb.dispatchEvent(new Event('change')); });
-        // Also toggle radio buttons to their default positions
-        document.querySelectorAll('input[name="zoneBlanche"][value="all"], input[name="siteNeuf"][value="all"]').forEach(r => {
-          r.checked = true;
-          r.dispatchEvent(new Event('change'));
+  Promise.resolve().then(() => {
+      const clearButton = document.getElementById('clearSearch');
+      if (clearButton) {
+        clearButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const input = document.getElementById('searchInput');
+          if (input) { input.value = ''; searchManager.hideResults(); input.focus(); }
+          clearButton.style.display = 'none';
         });
-        updateToggleButton();
-      });
-      
-      // Update button state when filters change
-      document.addEventListener('change', (e) => {
-        if (e.target.type === 'checkbox') {
+      }
+
+      const input = document.getElementById('searchInput');
+      if (input) {
+        input.addEventListener('input', (ev) => {
+          const v = ev.target.value.trim();
+          clearButton.style.display = v ? 'flex' : 'none';
+          searchManager.handleInput(v);
+        });
+      }
+
+      // Global toggle all filters button
+      const toggleAllBtn = document.getElementById('toggleAllFilters');
+      if (toggleAllBtn) {
+        const updateToggleButton = () => {
+          const allCheckboxes = document.querySelectorAll(
+            '#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], ' +
+            '#opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]'
+          );
+          const anyChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+          toggleAllBtn.textContent = anyChecked ? 'Tout décocher' : 'Tout cocher';
+        };
+
+        toggleAllBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const allCheckboxes = document.querySelectorAll(
+            '#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], ' +
+            '#opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]'
+          );
+          // Tout décocher si au moins une est cochée, tout cocher seulement si tout est déjà décoché
+          const anyChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+          const newState = !anyChecked;
+
+          allCheckboxes.forEach(cb => {
+            cb.checked = newState;
+            cb.dispatchEvent(new Event('change'));
+          });
+
+          document.querySelectorAll('input[name="zoneBlanche"][value="all"], input[name="siteNeuf"][value="all"]').forEach(r => {
+            r.checked = true;
+            r.dispatchEvent(new Event('change'));
+          });
+
           updateToggleButton();
+        });
+
+        document.addEventListener('change', (e) => {
+          if (e.target.type === 'checkbox') {
+            updateToggleButton();
+          }
+        });
+
+        // Synchro forcée depuis filterManager
+        document.addEventListener('filtersLabelUpdate', () => {
+          updateToggleButton();
+        });
+
+        updateToggleButton();
+      }
+
+      // Hide search on clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-control') && !e.target.closest('.search-icon-control')) {
+          searchManager.hideSearchBar();
         }
       });
-      
-      updateToggleButton();
-    }
 
-    // Hide search on clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-control') && !e.target.closest('.search-icon-control')) {
+      // Un seul handler pour masquer le message + fermer la search bar
+      map.on('movestart click zoomstart', () => {
+        const msg = document.getElementById('message');
+        if (msg) msg.style.display = 'none';
         searchManager.hideSearchBar();
-      }
-    });
+      });
 
-    // Map events to hide message & controls
-    map.on('movestart', () => {
-      const msg = document.getElementById('message'); if (msg) msg.style.display='none';
-      searchManager.hideSearchBar();
+      // Fermeture du panneau filtre sur movestart ou click carte
+      map.on('movestart click', () => {
+        const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
+        if (filterPanel?.classList.contains('expanded')) {
+          filterPanel.classList.replace('expanded', 'collapsed');
+          filterPanel.querySelector('.filters-content').style.display = 'none';
+          try { map.dragging.enable(); } catch (_) {}
+        }
+      });
+
+      // matchMedia mis en cache une seule fois
+      const mql = window.matchMedia('(max-width: 768px)');
       const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
-      if (filterPanel && filterPanel.classList.contains('expanded')) {
-        filterPanel.classList.remove('expanded'); filterPanel.classList.add('collapsed'); filterPanel.querySelector('.filters-content').style.display='none';
-        try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
-      }
-    });
-    
-    // Fermer les filtres quand on clique sur la carte
-    map.on('click', () => {
-      const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
-      if (filterPanel && filterPanel.classList.contains('expanded')) {
-        filterPanel.classList.remove('expanded');
-        filterPanel.classList.add('collapsed');
-        filterPanel.querySelector('.filters-content').style.display='none';
-        try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
-      }
-    });
-    
-    map.on('click zoomstart', () => {
-      const msg = document.getElementById('message'); if (msg) msg.style.display='none';
-    });
-    
-    // Hover behavior for filter button on PC (not on mobile)
-    const isDesktop = () => !window.matchMedia('(max-width: 768px)').matches;
-    if (isDesktop()) {
-      const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
-      if (filterPanel) {
-        // Handle button hover to open filter panel
-        filterPanel.addEventListener('mouseenter', () => {
-          if (filterPanel.classList.contains('collapsed')) {
-            filterPanel.classList.remove('collapsed');
-            filterPanel.classList.add('expanded');
-            filterPanel.querySelector('.filters-content').style.display='block';
-            try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
-          }
-        });
-        
-        // Handle leaving filter panel to close it
-        filterPanel.addEventListener('mouseleave', () => {
-          if (filterPanel.classList.contains('expanded')) {
-            filterPanel.classList.remove('expanded');
-            filterPanel.classList.add('collapsed');
-            filterPanel.querySelector('.filters-content').style.display='none';
-            try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
-          }
-        });
-      }
-    }
-  }, 150);
+
+      const applyHoverBehavior = (isMobile) => {
+        if (!filterPanel) return;
+        if (!isMobile) {
+          filterPanel.addEventListener('mouseenter', () => {
+            if (filterPanel.classList.contains('collapsed')) {
+              filterPanel.classList.replace('collapsed', 'expanded');
+              filterPanel.querySelector('.filters-content').style.display = 'block';
+              try { map.dragging.disable(); } catch (_) {}
+            }
+          });
+          filterPanel.addEventListener('mouseleave', () => {
+            if (filterPanel.classList.contains('expanded')) {
+              filterPanel.classList.replace('expanded', 'collapsed');
+              filterPanel.querySelector('.filters-content').style.display = 'none';
+              try { map.dragging.enable(); } catch (_) {}
+            }
+          });
+        }
+      };
+
+      applyHoverBehavior(mql.matches);
+      mql.addEventListener('change', (e) => applyHoverBehavior(e.matches));
+  });
 }
 
 async function loadCsvAndInit(dataStore, mapManager) {

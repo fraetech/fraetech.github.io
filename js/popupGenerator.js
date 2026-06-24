@@ -1,30 +1,32 @@
 import { CONFIG } from './config.js';
 
 export class PopupGenerator {
-  static generate(actionsData) {
-      if (!actionsData || actionsData.length === 0) return '';
-      
-      const firstAction = actionsData[0];
-      const [lat, lon] = firstAction.coordonnees.split(',').map(s => s.trim());
-      
-      // Récupère ID opérateur et URL logo GitHub
-      const opConfig = CONFIG.operators[firstAction.operateur] || CONFIG.operators['MISC'];
-      const logoUrl = `${CONFIG.baseIconUrl}opes/L_${opConfig.id}.avif`;
+  static generate(actionsData, lat, lon) {
+    if (!actionsData || actionsData.length === 0) return '';
 
-      // Retourner directement le contenu sans div wrapper supplémentaire
-      const content = `
-          <div class="popup-operator-bg" style="--logo-url: url('${logoUrl}');">
-              ${this.generateBandeau(firstAction, lat, lon)}
-              <div class="popup-content-wrapper">
-                  ${this.generateIcons(firstAction, lat, lon)}
-                  ${this.generateTitle(firstAction)}
-                  ${this.generateActions(actionsData)}
-                  ${this.generateFooter(firstAction)}
-              </div>
-          </div>
-      `;
-      
-      return content;
+    const firstAction = actionsData[0];
+
+    // lat/lon passés directement depuis dataStore (déjà parsés), fallback sur split si absent
+    if (lat === undefined || lon === undefined) {
+      [lat, lon] = firstAction.coordonnees.split(',').map(s => parseFloat(s.trim()));
+    }
+
+    const opConfig = CONFIG.operators[firstAction.operateur] || CONFIG.operators['MISC'];
+    const logoUrl = `${CONFIG.baseIconUrl}opes/L_${opConfig.id}.avif`;
+
+    const content = `
+      <div class="popup-operator-bg" style="--logo-url: url('${logoUrl}');">
+        ${this.generateBandeau(firstAction, lat, lon)}
+        <div class="popup-content-wrapper">
+          ${this.generateIcons(firstAction, lat, lon)}
+          ${this.generateTitle(firstAction)}
+          ${this.generateActions(actionsData)}
+          ${this.generateFooter(firstAction)}
+        </div>
+      </div>
+    `;
+
+    return content;
   }
 
   static generateBandeau(firstAction, lat, lon) {
@@ -86,35 +88,13 @@ export class PopupGenerator {
   static generateTitle(firstAction) {
     const badges = [];
     if (firstAction.is_zb === 'true') {
-      badges.push(`<span style="
-        display:inline-block;
-        border:1.5px solid #1a6fc4;
-        color:#1a6fc4;
-        border-radius:4px;
-        padding:1px 6px;
-        font-size:0.72em;
-        font-weight:600;
-        letter-spacing:0.03em;
-        vertical-align:middle;
-        line-height:1.4;
-      ">ZB</span>`);
+      badges.push(`<span class="popup-badge popup-badge--zb">ZB</span>`);
     }
     if (firstAction.is_new === 'true') {
-      badges.push(`<span style="
-        display:inline-block;
-        border:1.5px solid #2a9d4e;
-        color:#2a9d4e;
-        border-radius:4px;
-        padding:1px 6px;
-        font-size:0.72em;
-        font-weight:600;
-        letter-spacing:0.03em;
-        vertical-align:middle;
-        line-height:1.4;
-      ">Site neuf</span>`);
+      badges.push(`<span class="popup-badge popup-badge--new">Site neuf</span>`);
     }
     const badgeHtml = badges.length
-      ? `<br><span style="display:inline-flex;gap:5px;margin-top:3px;">${badges.join('')}</span>`
+      ? `<br><span class="popup-badge-row">${badges.join('')}</span>`
       : '';
     return `<div class="titre"><strong>${firstAction.adresse}</strong>${badgeHtml}</div>`;
   }

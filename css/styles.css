@@ -267,6 +267,29 @@ html, body {
   display: block;
   margin: 4px 0;
 }
+
+.filter-subcategory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  background-color: #f5f5f5;
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: default;
+}
+
+.toggle-subcategory-btn {
+  font-size: 0.8em;
+  padding: 2px 6px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 3px;
+}
     
 .leaflet-control.custom-filter-control.collapsed {
   width: auto;
@@ -489,6 +512,33 @@ html, body {
   font-weight: normal;
   color: #666;
   text-align: center;
+}
+.popup-badge {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  line-height: 1.4;
+  border: 1.5px solid;
+}
+
+.popup-badge--zb {
+  border-color: #1a6fc4;
+  color: #1a6fc4;
+}
+
+.popup-badge--new {
+  border-color: #2a9d4e;
+  color: #2a9d4e;
+}
+
+.popup-badge-row {
+  display: inline-flex;
+  gap: 5px;
+  margin-top: 3px;
 }
 .leaflet-popup-tip-container {
   z-index: 999 !important; /* Z-index inférieur à la croix mais supérieur au contenu */

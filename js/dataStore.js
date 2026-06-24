@@ -39,7 +39,7 @@ export class DataStore {
     const address = firstRow.adresse || '';
 
     if (supportId) {
-        this.supportsById.set(supportId, supportObj);
+      this.supportsById.set(supportId, supportObj);
     }
 
     // Index support id and address (lowercase)
@@ -58,10 +58,13 @@ export class DataStore {
     supIdx.get(keySup).push({ supportKey, data: supportObj });
     addrIdx.get(keyAddr).push({ supportKey, data: supportObj });
 
-    // Collect filter values
+    // Collect filter values + précalcul des paires tech/freq par row
     supportObj.data.forEach(row => {
       this.filterValues.operateurs.add(row.operateur);
       this.filterValues.actions.add(row.action);
+
+      // Précalcul une seule fois à l'ingestion
+      row._techFreqPairs = [];
       if (row.technologie) {
         row.technologie.split(',').forEach(techRaw => {
           const tech = techRaw.trim();
@@ -70,9 +73,9 @@ export class DataStore {
           if (baseTech) this.filterValues.technos.add(baseTech);
           if (freq) this.filterValues.freqs.add(freq);
           if (baseTech && freq) {
-            this.filterValues.techFreqPairs.add(
-              `${baseTech}_${freq}`
-            );
+            const pair = `${baseTech}_${freq}`;
+            this.filterValues.techFreqPairs.add(pair);
+            row._techFreqPairs.push({ baseTech, freq, pair });
           }
         });
       }
@@ -134,33 +137,24 @@ export class DataStore {
   }
 
   matchesAdvancedSupportFilter(supportData) {
+    if (this.activeAdvancedPairs.size === 0) return true;
+
+    // Utilise les paires précalculées — plus de Set reconstruit à chaque appel
     const sitePairs = new Set();
     for (const row of supportData.data) {
-      if (!row.technologie) continue;
-      row.technologie.split(',').forEach(techRaw => {
-        const tech = techRaw.trim();
-        const baseTech =
-          Utils.extractBaseTech(tech);
-        const freq =
-          Utils.extractFreq(tech);
-        if (baseTech && freq) {
-          sitePairs.add(
-            `${baseTech}_${freq}`
-          );
+      if (row._techFreqPairs) {
+        for (const { pair } of row._techFreqPairs) {
+          sitePairs.add(pair);
         }
-      });
+      }
     }
-    if (this.activeAdvancedPairs.size === 0)
-      return true;
+
     if (this.advancedMatchMode === 'contains') {
-      return [...this.activeAdvancedPairs]
-        .every(pair => sitePairs.has(pair));
+      return [...this.activeAdvancedPairs].every(pair => sitePairs.has(pair));
     }
     return (
-      sitePairs.size === this.activeAdvancedPairs.size
-      &&
-      [...this.activeAdvancedPairs]
-        .every(pair => sitePairs.has(pair))
+      sitePairs.size === this.activeAdvancedPairs.size &&
+      [...this.activeAdvancedPairs].every(pair => sitePairs.has(pair))
     );
   }
 
@@ -176,19 +170,14 @@ export class DataStore {
     if (
       !this.advancedFilterMode &&
       !changeActions.has(row.action) &&
-      row.technologie
+      row._techFreqPairs?.length
     ) {
-      techFreqMatch = row.technologie
-        .split(',')
-        .some(techRaw => {
-          const tech = techRaw.trim();
-          const baseTech =
-            Utils.extractBaseTech(tech);
-          const freq =
-            Utils.extractFreq(tech);
-          return this.activeFilters.technos.has(baseTech)
-            && this.activeFilters.freqs.has(freq);
-        });
+      // Utilise les paires précalculées — plus de split/regex ici
+      techFreqMatch = row._techFreqPairs.some(
+        ({ baseTech, freq }) =>
+          this.activeFilters.technos.has(baseTech) &&
+          this.activeFilters.freqs.has(freq)
+      );
     }
 
     return matchOp && matchAction && matchZB && matchNew && techFreqMatch;
@@ -229,7 +218,7 @@ export class DataStore {
           });
 
           const marker = L.marker([lat, lon], { icon, title: firstRow.operateur });
-          marker.bindPopup(PopupGenerator.generate(supportRows), { maxWidth: 320 });
+          marker.bindPopup(PopupGenerator.generate(supportRows, lat, lon), { maxWidth: 320 });
           const storeObj = { marker, data: supportRows, coords: { lat, lon } };
 
           this.addSupport(key, storeObj);

@@ -229,7 +229,7 @@ export class DataStore {
           });
 
           const marker = L.marker([lat, lon], { icon, title: firstRow.operateur });
-          marker.bindPopup(PopupGenerator.generate(supportRows, timestamp), { maxWidth: 320 });
+          marker.bindPopup(PopupGenerator.generate(supportRows), { maxWidth: 320 });
           const storeObj = { marker, data: supportRows, coords: { lat, lon } };
 
           this.addSupport(key, storeObj);

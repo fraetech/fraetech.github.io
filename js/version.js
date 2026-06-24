@@ -1,1 +1,1 @@
-self.APP_VERSION = "26.06.22s";
+self.APP_VERSION = "26.06.24c";

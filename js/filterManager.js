@@ -164,14 +164,26 @@ export class FilterManager {
     });
 
     // === ACTIONS: Split into Habituelles and Spéciales ===
-    const habituellesActions = ['AJO','ALL','EXT','SUP','AAV'];
+    const habituellesActions = ['AJO','ALL','EXT','SUP','AAV', 'ART'];
+
+    // Alias : si AJA ou AJR sont présents, leurs parents doivent apparaître dans les filtres
+    const ALIAS_PARENTS = {
+      'AJA': ['AJO', 'ALL'],
+      'AJR': ['AJO', 'ART'],
+    };
+    Object.entries(ALIAS_PARENTS).forEach(([alias, parents]) => {
+      if (this.dataStore.filterValues.actions.has(alias)) {
+        parents.forEach(p => this.dataStore.filterValues.actions.add(p));
+      }
+    });
     
     const specialesActions = [...this.dataStore.filterValues.actions]
       .filter(a => a.startsWith('CH'))
       .sort();
 
+    const ALIAS_ACTIONS = new Set(['AJA', 'AJR']);
     const otherActions = [...this.dataStore.filterValues.actions]
-      .filter(a => !habituellesActions.includes(a) && !a.startsWith('CH'))
+      .filter(a => !habituellesActions.includes(a) && !a.startsWith('CH') && !ALIAS_ACTIONS.has(a))
       .sort();
 
     // Sous-catégorie Actions habituelles
@@ -441,6 +453,12 @@ export class FilterManager {
     const actionVals = new Set();
     document.querySelectorAll('#actionFilters input:checked')
       .forEach(cb => actionVals.add(cb.value));
+
+    // AJA = alias de AJO + ALL  →  si l'un ou l'autre est coché, AJA passe aussi
+    if (actionVals.has('AJO') || actionVals.has('ALL')) actionVals.add('AJA');
+    // AJR = alias de AJO + ART  →  si l'un ou l'autre est coché, AJR passe aussi
+    if (actionVals.has('AJO') || actionVals.has('ART')) actionVals.add('AJR');
+
     this.dataStore.updateActiveFilters('actions', actionVals);
 
     const zbRadio = document.querySelector('input[name="zoneBlanche"]:checked');

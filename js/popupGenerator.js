@@ -155,6 +155,34 @@ export class PopupGenerator {
         </div>`;
       }
 
+      else if (actionType === 'AJR') {
+        html += `<div class="action-groupe">
+          <div class="action-titre">Ajout et activation rattrapée :</div>
+          <div>${actions.map(a => {
+            let dateBrackets = '';
+            if (a.date_activ) {
+              const [y, m, d] = a.date_activ.split('-');
+              dateBrackets = ` [Déclaré actif depuis le : ${d}/${m}/${y}]`;
+            }
+            return `${a.technologie}<br>${dateBrackets}`;
+          }).join('<br>')}</div>
+        </div>`;
+      }
+      
+      else if (actionType === 'ART') {
+        html += `<div class="action-groupe">
+          <div class="action-titre">Activation rattrapée :</div>
+          <div>${actions.map(a => {
+            let dateBrackets = '';
+            if (a.date_activ) {
+              const [y, m, d] = a.date_activ.split('-');
+              dateBrackets = ` [Déclaré actif depuis le : ${d}/${m}/${y}]`;
+            }
+            return `${a.technologie}<br>${dateBrackets}`;
+          }).join('<br>')}</div>
+        </div>`;
+      }
+
       else if (infosActions[actionType]) {
 
         const actionInfo = infosActions[actionType];

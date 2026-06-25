@@ -346,6 +346,8 @@ async function loadCsvAndInit(dataStore, mapManager) {
 
         const ts = (await tsResp.text()).trim();
 
+        window._resolvedCsvBase = timestampToWeekId(ts, params.get('csv'));
+
         if (!ts || /^\s*</.test(ts)) {
           throw new Error("Timestamp invalide");
         }
@@ -385,15 +387,51 @@ async function loadCsvAndInit(dataStore, mapManager) {
   return true;
 }
 
+function timestampToWeekId(ts, currentBase) {
+  // Si la base est déjà spécifique (pas index), on la garde telle quelle
+  if (currentBase && !currentBase.endsWith('/index')) {
+    return currentBase;  // ex: "mensu/M06_2026", "hebdo/S15_2026", "trim/T2_2026"
+  }
+
+  // Sinon on résout "hebdo/index" → "hebdo/S26_2026" depuis le timestamp
+  const [datePart] = ts.split(' à ');
+  const [day, month, year] = datePart.split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  // Numéro de semaine ISO 8601
+  const tmp = new Date(date);
+  tmp.setHours(0, 0, 0, 0);
+  tmp.setDate(tmp.getDate() + 3 - ((tmp.getDay() + 6) % 7));
+  const week1 = new Date(tmp.getFullYear(), 0, 4);
+  const weekNum = 1 + Math.round(
+    ((tmp - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7
+  );
+
+  // Préfixe = même dossier que la base actuelle (hebdo/ par défaut)
+  const prefix = currentBase ? currentBase.split('/')[0] : 'hebdo';
+  return `${prefix}/S${weekNum}_${year}`;
+}
+
 window.shareLocation = function(supportId, operateur) {
-  const url = `${window.location.origin}${window.location.pathname}?support=${supportId}&op=${encodeURIComponent(operateur)}`;
+  const params = new URLSearchParams(window.location.search);
+  const base = window._resolvedCsvBase   // figé au moment du chargement
+    ?? params.get('csv')                  // fallback si timestamp pas encore fetchéé
+    ?? 'hebdo/index';                     // dernier recours
+
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.searchParams.set('csv', base);
+  url.searchParams.set('support', supportId);
+  url.searchParams.set('op', operateur);
+
+  const finalUrl = url.toString();
   
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(url).then(() => {
+    navigator.clipboard.writeText(finalUrl).then(() => {
       showNotification('Lien copié dans le presse-papiers !', 'success');
-    }).catch(() => fallbackCopyToClipboard(url));
+    }).catch(() => fallbackCopyToClipboard(finalUrl));
   } else {
-    fallbackCopyToClipboard(url);
+    fallbackCopyToClipboard(finalUrl);
   }
 };
 

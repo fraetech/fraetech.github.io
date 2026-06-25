@@ -171,5 +171,36 @@
 // Minimal style hint before CSS loads: ensures map has height quickly
 document.documentElement.style.background = '#fff';
 </script>
+<!-- Légende des actions -->
+<div id="legend-control" class="legend-control collapsed">
+  <button id="legend-toggle" class="legend-toggle-btn" title="Légende des actions">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+    </svg>
+    Légende
+  </button>
+  <div class="legend-content">
+    <div class="legend-title">Actions représentées</div>
+    <div class="legend-items">
+      <div class="legend-item"><img src="icons/byt_aav.svg" alt="AAV"><span>Activation prévisionnelle support/fréquence</span></div>
+      <div class="legend-item"><img src="icons/byt_ajo.svg" alt="AJO"><span>Ajout d'un support/fréquence</span></div>
+      <div class="legend-item"><img src="icons/byt_all.svg" alt="ACT"><span>Activation d'un support/fréquence</span></div>
+      <div class="legend-item"><img src="icons/byt_cha.svg" alt="CHA"><span>Changement d'adresse d'un support</span></div>
+      <div class="legend-item"><img src="icons/byt_chh.svg" alt="CHH"><span>Changement de hauteur d'un support</span></div>
+      <div class="legend-item"><img src="icons/byt_chi.svg" alt="CHI"><span>Changement d'identifiant d'un support</span></div>
+      <div class="legend-item"><img src="icons/byt_chl.svg" alt="CHL"><span>Changement de position d'un support</span></div>
+      <div class="legend-item"><img src="icons/byt_chp.svg" alt="CHP"><span>Changement de propriétaire d'un support</span></div>
+      <div class="legend-item"><img src="icons/byt_cht.svg" alt="CHT"><span>Changement de type d'un support</span></div>
+      <div class="legend-item"><img src="icons/byt_ext.svg" alt="EXT"><span>Extinction d'un support/fréquence</span></div>
+      <div class="legend-item"><img src="icons/byt_sup.svg" alt="SUP"><span>Suppression d'un support/fréquence</span></div>
+	  <div class="legend-item"><img src="icons/byt_aja.svg" alt="AJA"><span>Ajout & activation d'un support/fréquence</span></div>
+	  <div class="legend-item"><img src="icons/byt_art.svg" alt="ART"><span>Activation "antérieure" (rattrapage)</span></div>
+	  <div class="legend-item"><img src="icons/byt_ajr.svg" alt="AJR"><span>Ajout & activation "antérieure" (rattrapage)</span></div>
+      <div class="legend-item"><img src="icons/byt.svg" alt="Multi"><span>Plusieurs actions simultanées</span></div>
+	  <div class="legend-item"><span>La couleur de l'icône change en fonction de l'opérateur concerné.</span></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

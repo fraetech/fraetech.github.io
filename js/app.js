@@ -77,6 +77,12 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
       const div = L.DomUtil.create('div', 'leaflet-control custom-filter-control collapsed');
       div.innerHTML = `<div class="filters-content" style="display:none;">
               <button class="toggle-all-filters" id="toggleAllFilters" type="button">Tout décocher</button>
+              <div class="filter-category-header">Mode de filtrage</div>
+              <div class="filter-group expanded">
+              <label><input type="radio" name="filterMode" value="simple" checked>Simple</label>
+              <label><input type="radio" name="filterMode" value="advanced">Avancé</label>
+              </div>
+              <div class="filter-group" id="advancedFilters"></div>
               <div class="filter-category-header">Technologies <button class="toggle-category-btn" data-category="technoFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
               <div class="filter-group" id="technoFilters"></div>
               <div class="filter-category-header">Fréquences <button class="toggle-category-btn" data-category="freqFilters" style="font-size:0.8em;padding:2px 6px;cursor:pointer;">Tout décocher</button></div>
@@ -101,6 +107,14 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
             div.classList.remove('collapsed'); 
             div.classList.add('expanded'); 
             content.style.display='block';
+            setTimeout(() => {
+              const adv = document.getElementById('advancedFilters');
+              if (adv) {
+                adv.offsetHeight; // force reflow
+              }
+
+              window.dispatchEvent(new Event('resize'));
+            }, 0);
             try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
             ['touchstart','touchmove','touchend','wheel'].forEach(evt => { 
               content.addEventListener(evt, function(ev){ ev.stopPropagation(); }, { passive: false }); 
@@ -115,13 +129,10 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
       });
 
       // Gestion du repli/dépli des catégories
-      setTimeout(() => {
-        // Headers cliquables pour replier/déplier
+      Promise.resolve().then(() => {
         div.querySelectorAll('.filter-category-header').forEach(header => {
           header.addEventListener('click', (e) => {
-            // Ne pas déclencher si on clique sur le bouton toggle
             if (e.target.classList.contains('toggle-category-btn')) return;
-            
             const nextGroup = header.nextElementSibling;
             if (nextGroup && nextGroup.classList.contains('filter-group')) {
               nextGroup.classList.toggle('expanded');
@@ -129,24 +140,22 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
           });
         });
 
-        // Boutons "Tout cocher/décocher" (uniquement ceux avec data-category)
         div.querySelectorAll('.toggle-category-btn[data-category]').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const category = btn.getAttribute('data-category');
             const container = document.getElementById(category);
             const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
-            const allChecked = Array.from(allCheckboxes).every(chk => chk.checked);
-            
+            // Tout décocher si au moins une est cochée, tout cocher seulement si tout est décoché
+            const newState = !Array.from(allCheckboxes).some(chk => chk.checked);
             allCheckboxes.forEach(chk => {
-              chk.checked = !allChecked;
+              chk.checked = newState;
               chk.dispatchEvent(new Event('change'));
             });
-            
-            btn.textContent = allChecked ? 'Tout cocher' : 'Tout décocher';
+            btn.textContent = newState ? 'Tout décocher' : 'Tout cocher';
           });
         });
-      }, 100);
+      });
 
       return div;
     }
@@ -157,168 +166,272 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
   map.addControl(new FilterControl({ position: 'topright' }));
 
   // Attach simple DOM behavior (clear search)
-  setTimeout(() => {
-    const clearButton = document.getElementById('clearSearch');
-    if (clearButton) {
-      clearButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const input = document.getElementById('searchInput');
-        if (input) { input.value = ''; searchManager.hideResults(); input.focus(); }
-        clearButton.style.display = 'none';
-      });
-    }
-
-    const input = document.getElementById('searchInput');
-    if (input) {
-      input.addEventListener('input', (ev) => {
-        const v = ev.target.value.trim();
-        clearButton.style.display = v ? 'flex' : 'none';
-        searchManager.handleInput(v);
-      });
-    }
-
-    // Global toggle all filters button
-    const toggleAllBtn = document.getElementById('toggleAllFilters');
-    if (toggleAllBtn) {
-      const updateToggleButton = () => {
-        const allCheckboxes = document.querySelectorAll('#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], #opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]');
-        const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
-        toggleAllBtn.textContent = allChecked ? 'Tout décocher' : 'Tout cocher';
-      };
-      
-      toggleAllBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const allCheckboxes = document.querySelectorAll('#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], #opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]');
-        const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
-        allCheckboxes.forEach(cb => { cb.checked = !allChecked; cb.dispatchEvent(new Event('change')); });
-        // Also toggle radio buttons to their default positions
-        document.querySelectorAll('input[name="zoneBlanche"][value="all"], input[name="siteNeuf"][value="all"]').forEach(r => {
-          r.checked = true;
-          r.dispatchEvent(new Event('change'));
+  Promise.resolve().then(() => {
+      const clearButton = document.getElementById('clearSearch');
+      if (clearButton) {
+        clearButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const input = document.getElementById('searchInput');
+          if (input) { input.value = ''; searchManager.hideResults(); input.focus(); }
+          clearButton.style.display = 'none';
         });
-        updateToggleButton();
-      });
-      
-      // Update button state when filters change
-      document.addEventListener('change', (e) => {
-        if (e.target.type === 'checkbox') {
+      }
+
+      const input = document.getElementById('searchInput');
+      if (input) {
+        input.addEventListener('input', (ev) => {
+          const v = ev.target.value.trim();
+          clearButton.style.display = v ? 'flex' : 'none';
+          searchManager.handleInput(v);
+        });
+      }
+
+      // Global toggle all filters button
+      const toggleAllBtn = document.getElementById('toggleAllFilters');
+      if (toggleAllBtn) {
+        const updateToggleButton = () => {
+          const allCheckboxes = document.querySelectorAll(
+            '#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], ' +
+            '#opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]'
+          );
+          const anyChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+          toggleAllBtn.textContent = anyChecked ? 'Tout décocher' : 'Tout cocher';
+        };
+
+        toggleAllBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const allCheckboxes = document.querySelectorAll(
+            '#technoFilters input[type="checkbox"], #freqFilters input[type="checkbox"], ' +
+            '#opFilters input[type="checkbox"], #actionFilters input[type="checkbox"]'
+          );
+          // Tout décocher si au moins une est cochée, tout cocher seulement si tout est déjà décoché
+          const anyChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+          const newState = !anyChecked;
+
+          allCheckboxes.forEach(cb => {
+            cb.checked = newState;
+            cb.dispatchEvent(new Event('change'));
+          });
+
+          document.querySelectorAll('input[name="zoneBlanche"][value="all"], input[name="siteNeuf"][value="all"]').forEach(r => {
+            r.checked = true;
+            r.dispatchEvent(new Event('change'));
+          });
+
           updateToggleButton();
+        });
+
+        document.addEventListener('change', (e) => {
+          if (e.target.type === 'checkbox') {
+            updateToggleButton();
+          }
+        });
+
+        // Synchro forcée depuis filterManager
+        document.addEventListener('filtersLabelUpdate', () => {
+          updateToggleButton();
+        });
+
+        updateToggleButton();
+      }
+
+      // Hide search on clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-control') && !e.target.closest('.search-icon-control')) {
+          searchManager.hideSearchBar();
         }
       });
-      
-      updateToggleButton();
-    }
 
-    // Hide search on clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-control') && !e.target.closest('.search-icon-control')) {
+      // Un seul handler pour masquer le message + fermer la search bar
+      map.on('movestart click zoomstart', () => {
+        const msg = document.getElementById('message');
+        if (msg) msg.style.display = 'none';
         searchManager.hideSearchBar();
-      }
-    });
+      });
 
-    // Map events to hide message & controls
-    map.on('movestart', () => {
-      const msg = document.getElementById('message'); if (msg) msg.style.display='none';
-      searchManager.hideSearchBar();
+      // Fermeture du panneau filtre sur movestart ou click carte
+      map.on('movestart click', () => {
+        const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
+        if (filterPanel?.classList.contains('expanded')) {
+          filterPanel.classList.replace('expanded', 'collapsed');
+          filterPanel.querySelector('.filters-content').style.display = 'none';
+          try { map.dragging.enable(); } catch (_) {}
+        }
+      });
+
+      // matchMedia mis en cache une seule fois
+      const mql = window.matchMedia('(max-width: 768px)');
       const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
-      if (filterPanel && filterPanel.classList.contains('expanded')) {
-        filterPanel.classList.remove('expanded'); filterPanel.classList.add('collapsed'); filterPanel.querySelector('.filters-content').style.display='none';
-        try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
-      }
-    });
-    
-    // Fermer les filtres quand on clique sur la carte
-    map.on('click', () => {
-      const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
-      if (filterPanel && filterPanel.classList.contains('expanded')) {
-        filterPanel.classList.remove('expanded');
-        filterPanel.classList.add('collapsed');
-        filterPanel.querySelector('.filters-content').style.display='none';
-        try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
-      }
-    });
-    
-    map.on('click zoomstart', () => {
-      const msg = document.getElementById('message'); if (msg) msg.style.display='none';
-    });
-    
-    // Hover behavior for filter button on PC (not on mobile)
-    const isDesktop = () => !window.matchMedia('(max-width: 768px)').matches;
-    if (isDesktop()) {
-      const filterPanel = document.querySelector('.leaflet-control.custom-filter-control');
-      if (filterPanel) {
-        // Handle button hover to open filter panel
-        filterPanel.addEventListener('mouseenter', () => {
-          if (filterPanel.classList.contains('collapsed')) {
-            filterPanel.classList.remove('collapsed');
-            filterPanel.classList.add('expanded');
-            filterPanel.querySelector('.filters-content').style.display='block';
-            try { if (map && map.dragging) map.dragging.disable(); } catch (err) {}
-          }
-        });
-        
-        // Handle leaving filter panel to close it
-        filterPanel.addEventListener('mouseleave', () => {
-          if (filterPanel.classList.contains('expanded')) {
-            filterPanel.classList.remove('expanded');
-            filterPanel.classList.add('collapsed');
-            filterPanel.querySelector('.filters-content').style.display='none';
-            try { if (map && map.dragging) map.dragging.enable(); } catch (err) {}
-          }
-        });
-      }
-    }
-  }, 150);
+
+      const applyHoverBehavior = (isMobile) => {
+        if (!filterPanel) return;
+        if (!isMobile) {
+          filterPanel.addEventListener('mouseenter', () => {
+            if (filterPanel.classList.contains('collapsed')) {
+              filterPanel.classList.replace('collapsed', 'expanded');
+              filterPanel.querySelector('.filters-content').style.display = 'block';
+              try { map.dragging.disable(); } catch (_) {}
+            }
+          });
+          filterPanel.addEventListener('mouseleave', () => {
+            if (filterPanel.classList.contains('expanded')) {
+              filterPanel.classList.replace('expanded', 'collapsed');
+              filterPanel.querySelector('.filters-content').style.display = 'none';
+              try { map.dragging.enable(); } catch (_) {}
+            }
+          });
+        }
+      };
+
+      applyHoverBehavior(mql.matches);
+      mql.addEventListener('change', (e) => applyHoverBehavior(e.matches));
+  });
 }
 
 async function loadCsvAndInit(dataStore, mapManager) {
+  const statusElem = document.querySelector("#message-status");
+
+  const setStatus = (message, color = '') => {
+    if (!statusElem) return;
+
+    statusElem.textContent = message;
+    statusElem.style.color = color;
+  };
+
   try {
     const params = new URLSearchParams(window.location.search);
-    const csvPath = params.get('csv');
-    const base = csvPath ? csvPath : 'hebdo/index';
-    const csvUrl = `${CONFIG.baseDataUrl}${base}.csv?t=${Date.now()}`;
-    const timestampUrl = `${CONFIG.baseDataUrl}${base.replace('index','timestamp')}.txt?t=${Date.now()}`;
+    const base = params.get('csv') || 'hebdo/index';
 
+    const cacheBuster = Date.now();
+
+    const csvUrl =
+      `${CONFIG.baseDataUrl}${base}.csv?t=${cacheBuster}`;
+
+    const timestampUrl =
+      `${CONFIG.baseDataUrl}${base.replace('index', 'timestamp')}.txt?t=${cacheBuster}`;
+
+    // CSV (bloquant)
     const csvResp = await fetch(csvUrl);
-    const csvText = await csvResp.text();
-    const rows = (await import('./utils.js')).Utils.csvToRows(csvText);
 
-    fetch(timestampUrl).then(r => r.text()).then(ts => {
-      const strongElem = document.querySelector("#message-status");
-      if (strongElem && ts) strongElem.textContent = `MAJ ANFR du ${ts.trim()}`;
-    }).catch(() => {});
+    if (!csvResp.ok) {
+      throw new Error(`CSV inaccessible (HTTP ${csvResp.status})`);
+    }
 
-    const grouped = {};
-    rows.forEach(row => {
+    const csvText = (await csvResp.text()).trim();
+
+    if (!csvText) {
+      throw new Error("CSV vide");
+    }
+
+    // Détection d'une page HTML renvoyée 
+    if (/^\s*</.test(csvText)) {
+      throw new Error("Le serveur a renvoyé du HTML au lieu du CSV");
+    }
+
+    const { Utils } = await import('./utils.js');
+    const rows = Utils.csvToRows(csvText);
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      throw new Error("Aucune donnée exploitable dans le CSV");
+    }
+
+    // Timestamp (optionnel, ne bloque jamais)
+    (async () => {
+      try {
+        const tsResp = await fetch(timestampUrl);
+
+        if (!tsResp.ok) {
+          throw new Error(`HTTP ${tsResp.status}`);
+        }
+
+        const ts = (await tsResp.text()).trim();
+
+        window._resolvedCsvBase = timestampToWeekId(ts, params.get('csv'));
+
+        if (!ts || /^\s*</.test(ts)) {
+          throw new Error("Timestamp invalide");
+        }
+
+        setStatus(`MAJ ANFR du ${ts}`);
+      } catch (err) {
+        console.warn("Timestamp indisponible :", err);
+
+        setStatus(
+          "Date de mise à jour indisponible",
+          "orange"
+        );
+      }
+    })();
+
+    // Initialisation de l'application
+    const grouped = Object.create(null);
+
+    for (const row of rows) {
       const key = `${row.id_support}_${row.operateur}`;
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(row);
-    });
+      (grouped[key] ??= []).push(row);
+    }
 
     await dataStore.createAndStoreMarkersInBatches(grouped, 200);
 
   } catch (err) {
-    console.error('Loading CSV failed', err);
-    const strongElem = document.querySelector("#message-status");
-    if (strongElem) { 
-      strongElem.textContent = "Erreur de chargement des données"; 
-      strongElem.style.color = 'red'; 
-    }
+    console.error("Erreur chargement CSV :", err);
+
+    setStatus(
+      "Erreur : impossible de charger les données",
+      "red"
+    );
+
+    return false;
   }
+
+  return true;
 }
 
-window.shareLocation = function(lat, lon, supportId) {
-  const url = `${window.location.origin}${window.location.pathname}#support=${supportId}&lat=${lat}&lon=${lon}`;
+function timestampToWeekId(ts, currentBase) {
+  // Si la base est déjà spécifique (pas index), on la garde telle quelle
+  if (currentBase && !currentBase.endsWith('/index')) {
+    return currentBase;  // ex: "mensu/M06_2026", "hebdo/S15_2026", "trim/T2_2026"
+  }
+
+  // Sinon on résout "hebdo/index" → "hebdo/S26_2026" depuis le timestamp
+  const [datePart] = ts.split(' à ');
+  const [day, month, year] = datePart.split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  // Numéro de semaine ISO 8601
+  const tmp = new Date(date);
+  tmp.setHours(0, 0, 0, 0);
+  tmp.setDate(tmp.getDate() + 3 - ((tmp.getDay() + 6) % 7));
+  const week1 = new Date(tmp.getFullYear(), 0, 4);
+  const weekNum = 1 + Math.round(
+    ((tmp - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7
+  );
+
+  // Préfixe = même dossier que la base actuelle (hebdo/ par défaut)
+  const prefix = currentBase ? currentBase.split('/')[0] : 'hebdo';
+  return `${prefix}/S${weekNum}_${year}`;
+}
+
+window.shareLocation = function(supportId, operateur) {
+  const params = new URLSearchParams(window.location.search);
+  const base = window._resolvedCsvBase   // figé au moment du chargement
+    ?? params.get('csv')                  // fallback si timestamp pas encore fetchéé
+    ?? 'hebdo/index';                     // dernier recours
+
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.searchParams.set('csv', base);
+  url.searchParams.set('support', supportId);
+  url.searchParams.set('op', operateur);
+
+  const finalUrl = url.toString();
   
-  // Copier dans le presse-papiers
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(url).then(() => {
+    navigator.clipboard.writeText(finalUrl).then(() => {
       showNotification('Lien copié dans le presse-papiers !', 'success');
-    }).catch(() => {
-      fallbackCopyToClipboard(url);
-    });
+    }).catch(() => fallbackCopyToClipboard(finalUrl));
   } else {
-    fallbackCopyToClipboard(url);
+    fallbackCopyToClipboard(finalUrl);
   }
 };
 
@@ -346,115 +459,41 @@ function fallbackCopyToClipboard(text) {
 
 class URLManager {
   constructor(mapManager, dataStore) {
-    this.mapManager = mapManager;
-    this.dataStore = dataStore;
-    // Attendre que les données soient chargées avant de vérifier l'URL
-    this.checkURLOnLoadDelayed();
-  }
-  
-  checkURLOnLoadDelayed() {
-    // Vérifier l'URL après un délai pour s'assurer que les markers sont chargés
-    setTimeout(() => {
-      this.checkURLOnLoad();
-    }, 1000); // Délai plus long pour laisser le temps aux markers de se charger
+  this.mapManager = mapManager;
+  this.dataStore = dataStore;
   }
   
   checkURLOnLoad() {
-    const hash = window.location.hash.substring(1);
-    if (!hash) return;
-    
-    const params = new URLSearchParams(hash);
+    const params = new URLSearchParams(window.location.search);
+
     const supportId = params.get('support');
-    const lat = parseFloat(params.get('lat'));
-    const lon = parseFloat(params.get('lon'));
-    
-    if (supportId && lat && lon) {
-      this.openSupportFromURL(supportId, lat, lon);
+    const operateur = params.get('op');
+
+    if (supportId && operateur) {
+      this.openSupportFromURL(supportId, operateur);
     }
   }
   
-  openSupportFromURL(supportId, lat, lon) {
-    // Centre la carte d'abord
-    this.mapManager.map.setView([lat, lon], 16);
-    
-    // Trouve et ouvre le popup correspondant avec plusieurs stratégies
-    setTimeout(() => {
-      let markerFound = false;
-      
-      // Stratégie 1 : Recherche par ID support dans les données
-      if (this.dataStore && this.dataStore.allData) {
-        const matchingData = this.dataStore.allData.find(item => 
-          item.id_support === supportId
-        );
-        
-        if (matchingData) {
-          const [itemLat, itemLon] = matchingData.coordonnees.split(',').map(s => parseFloat(s.trim()));
-          
-          // Chercher le marker correspondant
-          this.mapManager.markersLayer.eachLayer(marker => {
-            if (!markerFound) {
-              const markerLat = marker.getLatLng().lat;
-              const markerLon = marker.getLatLng().lng;
-              
-              // Comparaison avec une tolérance plus large
-              if (Math.abs(markerLat - itemLat) < 0.0001 && Math.abs(markerLon - itemLon) < 0.0001) {
-                marker.openPopup();
-                markerFound = true;
-                console.log('Popup ouvert via stratégie 1 (ID support)');
-                return;
-              }
-            }
-          });
-        }
+  openSupportFromURL(supportId, operateur) {
+    const support = this.dataStore.findSupportByIdAndOperator(
+      supportId,
+      operateur
+    );
+
+    if (!support?.marker) {
+      showNotification(
+        'Support non trouvé sur la carte',
+        'error'
+      );
+      return;
+    }
+
+    this.mapManager.markerCluster.zoomToShowLayer(
+      support.marker,
+      () => {
+        support.marker.openPopup();
       }
-      
-      // Stratégie 2 : Si pas trouvé, chercher par coordonnées avec tolérance
-      if (!markerFound) {
-        this.mapManager.markersLayer.eachLayer(marker => {
-          if (!markerFound) {
-            const markerLat = marker.getLatLng().lat;
-            const markerLon = marker.getLatLng().lng;
-            
-            // Tolérance élargie pour les coordonnées
-            if (Math.abs(markerLat - lat) < 0.001 && Math.abs(markerLon - lon) < 0.001) {
-              marker.openPopup();
-              markerFound = true;
-              console.log('Popup ouvert via stratégie 2 (coordonnées)');
-              return;
-            }
-          }
-        });
-      }
-      
-      // Stratégie 3 : Si toujours pas trouvé, chercher le marker le plus proche
-      if (!markerFound) {
-        let closestMarker = null;
-        let minDistance = Infinity;
-        
-        this.mapManager.markersLayer.eachLayer(marker => {
-          const markerLat = marker.getLatLng().lat;
-          const markerLon = marker.getLatLng().lng;
-          const distance = Math.sqrt(
-            Math.pow(markerLat - lat, 2) + Math.pow(markerLon - lon, 2)
-          );
-          
-          if (distance < minDistance && distance < 0.01) { // Dans un rayon raisonnable
-            minDistance = distance;
-            closestMarker = marker;
-          }
-        });
-        
-        if (closestMarker) {
-          closestMarker.openPopup();
-          markerFound = true;
-        }
-      }
-      
-      if (!markerFound) {
-        showNotification('Support non trouvé sur la carte', 'error');
-      }
-      
-    }, 800); // Délai pour laisser le temps à la carte de se centrer
+    );
   }
 }
 
@@ -511,12 +550,17 @@ async function main() {
 
   // Start loading CSV and building markers in background (non-blocking)
   await loadCsvAndInit(dataStore, mapManager);
-  // After initial markers added, initialize filter UI (build lists)
   filterManager.initFilters();
 
-  // Ensure controls are wired: searchManager displays results into #searchResults
-  // and filterManager will apply filters to the markers already added.
+  // Filtre opérateur via ?ope=
+  const initParams = new URLSearchParams(window.location.search);
+  const opeParam = initParams.get('ope');
+  if (opeParam) {
+    filterManager.applyOperatorFilter(opeParam.toUpperCase());
+  }
+
   const urlManager = new URLManager(mapManager, dataStore);
+  urlManager.checkURLOnLoad();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

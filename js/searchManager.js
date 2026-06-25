@@ -8,6 +8,7 @@ export class SearchManager {
     this.searchTimeout = null;
     this.currentResults = [];
     this._debouncedHandle = Utils.debounce(this._doSearch.bind(this), 250);
+    this._nominatimAbort = null;
     this._initDom();
   }
 
@@ -60,16 +61,26 @@ export class SearchManager {
   }
 
   async searchNominatim(query) {
+    // Annule la requête précédente si elle est encore en vol
+    if (this._nominatimAbort) {
+      this._nominatimAbort.abort();
+    }
+    this._nominatimAbort = new AbortController();
+    const signal = this._nominatimAbort.signal;
+
     try {
       const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=fr&q=${encodeURIComponent(query)}`;
-      const resp = await fetch(url, { headers: { 'Accept-Language': 'fr' } });
+      const resp = await fetch(url, {
+        headers: { 'Accept-Language': 'fr' },
+        signal
+      });
       if (!resp.ok) return [];
       const data = await resp.json();
       const seen = new Set();
       const filtered = [];
       for (const item of data) {
         const place = (item.display_name || '').split(',')[0].trim().toLowerCase();
-        const preferredTypes = ['city','town','village','hamlet','municipality'];
+        const preferredTypes = ['city', 'town', 'village', 'hamlet', 'municipality'];
         const isPreferred = preferredTypes.includes(item.type) || preferredTypes.includes(item.class);
         if (!seen.has(place) || isPreferred) {
           filtered.push({
@@ -85,6 +96,7 @@ export class SearchManager {
       }
       return filtered;
     } catch (err) {
+      if (err.name === 'AbortError') return []; // annulation propre, pas une erreur
       console.warn('Nominatim failed', err);
       return [];
     }
@@ -93,15 +105,15 @@ export class SearchManager {
   displayResults() {
     const container = document.getElementById('searchResults');
     if (!container) return;
-    container.innerHTML = '';
     if (!this.currentResults || this.currentResults.length === 0) {
+      container.innerHTML = '';
       container.style.display = 'none';
       return;
     }
-    this.currentResults.forEach(r => {
-      const item = this._createResultItem(r);
-      container.appendChild(item);
-    });
+    const frag = document.createDocumentFragment();
+    this.currentResults.forEach(r => frag.appendChild(this._createResultItem(r)));
+    container.innerHTML = '';   // vide une seule fois, puis un seul reflow
+    container.appendChild(frag);
     container.style.display = 'block';
   }
 

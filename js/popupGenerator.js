@@ -1,30 +1,32 @@
 import { CONFIG } from './config.js';
 
 export class PopupGenerator {
-  static generate(actionsData) {
-      if (!actionsData || actionsData.length === 0) return '';
-      
-      const firstAction = actionsData[0];
-      const [lat, lon] = firstAction.coordonnees.split(',').map(s => s.trim());
-      
-      // Récupère ID opérateur et URL logo GitHub
-      const opConfig = CONFIG.operators[firstAction.operateur] || CONFIG.operators['MISC'];
-      const logoUrl = `${CONFIG.baseIconUrl}opes/L_${opConfig.id}.avif`;
+  static generate(actionsData, lat, lon) {
+    if (!actionsData || actionsData.length === 0) return '';
 
-      // Retourner directement le contenu sans div wrapper supplémentaire
-      const content = `
-          <div class="popup-operator-bg" style="--logo-url: url('${logoUrl}');">
-              ${this.generateBandeau(firstAction, lat, lon)}
-              <div class="popup-content-wrapper">
-                  ${this.generateIcons(firstAction, lat, lon)}
-                  ${this.generateTitle(firstAction)}
-                  ${this.generateActions(actionsData)}
-                  ${this.generateFooter(firstAction)}
-              </div>
-          </div>
-      `;
-      
-      return content;
+    const firstAction = actionsData[0];
+
+    // lat/lon passés directement depuis dataStore (déjà parsés), fallback sur split si absent
+    if (lat === undefined || lon === undefined) {
+      [lat, lon] = firstAction.coordonnees.split(',').map(s => parseFloat(s.trim()));
+    }
+
+    const opConfig = CONFIG.operators[firstAction.operateur] || CONFIG.operators['MISC'];
+    const logoUrl = `${CONFIG.baseIconUrl}opes/L_${opConfig.id}.avif`;
+
+    const content = `
+      <div class="popup-operator-bg" style="--logo-url: url('${logoUrl}');">
+        ${this.generateBandeau(firstAction, lat, lon)}
+        <div class="popup-content-wrapper">
+          ${this.generateIcons(firstAction, lat, lon)}
+          ${this.generateTitle(firstAction)}
+          ${this.generateActions(actionsData)}
+          ${this.generateFooter(firstAction)}
+        </div>
+      </div>
+    `;
+
+    return content;
   }
 
   static generateBandeau(firstAction, lat, lon) {
@@ -78,13 +80,23 @@ export class PopupGenerator {
     const carteFhUrl = `https://carte-fh.lafibre.info/index.php?no_sup_init=${firstAction.id_support}`;
     icons.push(`<a href="${carteFhUrl}" target="_blank" rel="noopener" class="icone"><img loading="lazy" src="${base}carte-fh.avif" alt="Carte-FH"></a>`);
     
-    icons.push(`<a href="#" onclick="shareLocation('${lat}', '${lon}', '${firstAction.id_support}'); return false;" class="icone" title="Partager ce support"><img loading="lazy" src="${base}share.svg" alt="Partager"></a>`);
+    icons.push(`<a href="#" onclick="shareLocation('${firstAction.id_support}', '${firstAction.operateur}'); return false;" class="icone" title="Partager ce support"><img loading="lazy" src="${base}share.svg" alt="Partager"></a>`);
     
     return `<div class="icone-container">${icons.join('')}</div>`;
   }
 
   static generateTitle(firstAction) {
-    return `<div class="titre"><strong>${firstAction.adresse}</strong></div>`;
+    const badges = [];
+    if (firstAction.is_zb === 'true') {
+      badges.push(`<span class="popup-badge popup-badge--zb">ZB</span>`);
+    }
+    if (firstAction.is_new === 'true') {
+      badges.push(`<span class="popup-badge popup-badge--new">Site neuf</span>`);
+    }
+    const badgeHtml = badges.length
+      ? `<br><span class="popup-badge-row">${badges.join('')}</span>`
+      : '';
+    return `<div class="titre"><strong>${firstAction.adresse}</strong>${badgeHtml}</div>`;
   }
 
   static generateActions(actionsData) {
@@ -117,6 +129,34 @@ export class PopupGenerator {
             if (a.date_activ) {
               const [y, m, d] = a.date_activ.split('-');
               dateBrackets = ` [Activation prévue le : ${d}/${m}/${y}]`;
+            }
+            return `${a.technologie}<br>${dateBrackets}`;
+          }).join('<br>')}</div>
+        </div>`;
+      }
+
+      else if (actionType === 'AJR') {
+        html += `<div class="action-groupe">
+          <div class="action-titre">Ajout et activation rattrapée :</div>
+          <div>${actions.map(a => {
+            let dateBrackets = '';
+            if (a.date_activ) {
+              const [y, m, d] = a.date_activ.split('-');
+              dateBrackets = ` [Déclaré actif depuis le : ${d}/${m}/${y}]`;
+            }
+            return `${a.technologie}<br>${dateBrackets}`;
+          }).join('<br>')}</div>
+        </div>`;
+      }
+      
+      else if (actionType === 'ART') {
+        html += `<div class="action-groupe">
+          <div class="action-titre">Activation rattrapée :</div>
+          <div>${actions.map(a => {
+            let dateBrackets = '';
+            if (a.date_activ) {
+              const [y, m, d] = a.date_activ.split('-');
+              dateBrackets = ` [Déclaré actif depuis le : ${d}/${m}/${y}]`;
             }
             return `${a.technologie}<br>${dateBrackets}`;
           }).join('<br>')}</div>

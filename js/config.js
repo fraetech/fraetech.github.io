@@ -26,6 +26,9 @@ export const CONFIG = {
     'ALL': 'Activation fréquence',
     'AAV': 'Activation prévisionnelle',
     'AJO': 'Ajout fréquence',
+    'AJA': 'Ajout & activation',
+    'AJR': 'Ajout & activation rattrapée',
+    'ART': 'Activation rattrapée',
     'SUP': 'Suppression fréquence',
     'EXT': 'Extinction fréquence',
     'CHI': 'Changement identifiant support',
@@ -42,6 +45,6 @@ export const CONFIG = {
     '5G NR': 'NR (5G)'
   },
   techOrder: ['GSM', 'UMTS', 'LTE', '5G NR'],
-  baseIconUrl: 'https://fraetech.github.io/icons/',
-  baseDataUrl: 'https://fraetech.github.io/files/'
+  baseIconUrl: '/icons/',
+  baseDataUrl: '/files/'
 };

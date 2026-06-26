@@ -823,8 +823,60 @@ strong { font-weight: bold; }
   margin-bottom: 6px;
 }
 
+/* Tooltip CSS pur — */
 .tooltip-icon {
+  position: relative;
   cursor: help;
   color: #888;
   font-size: 0.85em;
+  display: inline-block;
+}
+
+.tooltip-icon::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  font-size: 11px;
+  font-weight: normal;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: normal;
+  width: 200px;
+  text-align: left;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 9999;
+  line-height: 1.4;
+}
+
+/* Flèche */
+.tooltip-icon::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #333;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Hover (desktop) */
+.tooltip-icon:hover::after,
+.tooltip-icon:hover::before {
+  opacity: 1;
+}
+
+/* Tap (mobile) — toggle via :focus */
+.tooltip-icon:focus::after,
+.tooltip-icon:focus::before {
+  opacity: 1;
 }

@@ -128,7 +128,7 @@ export class PopupGenerator {
             let dateBrackets = '';
             if (a.date_activ) {
               const [y, m, d] = a.date_activ.split('-');
-              dateBrackets = ` [Activation prévue le : ${d}/${m}/${y}]`;
+              dateBrackets = ` [Activation le : ${d}/${m}/${y}]`;
             }
             return `${a.technologie}<br>${dateBrackets}`;
           }).join('<br>')}</div>

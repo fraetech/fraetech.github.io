@@ -121,7 +121,21 @@ export class PopupGenerator {
     for (const [actionType, actions] of Object.entries(actionsByType)) {
       const actionTitle = CONFIG.actions[actionType] || actionType;
 
-      if (actionType === 'AAV') {
+      if (actionType === 'ALL') {
+        html += `<div class="action-groupe">
+          <div class="action-titre">Activation fréquence :</div>
+          <div>${actions.map(a => {
+            let dateBrackets = '';
+            if (a.date_activ) {
+              const [y, m, d] = a.date_activ.split('-');
+              dateBrackets = ` [Activation prévue le : ${d}/${m}/${y}]`;
+            }
+            return `${a.technologie}<br>${dateBrackets}`;
+          }).join('<br>')}</div>
+        </div>`;
+      }
+
+      else if (actionType === 'AAV') {
         html += `<div class="action-groupe">
           <div class="action-titre">Activation prévisionnelle :</div>
           <div>${actions.map(a => {

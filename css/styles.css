@@ -823,8 +823,50 @@ strong { font-weight: bold; }
   margin-bottom: 6px;
 }
 
+/* Tooltip CSS pur — */
 .tooltip-icon {
+  position: relative;
   cursor: help;
   color: #888;
   font-size: 0.85em;
+  display: inline-block;
+}
+
+.tooltip-icon::after {
+  content: attr(data-tooltip);
+  position: fixed;  /* ← fixed au lieu de absolute = échappe au overflow */
+  background: #333;
+  color: #fff;
+  font-size: 11px;
+  font-weight: normal;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: normal;
+  width: 200px;
+  text-align: left;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 99999;
+  line-height: 1.4;
+  /* Ancrage relatif à l'icône via anchor positioning approximatif */
+  margin-top: -60px;
+  right: 10px;   /* ← collé au bord droit du viewport, jamais tronqué */
+  left: auto;
+}
+
+.tooltip-icon::before {
+  display: none;
+}
+
+/* Hover (desktop) */
+.tooltip-icon:hover::after,
+.tooltip-icon:hover::before {
+  opacity: 1;
+}
+
+/* Tap (mobile) — toggle via :focus */
+.tooltip-icon:focus::after,
+.tooltip-icon:focus::before {
+  opacity: 1;
 }

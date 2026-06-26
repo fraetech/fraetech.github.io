@@ -12,7 +12,7 @@ export const CONFIG = {
     'DIGICEL': { id: 'dig', color: '#E4002B', mcc: 340, mnc: 20 },
     'Gouv Nelle Calédonie (OPT)': { id: 'opt', color: '#292C83' },
     'OUTREMER TELECOM': { id: 'ott', color: '#DE006F' },
-    'PMT/VODAFONE': { id: 'pmt', color: '#FF0E00', mcc: 547, mnc: 15 },
+    'PMT-VODAFONE': { id: 'pmt', color: '#FF0E00', mcc: 547, mnc: 15 },
     // ONATI (Polynésie Française)
     // VITI (Polynésie Française)
     // BPT/SPT (Wallis & Futuna)

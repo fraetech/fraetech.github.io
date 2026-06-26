@@ -270,8 +270,8 @@ export class FilterManager {
     let html = `
       <div class="filter-category-header">
         Filtres avancés
-        <span class="tooltip-icon"
-          title="Sélectionnez les couples technologie/fréquence souhaités. Les filtres Technologie et Fréquence classiques sont ignorés dans ce mode.">
+        <span class="tooltip-icon" tabindex="0"
+          data-tooltip="Sélectionnez les couples technologie/fréquence souhaités. Les filtres Technologie et Fréquence classiques sont ignorés dans ce mode.">
           ⓘ
         </span>
       </div>
@@ -281,7 +281,7 @@ export class FilterManager {
       <table class="advanced-matrix">
         <thead>
           <tr><th></th>
-          ${sortedFreqs.map(freq => `<th title="${freq} MHz">${freq}</th>`).join('')}
+          ${sortedFreqs.map(freq => `<th>${freq}</th>`).join('')}
           </tr>
         </thead>
         <tbody>
@@ -303,15 +303,15 @@ export class FilterManager {
           <input type="radio" name="advancedMatchMode" value="contains" checked>
           Contient tous les couples
         </label>
-        <span class="tooltip-icon"
-          title="Le site doit contenir tous les couples sélectionnés mais peut en contenir d'autres.">ⓘ</span>
+        <span class="tooltip-icon" tabindex="0"
+          data-tooltip="Le site doit contenir tous les couples sélectionnés mais peut en contenir d'autres.">ⓘ</span>
         <br>
         <label>
           <input type="radio" name="advancedMatchMode" value="exact">
           Correspondance exacte
         </label>
-        <span class="tooltip-icon"
-          title="Le site doit contenir exactement les couples sélectionnés.">ⓘ</span>
+        <span class="tooltip-icon" tabindex="0"
+          data-tooltip="Le site doit contenir exactement les couples sélectionnés.">ⓘ</span>
       </div>
     `;
 

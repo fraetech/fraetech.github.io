@@ -16,49 +16,49 @@ Vous pouvez filtrer les données par :
 *La couleur de l’icône change selon l’opérateur !*
 
 - **Activation déclarée en avance** : l’opérateur a indiqué qu’une fréquence/un site allait être activé à une date future (par "site", comprendre "station de base") ;
-<img src="https://fraetech.github.io/icons/byt_aav.svg" alt="Activation déclarée en avance" width="32">
+<img src="https://fraetech.github.io/icons/byt_aav.svg" alt="Activation déclarée en avance" width="128">
 
 - **Ajout site/fréquence** : ajout d’une fréquence sur un site existant ou déclaration d’un nouveau site ;
-<img src="https://fraetech.github.io/icons/byt_ajo.svg" alt="Ajout site/fréquence" width="32">
+<img src="https://fraetech.github.io/icons/byt_ajo.svg" alt="Ajout site/fréquence" width="128">
 
 - **Ajout et activation en même temps** (AJA) : un site ou une fréquence a été ajouté et activé lors de la même déclaration ;
-<img src="https://fraetech.github.io/icons/byt_aja.svg" alt="Ajout et activation (AJA)" width="32">
+<img src="https://fraetech.github.io/icons/byt_aja.svg" alt="Ajout et activation (AJA)" width="128">
 
 - **Ajout et activation en même temps (rattrapage)** (AJR) : même chose que l’AJA, mais déclaré en rattrapage d’une activation déjà effective ;
-<img src="https://fraetech.github.io/icons/byt_ajr.svg" alt="Ajout et activation rattrapage (AJR)" width="32">
+<img src="https://fraetech.github.io/icons/byt_ajr.svg" alt="Ajout et activation rattrapage (AJR)" width="128">
 
 - **Activation site/fréquence** : activation d’une fréquence sur un site existant ou activation d’un nouveau site ;
-<img src="https://fraetech.github.io/icons/byt_all.svg" alt="Activation site/fréquence" width="32">
+<img src="https://fraetech.github.io/icons/byt_all.svg" alt="Activation site/fréquence" width="128">
 
 - **Activation (rattrapage)** (ART) : activation déclarée en rattrapage d’une mise en service déjà effective ;
-<img src="https://fraetech.github.io/icons/byt_art.svg" alt="Activation rattrapage (ART)" width="32">
+<img src="https://fraetech.github.io/icons/byt_art.svg" alt="Activation rattrapage (ART)" width="128">
 
 - **Changement d’adresse du support** : l’adresse ANFR du site concerné a changé ;
-<img src="https://fraetech.github.io/icons/byt_cha.svg" alt="Changement d’adresse" width="32">
+<img src="https://fraetech.github.io/icons/byt_cha.svg" alt="Changement d’adresse" width="128">
 
 - **Changement de hauteur du support** : la hauteur déclarée à l’ANFR a été modifiée ;
-<img src="https://fraetech.github.io/icons/byt_chh.svg" alt="Changement de hauteur du support" width="32">
+<img src="https://fraetech.github.io/icons/byt_chh.svg" alt="Changement de hauteur du support" width="128">
 
 - **Changement de numéro du support** : le numéro de support ANFR a été modifié (souvent synonyme de modification de hauteur, de type de support, ou arrivée prochaine d’un nouvel opérateur) ;
-<img src="https://fraetech.github.io/icons/byt_chi.svg" alt="Changement de numéro du support" width="32">
+<img src="https://fraetech.github.io/icons/byt_chi.svg" alt="Changement de numéro du support" width="128">
 
 - **Changement de position du support (coordonnées GPS)** : les coordonnées GPS du site ont changé ;
-<img src="https://fraetech.github.io/icons/byt_chl.svg" alt="Changement de position" width="32">
+<img src="https://fraetech.github.io/icons/byt_chl.svg" alt="Changement de position" width="128">
 
 - **Changement du propriétaire du support** : le propriétaire déclaré à l’ANFR a été modifié ;
-<img src="https://fraetech.github.io/icons/byt_chp.svg" alt="Changement du propriétaire du support" width="32">
+<img src="https://fraetech.github.io/icons/byt_chp.svg" alt="Changement du propriétaire du support" width="128">
 
 - **Changement de type du support** : le type de support déclaré à l’ANFR a été modifié ;
-<img src="https://fraetech.github.io/icons/byt_cht.svg" alt="Changement de type du support" width="32">
+<img src="https://fraetech.github.io/icons/byt_cht.svg" alt="Changement de type du support" width="128">
 
 - **Extinction site/fréquence** : une fréquence (ou un site entier) a été éteint ;
-<img src="https://fraetech.github.io/icons/byt_ext.svg" alt="Extinction site/fréquence" width="32">
+<img src="https://fraetech.github.io/icons/byt_ext.svg" alt="Extinction site/fréquence" width="128">
 
 - **Suppression site/fréquence** : une fréquence (ou un site entier) a été supprimé ;
-<img src="https://fraetech.github.io/icons/byt_sup.svg" alt="Suppression site/fréquence" width="32">
+<img src="https://fraetech.github.io/icons/byt_sup.svg" alt="Suppression site/fréquence" width="128">
 
 - **Plusieurs actions à la fois** ;
-<img src="https://fraetech.github.io/icons/byt.svg" alt="Plusieurs actions" width="32">
+<img src="https://fraetech.github.io/icons/byt.svg" alt="Plusieurs actions" width="128">
 ### Popups et options
 En cliquant sur une icône, un popup affiche le détail de la modification :
 - Le **numéro de support** *(+ un lien vers data.anfr.fr)* ;

@@ -3,24 +3,39 @@ importScripts('/js/version.js');
 const STATIC_CACHE = `mh-static-${self.APP_VERSION}`;
 const ICONS_CACHE = `mh-icons-${self.APP_VERSION}`;
 
-// Flag pour indiquer si une mise à jour est en cours
 let updateInProgress = false;
 
-// Uniquement les ressources critiques (chargement initial)
+// Ressources critiques de chaque variante (chargement initial)
 const URLS_TO_CACHE = [
+  // racine / hebdo
   '/',
   '/index.html',
   '/historique.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/config.js',
-  '/js/dataStore.js',
-  '/js/filterManager.js',
-  '/js/mapManager.js',
-  '/js/popupGenerator.js',
-  '/js/searchManager.js',
-  '/js/utils.js',
+  '/css/core.css',
+  '/css/hebdo.css',
+  '/js/core/mapManager.js',
+  '/js/core/utils.js',
+  '/js/core/notifications.js',
+  '/js/core/mapControls.js',
+  '/js/hebdo/app.js',
+  '/js/hebdo/config.js',
+  '/js/hebdo/dataStore.js',
+  '/js/hebdo/filterManager.js',
+  '/js/hebdo/popupGenerator.js',
+  '/js/hebdo/searchManager.js',
   '/js/version.js',
+
+  // mensu
+  '/mensu/index.html',
+  '/css/mensu.css',
+  '/js/mensu/app.js',
+  '/js/mensu/config.js',
+  '/js/mensu/dataStore.js',
+  '/js/mensu/filterManager.js',
+  '/js/mensu/popupGenerator.js',
+  '/js/mensu/searchManager.js',
+
+  // assets communs
   '/favicon.png',
   '/favicon.ico',
   '/favicon.svg',
@@ -31,9 +46,8 @@ const URLS_TO_CACHE = [
 // Installation : cache uniquement les ressources critiques
 self.addEventListener('install', event => {
   console.log('SW installing version:', self.APP_VERSION);
-  
+
   event.waitUntil(
-    // D'abord, supprime TOUS les anciens caches
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
@@ -44,7 +58,6 @@ self.addEventListener('install', event => {
         })
       );
     }).then(() => {
-      // Puis crée les nouveaux caches
       return Promise.all([
         caches.open(ICONS_CACHE),
         caches.open(STATIC_CACHE).then(async cache => {
@@ -69,10 +82,9 @@ self.addEventListener('install', event => {
 // Activation : nettoie les anciens caches
 self.addEventListener('activate', event => {
   console.log('SW activating, current version:', self.APP_VERSION);
-  
+
   event.waitUntil(
     caches.keys().then(keys => {
-      console.log('Activating - existing caches:', keys);
       return Promise.all(
         keys.map(key => {
           const isCurrentCache = (key === STATIC_CACHE || key === ICONS_CACHE);
@@ -80,25 +92,19 @@ self.addEventListener('activate', event => {
             console.log('SW activate: Deleting old cache:', key);
             return caches.delete(key);
           }
-          console.log('SW activate: Keeping cache:', key);
           return Promise.resolve();
         })
       );
-    }).then(() => {
-      console.log('Cache cleanup complete, claiming clients');
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
 // Message handler pour les mises à jour
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
-    console.log('SW: Skip waiting requested');
     self.skipWaiting();
   }
   if (event.data && event.data.type === 'UPDATE_DETECTED') {
-    console.log('SW: Update detected, switching to Network-First strategy');
     updateInProgress = true;
   }
 });
@@ -106,17 +112,22 @@ self.addEventListener('message', event => {
 // Fetch : stratégies différentes selon le type de ressource
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-  
-  // Ignore les requêtes non-HTTP
+
   if (!url.protocol.startsWith('http')) return;
-  
-  // Stratégie pour les icônes : Cache-First avec mise en cache automatique
-  if (url.pathname.startsWith('/icons/') && 
+
+  // Données ANFR (CSV hebdo + JSON mensu) : toujours réseau, jamais de cache
+  // (fraîcheur des données prioritaire sur la vitesse de chargement)
+  if (url.pathname.startsWith('/files/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Icônes : Cache-First avec mise à jour en arrière-plan
+  if (url.pathname.startsWith('/icons/') &&
       (url.pathname.endsWith('.svg') || url.pathname.endsWith('.avif'))) {
     event.respondWith(
       caches.open(ICONS_CACHE).then(cache => {
         return cache.match(event.request).then(cached => {
-          // Fonction pour récupérer et mettre en cache
           const fetchAndCache = fetch(event.request).then(response => {
             if (response && response.ok) {
               cache.put(event.request, response.clone());
@@ -124,24 +135,18 @@ self.addEventListener('fetch', event => {
             return response;
           }).catch(err => {
             console.warn('Icon fetch failed:', url.pathname, err);
-            // Retourne une réponse vide en cas d'erreur
             return new Response('', { status: 404 });
           });
-          
-          // Si en cache, retourne le cache, sinon fetch
           return cached || fetchAndCache;
         });
       })
     );
     return;
   }
-  
-  // Stratégie pour les ressources statiques : Cache-First par défaut, Network-First si mise à jour
-  if (url.origin === self.location.origin && 
-      URLS_TO_CACHE.includes(url.pathname)) {
-    
+
+  // Ressources statiques de l'app : Cache-First par défaut, Network-First si MAJ détectée
+  if (url.origin === self.location.origin && URLS_TO_CACHE.includes(url.pathname)) {
     if (updateInProgress) {
-      // Network-First pendant une mise à jour
       event.respondWith(
         fetch(event.request).then(fetchResponse => {
           if (fetchResponse && fetchResponse.ok) {
@@ -154,12 +159,9 @@ self.addEventListener('fetch', event => {
         }).catch(() => caches.match(event.request))
       );
     } else {
-      // Cache-First en temps normal
       event.respondWith(
         caches.match(event.request).then(cached => {
-          if (cached) {
-            return cached;
-          }
+          if (cached) return cached;
           return fetch(event.request).then(fetchResponse => {
             if (fetchResponse && fetchResponse.ok) {
               return caches.open(STATIC_CACHE).then(cache => {
@@ -174,8 +176,8 @@ self.addEventListener('fetch', event => {
     }
     return;
   }
-  
-  // Pour tout le reste : Network-First (données dynamiques, API, etc.)
+
+  // Tout le reste : Network-First
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );

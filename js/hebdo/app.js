@@ -1,10 +1,11 @@
 // app.js
 import { CONFIG } from './config.js';
 import { Utils } from './utils.js';
-import { MapManager } from './mapManager.js';
+import { MapManager } from '../core/mapManager.js';
 import { DataStore } from './dataStore.js';
 import { SearchManager } from './searchManager.js';
 import { FilterManager } from './filterManager.js';
+import { showNotification, copyToClipboard } from '../core/notifications.js';
 
 // Make CONFIG global for plugins that read it (used in some modules)
 window.CONFIG = CONFIG;
@@ -425,37 +426,8 @@ window.shareLocation = function(supportId, operateur) {
   url.searchParams.set('op', operateur);
 
   const finalUrl = url.toString();
-  
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(finalUrl).then(() => {
-      showNotification('Lien copié dans le presse-papiers !', 'success');
-    }).catch(() => fallbackCopyToClipboard(finalUrl));
-  } else {
-    fallbackCopyToClipboard(finalUrl);
-  }
+  copyToClipboard(finalUrl);
 };
-
-// Fallback pour les navigateurs plus anciens
-function fallbackCopyToClipboard(text) {
-  const textArea = document.createElement('textarea');
-  textArea.value = text;
-  textArea.style.position = 'fixed';
-  textArea.style.left = '-999999px';
-  textArea.style.top = '-999999px';
-  document.body.appendChild(textArea);
-  textArea.focus();
-  textArea.select();
-  
-  try {
-    document.execCommand('copy');
-    showNotification('Lien copié dans le presse-papiers !', 'success');
-  } catch (err) {
-    console.error('Erreur de copie:', err);
-    showNotification('Impossible de copier automatiquement. URL: ' + text, 'error');
-  }
-  
-  document.body.removeChild(textArea);
-}
 
 class URLManager {
   constructor(mapManager, dataStore) {
@@ -495,32 +467,6 @@ class URLManager {
       }
     );
   }
-}
-
-function showNotification(message, type = 'info') {
-  const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
-  notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: ${type === 'success' ? '#4CAF50' : '#f44336'};
-    color: white;
-    padding: 12px 20px;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    z-index: 10000;
-    font-family: inherit;
-    animation: slideIn 0.3s ease;
-  `;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease forwards';
-    setTimeout(() => document.body.removeChild(notification), 300);
-  }, 3000);
 }
 
 async function main() {

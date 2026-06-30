@@ -1,0 +1,106 @@
+/* mensu.css — styles spécifiques à la variante mensuelle (popup diff add/del/mod) */
+@import url('../css/core.css');
+
+.leaflet-popup-content {
+  max-width: 420px !important;
+  text-align: left;
+}
+
+.popup-header {
+  border-bottom: 2px solid #eee;
+  padding: 10px 14px 8px;
+  margin-bottom: 8px;
+}
+.popup-sta { font-family: monospace; font-size: 11px; color: #888; }
+.popup-exp { font-size: 15px; font-weight: 700; margin: 2px 0; }
+.popup-meta { font-size: 12px; color: #555; }
+
+.popup-type-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.badge-add { background: #d4edda; color: #155724; }
+.badge-del { background: #f8d7da; color: #721c24; }
+.badge-mod { background: #fff3cd; color: #856404; }
+
+.popup-body { padding: 0 14px 12px; }
+
+.popup-section { margin-top: 10px; }
+.popup-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #888;
+  margin-bottom: 5px;
+}
+.popup-section-title.added { color: #27ae60; }
+.popup-section-title.deleted { color: #e74c3c; }
+.popup-section-title.modified { color: #e67e22; }
+
+table.info { width: 100%; border-collapse: collapse; }
+table.info td { padding: 2px 4px; vertical-align: top; font-size: 12px; }
+table.info td:first-child { color: #666; white-space: nowrap; width: 42%; }
+
+.diff-row { display: flex; gap: 6px; align-items: baseline; padding: 2px 0; flex-wrap: wrap; }
+.diff-key { color: #666; min-width: 130px; font-size: 12px; flex-shrink: 0; }
+.diff-old { color: #c0392b; text-decoration: line-through; font-size: 12px; }
+.diff-new { color: #27ae60; font-size: 12px; font-weight: 600; }
+.diff-arrow { color: #bbb; font-size: 11px; }
+
+.ant-block {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 8px 10px;
+  margin-top: 6px;
+}
+.ant-block.deleted { border-color: #f5c6cb; background: #fff5f5; }
+.ant-block.added { border-color: #c3e6cb; background: #f5fff7; }
+.ant-title { font-weight: 700; font-size: 12px; margin-bottom: 5px; }
+.ant-meta { font-size: 11px; color: #666; margin-bottom: 5px; }
+
+.emr-block {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 5px 8px;
+  margin-top: 4px;
+}
+.emr-block.deleted { border-color: #f5c6cb; background: #fff8f8; }
+.emr-block.added { border-color: #c3e6cb; background: #f8fff9; }
+.emr-title { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
+
+.band-line { font-size: 11px; color: #555; padding: 1px 0; }
+
+.label-sm {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-weight: 700;
+  margin: 6px 0 3px;
+}
+.label-sm.added { color: #27ae60; }
+.label-sm.deleted { color: #e74c3c; }
+.label-sm.modified { color: #e67e22; }
+
+.sys-chip {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  background: #e8f0fe;
+  color: #1a56db;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+/* ── Responsive spécifique popup mensu ── */
+@media (max-width: 768px) {
+  .leaflet-popup-content { max-width: calc(100vw - 60px) !important; }
+}

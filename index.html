@@ -45,9 +45,9 @@
 <meta name="theme-color" content="#1976d2">
 
 <!-- Styles principaux (externalisés pour cache) -->
-<link rel="preload" href="css/styles.css" as="style">
+<link rel="preload" href="css/hebdo.css" as="style">
 <link rel="preload" href="https://unpkg.com/leaflet/dist/leaflet.css" as="style">
-<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/hebdo.css">
 
 <!-- Favicon et icônes diverses tailles -->
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -69,6 +69,7 @@
 <h4><strong id="message-status">Chargement… (peut prendre du temps sur les grosses MAJs)</strong></h4>
 <p>
  Vous pouvez filtrer les supports à afficher à l'aide du bouton "Filtres" (en haut à droite).<br>
+ Vous cherchez les modifications mensuelles (toutes installations radioélectriques) ? <a href="mensu/" target="_self">ANFR Mensu</a><br>
  Questions, remarques et suggestions :<br>
 <a href="https://github.com/fraetech/fraetech.github.io" target="_blank" rel="noopener">GitHub</a><br>
  L'historique (sur un an) des mises à jour : <br><a href="historique" target="_self">Historique des mises à jour</a><br>
@@ -81,7 +82,7 @@
 </div>
 <div id="map" role="region" aria-label="Carte des modifications ANFR"></div>
 <!-- Application JS: module, lazy-load des dépendances et logique -->
-<script type="module" src="js/app.js" defer></script>
+<script type="module" src="js/hebdo/app.js" defer></script>
 
 <!-- Enregistrement du service worker PWA avec gestion des mises à jour -->
 <script>

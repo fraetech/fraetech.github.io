@@ -1,4 +1,5 @@
-/* Appliquer la police globale identique à l'original */
+/* core.css — styles partagés entre toutes les variantes (hebdo, mensu, trim...) */
+
 * {
   font-family: "Didact Gothic", sans-serif !important;
   font-weight: 500;
@@ -17,6 +18,10 @@ html, body {
   z-index: 1;
 }
 
+strong { font-weight: bold; }
+:focus { outline: none; }
+
+/* ── Message de chargement ── */
 #message {
   position: fixed;
   bottom: 20px;
@@ -43,7 +48,7 @@ html, body {
   cursor: pointer;
 }
 
-/* Styles pour l'icône de recherche */
+/* ── Icône de recherche ── */
 .leaflet-control.search-icon-control {
   background: white;
   width: 30px;
@@ -57,16 +62,10 @@ html, body {
   justify-content: center;
   color: #333;
 }
+.leaflet-control.search-icon-control svg { display: block; }
+.leaflet-control.search-icon-control:hover { background-color: #f4f4f4; }
 
-.leaflet-control.search-icon-control svg {
-  display: block;
-}
-
-.leaflet-control.search-icon-control:hover {
-  background-color: #f4f4f4;
-}
-
-/* Styles pour la search box */
+/* ── Search box ── */
 .leaflet-control.search-control {
   background: white;
   padding: 8px;
@@ -76,10 +75,7 @@ html, body {
   position: relative;
   display: none;
 }
-
-.leaflet-control.search-control.expanded {
-  display: block;
-}
+.leaflet-control.search-control.expanded { display: block; }
 
 .clear-search-btn {
   position: absolute;
@@ -99,11 +95,7 @@ html, body {
   justify-content: center;
   border-radius: 50%;
 }
-
-.clear-search-btn:hover {
-  background-color: #f0f0f0;
-  color: #333;
-}
+.clear-search-btn:hover { background-color: #f0f0f0; color: #333; }
 
 .search-input {
   width: 100%;
@@ -114,7 +106,6 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Centrer la search box en haut */
 .leaflet-top.leaflet-center {
   top: 10px;
   left: 50%;
@@ -145,28 +136,16 @@ html, body {
   font-size: 13px;
   position: relative;
 }
-
-.search-result-item.has-operator {
-  padding-left: 20px;
-}
-
+.search-result-item.has-operator { padding-left: 20px; }
 .search-result-item.has-operator::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  left: 0; top: 0; bottom: 0;
   width: 4px;
   background-color: var(--operator-color);
 }
-
-.search-result-item:hover {
-  background-color: #f0f0f0;
-}
-
-.search-result-item:last-child {
-  border-bottom: none;
-}
+.search-result-item:hover { background-color: #f0f0f0; }
+.search-result-item:last-child { border-bottom: none; }
 
 .search-result-type {
   font-size: 11px;
@@ -174,18 +153,14 @@ html, body {
   font-weight: bold;
   text-transform: uppercase;
 }
-
-.search-result-main {
-  margin-top: 2px;
-}
-
+.search-result-main { margin-top: 2px; }
 .search-result-detail {
   font-size: 11px;
   color: #888;
   margin-top: 2px;
 }
 
-/* Filter control styles */
+/* ── Filtres (coquille générique) ── */
 .leaflet-control.custom-filter-control {
   background: white;
   padding: 10px;
@@ -220,10 +195,7 @@ html, body {
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-
-.filter-category-header:hover {
-  background-color: #e8e8e8;
-}
+.filter-category-header:hover { background-color: #e8e8e8; }
 
 .toggle-category-btn {
   font-size: 0.8em;
@@ -238,16 +210,12 @@ html, body {
   white-space: nowrap;
   flex-shrink: 0;
 }
-
 .toggle-category-btn:hover {
   background-color: #f9f9f9;
   border-color: #999;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-
-.toggle-category-btn:active {
-  transform: scale(0.98);
-}
+.toggle-category-btn:active { transform: scale(0.98); }
 
 .filter-group {
   display: block;
@@ -257,16 +225,8 @@ html, body {
   overflow: hidden;
   transition: max-height 0.3s ease;
 }
-
-.filter-group.expanded {
-  max-height: 2000px;
-  overflow: visible;
-}
-
-.filter-group label {
-  display: block;
-  margin: 4px 0;
-}
+.filter-group.expanded { max-height: 2000px; overflow: visible; }
+.filter-group label { display: block; margin: 4px 0; }
 
 .filter-subcategory-header {
   display: flex;
@@ -290,7 +250,7 @@ html, body {
   background: #fff;
   border-radius: 3px;
 }
-    
+
 .leaflet-control.custom-filter-control.collapsed {
   width: auto;
   height: auto;
@@ -299,11 +259,8 @@ html, body {
   cursor: pointer;
   text-align: center;
 }
-    
-.leaflet-control.custom-filter-control.collapsed::after {
-  content: "Filtres";
-}
-    
+.leaflet-control.custom-filter-control.collapsed::after { content: "Filtres"; }
+
 .leaflet-control.custom-filter-control.expanded {
   transition: all 0.3s ease;
   width: 340px;
@@ -321,24 +278,21 @@ html, body {
   text-align: center;
   font-weight: bold;
 }
+.reset-filters:hover { background-color: #e0e0e0; }
 
-.reset-filters:hover {
-  background-color: #e0e0e0;
-}
-
+/* ── Coquille popup Leaflet (commune) ── */
 .leaflet-popup-content {
   text-align: center;
-  margin: 0 !important; /* Supprimer la marge par défaut de Leaflet */
-  padding: 0 !important; /* Supprimer le padding par défaut */
-  width: auto !important; /* Laisser la largeur s'adapter au contenu */
-  max-width: 280px; /* Limiter la largeur maximale */
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  max-width: 280px;
 }
 
-/* 2. S'assurer que le wrapper du popup ne déborde pas */
 .leaflet-popup-content-wrapper {
-  padding: 0 !important; /* Supprimer le padding par défaut de Leaflet */
+  padding: 0 !important;
   margin: 0 !important;
-  background: none !important; /* Laisser le background à popup-operator-bg */
+  background: none !important;
   border-radius: 6px !important;
   overflow: hidden;
 }
@@ -346,7 +300,7 @@ html, body {
 .leaflet-popup-close-button {
   background-color: rgba(255, 255, 255, 0.9) !important;
   border-radius: 50% !important;
-  width: 22px !important; /* Légèrement plus petite */
+  width: 22px !important;
   height: 22px !important;
   line-height: 20px !important;
   text-align: center !important;
@@ -354,206 +308,32 @@ html, body {
   font-weight: bold !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
   border: 1px solid #ccc !important;
-  top: 17px !important; /* Ajusté pour le nouveau bandeau plus petit */
-  right: 10px !important; /* Légèrement plus proche du bord */
+  top: 17px !important;
+  right: 10px !important;
   transform: translateY(-50%) !important;
   z-index: 1001 !important;
-  font-size: 14px !important; /* Taille de police légèrement réduite */
+  font-size: 14px !important;
 }
-
 .leaflet-popup-close-button:hover {
   background-color: rgba(255, 255, 255, 1) !important;
   color: #000 !important;
 }
 
-.bandeau {
-  margin: 0;
-  padding: 6px 12px;
-  text-align: center;
-  border-radius: 6px 6px 0 0;
-  position: relative;
-  width: 100%;
-  box-sizing: border-box;
-}
+.leaflet-popup-tip-container { z-index: 999 !important; }
+.leaflet-popup-tip { z-index: 999 !important; }
 
 .titre, .contenu {
   width: 100%;
   box-sizing: border-box;
 }
 
-.icone-container {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin: 8px 0;
-  width: 100%;
-  box-sizing: border-box;
-  flex-wrap: wrap;
-  overflow: hidden;
-}
-
-.bandeau a {
-  text-decoration: none;
-  font-weight: bold;
-  color: #FFFFFF !important;
-}
-
-.bandeau a:hover {
-  text-decoration: underline;
-}
-
-/* Espacement entre les icônes et le contenu */
-.icone-container + .titre {
-  margin-top: 15px;
-}
-
-.icone {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  border-radius: 6px;
-  background-color: rgba(245, 245, 245, 0.9);
-  padding: 3px;
-  transition: all 0.2s ease;
-}
-
-.icone img {
-  max-width: 30px; /* Ajusté proportionnellement */
-  max-height: 30px;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.icone:hover {
-  background-color: rgba(224, 224, 224, 0.9);
-  transform: scale(1.05);
-}
-
-.titre {
-  margin: 6px 0; /* Réduit de 8px à 6px */
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 4px 8px; /* Réduit de 6px 10px à 4px 8px */
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 14px; /* Légère réduction de la taille de police si nécessaire */
-}
-
-.contenu {
-  margin: 6px 0; /* Réduit de 8px à 6px */
-  text-align: left;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 8px; /* Réduit de 10px à 8px */
-  border-radius: 4px;
-}
-
-.action-groupe {
-  margin-bottom: 6px; /* Réduit de 8px à 6px */
-}
-
-.action-groupe:last-child {
-  margin-bottom: 0; /* Supprimer la marge du dernier élément */
-}
-
-.action-titre {
-  font-weight: bold;
-  margin-bottom: 2px; /* Réduit de 4px à 2px */
-  font-size: 13px; /* Légère réduction */
-}
-.popup-operator-bg {
-  position: relative;
-  padding: 0;
-  border-radius: 6px;
-  overflow: hidden;
-  min-height: 160px; /* Réduit de 200px à 160px */
-  width: 260px; /* Réduit de 280px à 260px */
-  box-sizing: border-box;
-  background-color: rgba(255, 255, 255, 0.95);
-}
-
-.popup-operator-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: var(--logo-url);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  opacity: 0.15;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.popup-operator-bg > * {
-  position: relative;
-  z-index: 1;
-}
-
-.popup-content-wrapper {
-  padding: 8px 12px 12px 12px;
-  box-sizing: border-box;
-  width: 100%;
-}
-/* Style pour le container des icônes - MANQUANT */
-.icone-container {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 12px 0;
-}
-
-/* Amélioration de la lisibilité du footer */
-.popup-content-wrapper .titre:last-child {
-  background-color: rgba(255, 255, 255, 0.85);
-  font-size: 0.9em;
-  font-weight: normal;
-  color: #666;
-  text-align: center;
-}
-.popup-badge {
-  display: inline-block;
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-size: 0.72em;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  vertical-align: middle;
-  line-height: 1.4;
-  border: 1.5px solid;
-}
-
-.popup-badge--zb {
-  border-color: #1a6fc4;
-  color: #1a6fc4;
-}
-
-.popup-badge--new {
-  border-color: #2a9d4e;
-  color: #2a9d4e;
-}
-
-.popup-badge-row {
-  display: inline-flex;
-  gap: 5px;
-  margin-top: 3px;
-}
-.leaflet-popup-tip-container {
-  z-index: 999 !important; /* Z-index inférieur à la croix mais supérieur au contenu */
-}
-
-.leaflet-popup-tip {
-  z-index: 999 !important;
-}
+/* ── Notifications ── */
 .share-btn {
   background: rgba(245, 245, 245, 0.9);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
 .share-btn:hover {
   background: rgba(224, 224, 224, 0.9);
   transform: scale(1.05);
@@ -563,100 +343,21 @@ html, body {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
-
 @keyframes slideOut {
   from { transform: translateX(0); opacity: 1; }
   to { transform: translateX(100%); opacity: 0; }
 }
 
-strong { font-weight: bold; }
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .popup-operator-bg {
-    width: calc(100vw - 60px);
-    max-width: 260px;
-    min-height: 140px; /* Encore plus compact sur mobile */
-  }
-  
-  .popup-content-wrapper {
-    padding: 6px 10px 10px 10px;
-  }
-  
-  .bandeau {
-    padding: 5px 10px;
-  }
-  
-  .icone-container {
-    margin: 6px 0;
-    gap: 5px;
-  }
-  
-  .icone {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .icone img {
-    max-width: 26px;
-    max-height: 26px;
-  }
-  
-  .titre {
-    font-size: 13px;
-    padding: 3px 6px;
-    margin: 4px 0;
-  }
-  
-  .contenu {
-    padding: 6px;
-    margin: 4px 0;
-  }
-  
-  .action-titre {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .icone-container {
-    gap: 4px;
-  }
-
-  .icone {
-    width: 30px;
-    height: 30px;
-  }
-
-  .icone img {
-    max-width: 24px;
-    max-height: 24px;
-  }
-
-  .popup-operator-bg {
-    width: calc(100vw - 40px);
-    max-width: 260px;
-  }
-  
-  .popup-content-wrapper {
-    padding: 5px 8px 8px 8px;
-  }
-}
-
-/* small accessibility and motion preferences */
-:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) {
-  .icone, .icone:hover, .leaflet-control.custom-filter-control.expanded { transition: none !important; transform: none !important; }
+  .leaflet-control.custom-filter-control.expanded { transition: none !important; transform: none !important; }
 }
 
-/* === LÉGENDE === */
+/* ── Légende (coquille générique) ── */
 .legend-control {
   position: fixed;
   bottom: 24px;
   left: 10px;
-
   z-index: 1000;
-
   font-family: inherit;
   font-size: 0.85em;
 }
@@ -676,33 +377,25 @@ strong { font-weight: bold; }
   color: #333;
   transition: background 0.15s;
 }
-.legend-toggle-btn:hover {
-  background: #f4f4f4;
-}
+.legend-toggle-btn:hover { background: #f4f4f4; }
 
 .legend-content {
   position: absolute;
   left: 0;
   bottom: calc(100% + 4px);
-
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-
   transition: opacity 0.15s ease;
-
   background: white;
   border: 1px solid rgba(0,0,0,0.2);
   border-radius: 6px;
   padding: 10px 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-
   max-height: 75vh;
   overflow-y: auto;
-
   min-width: 350px;
 }
-
 .legend-control:hover .legend-content {
   opacity: 1;
   visibility: visible;
@@ -718,28 +411,12 @@ strong { font-weight: bold; }
   padding-bottom: 5px;
 }
 
-.legend-items {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
+.legend-items { display: flex; flex-direction: column; gap: 5px; }
+.legend-item { display: flex; align-items: center; gap: 8px; color: #333; }
+.legend-item img { width: 28px; height: 28px; flex-shrink: 0; }
+.legend-item span { line-height: 1.2; }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #333;
-}
-
-.legend-item img {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-}
-
-.legend-item span {
-  line-height: 1.2;
-}
+/* ── Matrice avancée (filtres techno/fréquence) ── */
 .advanced-matrix {
   border-collapse: collapse;
   width: 100%;
@@ -747,25 +424,18 @@ strong { font-weight: bold; }
   margin-top: 6px;
   table-layout: fixed;
 }
-
-.advanced-matrix th,
-.advanced-matrix td {
+.advanced-matrix th, .advanced-matrix td {
   border: 1px solid #e0e0e0;
   text-align: center;
   padding: 4px 2px;
 }
-
-/* En-têtes de colonne (fréquences) */
 .advanced-matrix thead th {
   background: #f0f4ff;
   color: #3a5fc8;
   font-weight: 600;
   font-size: 11px;
 }
-
-/* En-têtes de ligne (technologies) */
-.advanced-matrix tbody th,
-.advanced-matrix thead th:first-child {
+.advanced-matrix tbody th, .advanced-matrix thead th:first-child {
   width: 52px;
   min-width: 52px;
   text-align: left;
@@ -777,7 +447,6 @@ strong { font-weight: bold; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .advanced-matrix thead th:not(:first-child) {
   width: auto;
   background: #f0f4ff;
@@ -786,16 +455,8 @@ strong { font-weight: bold; }
   font-size: 10px;
   white-space: nowrap;
 }
-
-.advanced-matrix td:not(:has(input)) {
-  background: #f5f5f5;
-}
-
-/* Cellule cochée = surlignée */
-.advanced-matrix td:has(input:checked) {
-  background: #deeaff;
-}
-
+.advanced-matrix td:not(:has(input)) { background: #f5f5f5; }
+.advanced-matrix td:has(input:checked) { background: #deeaff; }
 .advanced-matrix input[type="checkbox"] {
   cursor: pointer;
   width: 13px;
@@ -804,11 +465,7 @@ strong { font-weight: bold; }
   margin: 0;
 }
 
-/* Section correspondance */
-.advanced-match-mode {
-  margin-top: 10px;
-}
-
+.advanced-match-mode { margin-top: 10px; }
 .advanced-match-mode label {
   display: inline-flex;
   align-items: center;
@@ -816,14 +473,9 @@ strong { font-weight: bold; }
   font-size: 12px;
   margin-right: 10px;
 }
+.advanced-help { font-size: 0.78em; color: #888; margin-bottom: 6px; }
 
-.advanced-help {
-  font-size: 0.78em;
-  color: #888;
-  margin-bottom: 6px;
-}
-
-/* Tooltip CSS pur — */
+/* ── Tooltip CSS pur ── */
 .tooltip-icon {
   position: relative;
   cursor: help;
@@ -831,10 +483,9 @@ strong { font-weight: bold; }
   font-size: 0.85em;
   display: inline-block;
 }
-
 .tooltip-icon::after {
   content: attr(data-tooltip);
-  position: fixed;  /* ← fixed au lieu de absolute = échappe au overflow */
+  position: fixed;
   background: #333;
   color: #fff;
   font-size: 11px;
@@ -849,24 +500,16 @@ strong { font-weight: bold; }
   transition: opacity 0.15s ease;
   z-index: 99999;
   line-height: 1.4;
-  /* Ancrage relatif à l'icône via anchor positioning approximatif */
   margin-top: -60px;
-  right: 10px;   /* ← collé au bord droit du viewport, jamais tronqué */
+  right: 10px;
   left: auto;
 }
+.tooltip-icon::before { display: none; }
+.tooltip-icon:hover::after, .tooltip-icon:hover::before { opacity: 1; }
+.tooltip-icon:focus::after, .tooltip-icon:focus::before { opacity: 1; }
 
-.tooltip-icon::before {
-  display: none;
-}
-
-/* Hover (desktop) */
-.tooltip-icon:hover::after,
-.tooltip-icon:hover::before {
-  opacity: 1;
-}
-
-/* Tap (mobile) — toggle via :focus */
-.tooltip-icon:focus::after,
-.tooltip-icon:focus::before {
-  opacity: 1;
+/* ── Responsive (coquille générique) ── */
+@media (max-width: 768px) {
+  .titre { font-size: 13px; padding: 3px 6px; margin: 4px 0; }
+  .contenu { padding: 6px; margin: 4px 0; }
 }

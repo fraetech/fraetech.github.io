@@ -292,7 +292,6 @@ strong { font-weight: bold; }
 .leaflet-popup-content-wrapper {
   padding: 0 !important;
   margin: 0 !important;
-  background: none !important;
   border-radius: 6px !important;
   overflow: hidden;
 }

@@ -117,7 +117,6 @@ async function main() {
 
   const mapManager = new MapManager();
   const map = mapManager.createMap();
-  mapManager.createNamedClusters(['add', 'del', 'mod']);
 
   const dataStore = new DataStore(mapManager);
   const ok = await loadDiffAndInit(dataStore);

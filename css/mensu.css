@@ -3,7 +3,25 @@
 
 .leaflet-popup-content {
   max-width: 420px !important;
+  min-width: 320px;
   text-align: left;
+}
+
+/* Fond blanc explicite + largeur étendue par rapport à hebdo */
+.leaflet-popup-content-wrapper {
+  background: white !important;
+  box-shadow: 0 3px 14px rgba(0,0,0,.25) !important;
+}
+
+/* popup-operator-bg étendu pour le diff hiérarchique (antennes + émetteurs) */
+.popup-operator-bg {
+  min-height: 160px;
+  width: 400px !important;
+  max-width: 100%;
+}
+
+@media (max-width: 480px) {
+  .popup-operator-bg { width: calc(100vw - 50px) !important; }
 }
 
 .popup-header {
@@ -98,6 +116,33 @@ table.info td:first-child { color: #666; white-space: nowrap; width: 42%; }
   color: #1a56db;
   font-weight: 600;
   letter-spacing: .02em;
+}
+
+/* ── Marker icône mensu ── */
+.mensu-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+.mensu-marker img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* ── Badge action (liste des codes sur popup mod) ── */
+.popup-badge--action {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f0f4ff;
+  color: #3a5fc8;
+  border: 1px solid #c5d3f5;
+  margin: 2px 2px 2px 0;
 }
 
 /* ── Responsive spécifique popup mensu ── */

@@ -17,43 +17,27 @@ export class MapManager {
     });
     osmLayer.addTo(this.map);
 
-    this.markerCluster = L.markerClusterGroup();
+    this.markerCluster = L.markerClusterGroup({ chunkedLoading: true });
     this.map.addLayer(this.markerCluster);
     return this.map;
   }
 
   /**
-   * Crée plusieurs clusters nommés (ex: {add, del, mod}), tous ajoutés à la carte.
-   * @param {String[]} names
-   */
-  createNamedClusters(names) {
-    names.forEach(name => {
-      this.clusters[name] = L.markerClusterGroup({ maxClusterRadius: 50, chunkedLoading: true });
-      this.map.addLayer(this.clusters[name]);
-    });
-    return this.clusters;
-  }
-
-  /**
-   * Ajoute un marker au cluster nommé s'il existe, sinon au cluster unique par défaut.
+   * Ajoute un marker au cluster unique (le param name est ignoré —
+   * mensu utilise un seul cluster, la distinction se fait via l'icône).
    */
   addMarkerToCluster(marker, name = null) {
-    if (name && this.clusters[name]) {
-      this.clusters[name].addLayer(marker);
-      return;
-    }
     if (!this.markerCluster) return;
     this.markerCluster.addLayer(marker);
   }
 
-  clearCluster(name = null) {
-    if (name && this.clusters[name]) { this.clusters[name].clearLayers(); return; }
+  clearCluster() {
     if (this.markerCluster) this.markerCluster.clearLayers();
   }
 
   clearAllClusters() {
+    this.clearCluster();
     Object.values(this.clusters).forEach(c => c.clearLayers());
-    if (this.markerCluster) this.markerCluster.clearLayers();
   }
 
   updateMarkers(supports) {

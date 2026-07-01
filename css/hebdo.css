@@ -1,6 +1,9 @@
 /* hebdo.css — styles spécifiques à la variante hebdomadaire (popup CSV par action) */
 @import url('../css/core.css');
 
+/* Fond transparent : popup-operator-bg gère lui-même le fond visuel */
+.leaflet-popup-content-wrapper { background: none !important; }
+
 .bandeau {
   margin: 0;
   padding: 6px 12px;

@@ -70,14 +70,13 @@ export class FilterManager {
   }
 
   apply() {
-    this.mapManager.clearAllClusters();
+    this.mapManager.clearCluster();
     this.dataStore.records.forEach(({ type, sys, marker }) => {
       if (!this.activeTypes.has(type)) return;
       if (this.activeSys.size > 0) {
-        const match = [...this.activeSys].some(s => sys.has(s));
-        if (!match) return;
+        if (![...this.activeSys].some(s => sys.has(s))) return;
       }
-      this.mapManager.addMarkerToCluster(marker, type);
+      this.mapManager.addMarkerToCluster(marker);
     });
   }
 }

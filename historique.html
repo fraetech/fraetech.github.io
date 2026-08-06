@@ -21,10 +21,10 @@ h1 { text-align: center; color: #333; transition: color 0.3s; }
 }
 .column h2 { 
   text-align: center; padding: 12px 16px; margin: -20px -20px 0 -20px; cursor: pointer; user-select: none;
-  background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%); color: white; border-radius: 8px 8px 0 0;
-  font-size: 1.1em; transition: all 0.3s ease; position: relative;
+  background: #007BFF; color: white; border-radius: 8px 8px 0 0;
+  font-size: 1.1em; transition: background 0.2s; position: relative;
 }
-.column h2:hover { background: linear-gradient(135deg, #0056b3 0%, #003d82 100%); transform: translateY(-2px); }
+.column h2:hover { background: #0062cc; }
 .column h2::after { content: "▼"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); transition: transform 0.3s; }
 .column.active h2::after { transform: translateY(-50%) rotate(180deg); }
 .years-wrapper { list-style: none; padding: 10px 0 0 0; margin: 0; display: none; flex-direction: column; gap: 12px; }
@@ -69,10 +69,10 @@ h1 { text-align: center; color: #333; transition: color 0.3s; }
 }
 .back-link { 
   display: inline-block; margin: 20px 0; padding: 12px 24px;
-  background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%); color: white; text-decoration: none;
-  border-radius: 6px; transition: all 0.3s; font-weight: 600;
+  background: #007BFF; color: white; text-decoration: none;
+  border-radius: 6px; transition: background 0.2s; font-weight: 600;
 }
-.back-link:hover { background: linear-gradient(135deg, #0056b3 0%, #003d82 100%); transform: translateY(-2px); }
+.back-link:hover { background: #0056b3; }
 .info-section { background: white; padding: 30px; border-radius: 8px; max-width: 800px; margin: 30px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: background 0.3s, box-shadow 0.3s; }
 .info-section h2 { border-bottom: 3px solid #007BFF; padding-bottom: 15px; margin-top: 0; color: #333; transition: color 0.3s, border-color 0.3s; }
 .info-section h3 { color: #007BFF; margin-top: 25px; margin-bottom: 15px; transition: color 0.3s; }
@@ -89,6 +89,10 @@ h1 { text-align: center; color: #333; transition: color 0.3s; }
   .info-section a:hover { color: #80b3ff; }
 }
 .sorry-message { text-align: center; font-size: 1.3em; color: #007BFF; font-weight: 600; margin-top: 40px; padding: 20px; }
+.column-note { font-size: 0.8em; color: #777; padding: 8px 4px 0 4px; margin: 0; font-style: italic; }
+@media (prefers-color-scheme: dark) {
+  .column-note { color: #999; }
+}
 @media (max-width: 768px) {
   .container { flex-direction: column; align-items: center; }
   .column { width: 90%; max-width: 400px; }
@@ -101,7 +105,12 @@ h1 { text-align: center; color: #333; transition: color 0.3s; }
 <div class="container" id="columns-container"></div>
 
 <script>
-const TITLES = { hebdo: 'Hebdomadaires', mensu: 'Mensuelles', trim: 'Trimestrielles' };
+const TITLES = { hebdo: 'Hebdomadaires', mensu: 'Quadri-hebdomadaires', trim: 'Duodéca-hebdomadaires' };
+const NOTES = {
+  hebdo: 'NB : l\'horodatage indiqué correspond à la date et heure de génération automatique du fichier côté ANFR ou de prise en charge par mes soins lorsque la MAJ n\'est pas automatique.',
+  mensu: 'NB : agrégation des MAJ hebdo sur 1 mois, réalisée automatiquement le 1er du mois N en comparant les dernières données disponibles pour le mois N-2 aux dernières données disponibles pour le mois N-1. L\'horodatage indiqué est celui des "dernières données disponibles pour le mois N-1".',
+  trim: 'NB : agrégation des MAJ hebdo sur 3 mois, réalisée automatiquement le 1er du mois N en comparant les dernières données disponibles pour le mois N-4 aux dernières données disponibles pour le mois N-1. L\'horodatage indiqué est celui des "dernières données disponibles pour le mois N-1".'
+};
 const MONTH_NAMES = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
 // Fonction pour simplifier les labels
@@ -120,7 +129,7 @@ function simplifyLabel(label, type) {
 }
 
 async function init() {
-  const res = await fetch('https://fraetech.github.io/files/history.csv?nocache=' + Date.now());
+  const res = await fetch('/files/history.csv?nocache=' + Date.now());
   const csv = await res.text();
   const data = csv.trim().split('\n').slice(1).map(row => {
     const [type, label, path] = row.split(',');
@@ -142,7 +151,8 @@ async function init() {
 function createColumn(type, items) {
   const col = document.createElement('div');
   col.className = 'column';
-  col.innerHTML = `<h2>${TITLES[type]}</h2><ul class="years-wrapper"></ul>`;
+  const note = NOTES[type] ? `<p class="column-note">${NOTES[type]}</p>` : '';
+  col.innerHTML = `<h2>${TITLES[type]}</h2><ul class="years-wrapper"></ul>${note}`;
   
   const wrapper = col.querySelector('.years-wrapper');
   const sorted = items.sort((a, b) => compareDates(a.label, b.label));
@@ -229,7 +239,7 @@ function createExpandable(type, text) {
 function createLink(item, type) {
   const li = document.createElement('li');
   const a = document.createElement('a');
-  a.href = `https://fraetech.github.io/index.html?csv=${item.path}`;
+  a.href = `/index.html?csv=${item.path}`;
   a.textContent = simplifyLabel(item.label, type);
   li.appendChild(a);
   return li;
@@ -295,20 +305,20 @@ init().catch(console.error);
 </script>
 
 <div style="text-align: center; margin-top: 60px;">
-  <a href="https://fraetech.github.io/" class="back-link">← Retour à la carte principale</a>
+  <a href="/index.html" class="back-link">← Retour à la carte principale</a>
 </div>
 
 <div class="info-section">
-  <h2>ℹ️ Informations</h2>
+  <h2>Informations</h2>
   <h3>Note importante :</h3>
-  <p>Certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte peuvent ne pas être présents sur celle-ci. Si une semaine devait être regénérée, n'hésitez pas à me le faire savoir.</p>
+  <p>Certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte peuvent ne pas être présents sur celle-ci. Si une MAJ devait être regénérée, n'hésitez pas à me contacter.</p>
   
-  <h3>⚠️ MAJ manquantes (et raison)</h3>
+  <h3>MAJ manquantes (et raison)</h3>
   
   <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Hebdomadaires :</h3>
   <p style="margin: 5px 0; font-size: 0.9em;">
-    S27-2025 : Deux MAJs cette semaine (S27 et S28, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).<br>
-    S22-2025 : Deux MAJs cette semaine (S22 et S23, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).<br>
+    S27-2025 : Deux MAJ cette semaine (S27 et S28, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).<br>
+    S22-2025 : Deux MAJ cette semaine (S22 et S23, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).<br>
     S18-2025 : MAJ en retard, mise sur S19.<br>
     S17-2025 : Bug sur la MAJ.<br>
     S15-2025 : Bug sur la MAJ.<br>
@@ -316,10 +326,10 @@ init().catch(console.error);
     S52-2024 : Pas de MAJ, report sur S2-2025.
   </p>
   
-  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Mensuelles :</h3>
+  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Quadri-hebdomadaires (agrégation des MAJ hebdos sur 1 mois) :</h3>
   <p style="margin: 5px 0; font-size: 0.9em;">04-2025 : Bug sur la MAJ.</p>
   
-  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Trimestrielles :</h3>
+  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Duodéca-hebdomadaires (agrégation des MAJ hebdos sur 3 mois) :</h3>
   <p style="margin: 5px 0; font-size: 0.9em;">T2-2025 : Bug sur la MAJ.</p>
   
   <div class="sorry-message">Sorry :/</div>

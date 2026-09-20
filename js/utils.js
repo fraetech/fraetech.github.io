@@ -14,9 +14,14 @@ export const Utils = {
     headers.forEach((h, i) => {
       columnMap[h] = i;
     });
+
     
     return lines.map(line => {
       const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, ''));
+        const valueFor = (...names) => {
+          const name = names.find(candidate => columnMap[candidate] !== undefined);
+          return name === undefined ? '' : values[columnMap[name]] || '';
+        };
       return {
         id_support: values[columnMap['id_support']],
         operateur: values[columnMap['operateur']],
@@ -28,10 +33,14 @@ export const Utils = {
         type_support: values[columnMap['type_support']],
         hauteur_support: values[columnMap['hauteur_support']],
         proprietaire_support: values[columnMap['proprietaire_support']],
-        date_activ: values[columnMap['date_activ']] || '',
-        infos: values[columnMap['infos']] || '',
-        is_zb: values[columnMap['is_zb']]?.toLowerCase().trim() || 'false',
-        is_new: values[columnMap['is_new']]?.toLowerCase().trim() || 'false'
+        date_activ: valueFor('date_activ', 'date_modif'),
+        date_modif: valueFor('date_modif'),
+        liste_azimut: valueFor('liste_azimut', 'list_azimut', 'list_azimut_last', 'azimut', 'azimuth'),
+        list_azimut_old: valueFor('list_azimut_old', 'liste_azimut_old'),
+        list_azimut_last: valueFor('list_azimut_last', 'liste_azimut_last'),
+        infos: valueFor('infos'),
+        is_zb: valueFor('is_zb').toLowerCase().trim() || 'false',
+        is_new: valueFor('is_new').toLowerCase().trim() || 'false'
       };
     });
   },

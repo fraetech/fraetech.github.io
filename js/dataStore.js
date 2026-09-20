@@ -164,7 +164,7 @@ export class DataStore {
     const matchZB = this.activeFilters.zb.has(row.is_zb);
     const matchNew = this.activeFilters.new.has(row.is_new);
 
-    const changeActions = new Set(['CHI', 'CHA', 'CHL', 'CHT', 'CHH', 'CHP']);
+    const changeActions = new Set(['CHI', 'CHA', 'CHL', 'CHT', 'CHH', 'CHP', 'CHZ']);
     let techFreqMatch = true;
 
     if (
@@ -207,14 +207,18 @@ export class DataStore {
           if (isNaN(lat) || isNaN(lon)) continue;
 
           const opConfig = CONFIG.operators[firstRow.operateur] || CONFIG.operators['MISC'];
-          const actionId = supportRows.length > 1 ? '' : `_${firstRow.action?.toLowerCase?.() || ''}`;
+          const actionId = supportRows.length > 1 || firstRow.action === 'CHZ'
+            ? ''
+            : `_${firstRow.action?.toLowerCase?.() || ''}`;
           const iconUrl = `${CONFIG.baseIconUrl}${opConfig.id}${actionId}.svg`;
 
-          const icon = L.icon({
-            iconUrl,
-            iconSize: [48,48],
-            iconAnchor: [24,48],
-            popupAnchor: [0,-40]
+          const azimuthOverlay = PopupGenerator.generateAzimuthOverlay(supportRows);
+          const icon = L.divIcon({
+            className: 'antenna-marker',
+            html: `${azimuthOverlay}<img src="${iconUrl}" alt="" aria-hidden="true">`,
+            iconSize: [120, 120],
+            iconAnchor: [60, 60],
+            popupAnchor: [0, -60]
           });
 
           const marker = L.marker([lat, lon], { icon, title: firstRow.operateur });

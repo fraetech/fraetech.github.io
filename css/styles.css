@@ -463,6 +463,215 @@ html, body {
   margin-bottom: 2px; /* Réduit de 4px à 2px */
   font-size: 13px; /* Légère réduction */
 }
+
+.azimut-actions {
+  margin: 6px 0;
+  padding: 8px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+}
+
+.azimut-bloc + .azimut-bloc {
+  margin-top: 8px;
+}
+
+.azimut-titre {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.azimut-techno {
+  color: #555;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.azimut-rendu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.azimut-diagramme {
+  width: 86px;
+  height: 86px;
+  flex: 0 0 86px;
+}
+
+.antenna-marker {
+  position: relative;
+  isolation: isolate;
+  width: 120px !important;
+  height: 120px !important;
+  pointer-events: none;
+  background: transparent;
+  border: 0;
+}
+
+.antenna-marker img {
+  position: absolute;
+  z-index: 10 !important;
+  left: 36px;
+  top: 36px;
+  width: 48px;
+  height: 48px;
+  pointer-events: auto;
+}
+
+.azimut-overlay {
+  position: absolute;
+  z-index: 0 !important;
+  inset: 0;
+  width: 120px;
+  height: 120px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.azimut-cercle {
+  fill: transparent;
+  stroke: #718096;
+  stroke-width: 1.5;
+}
+
+.azimut-secteur {
+  fill-opacity: 0.2;
+  stroke-opacity: 0.75;
+  stroke-width: 1.3;
+}
+
+.azimut-fleche {
+  stroke-width: 2.2;
+}
+
+.azimut-label {
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.azimut-centre {
+  fill: #333;
+}
+
+.azimut-valeurs {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+}
+
+.azimut-legende {
+  white-space: nowrap;
+}
+
+.azimut-legende i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border-radius: 50%;
+}
+
+.azimut-changement {
+  margin-top: 5px;
+  font-size: 11px;
+  color: #555;
+}
+
+.azimut-change-details {
+  margin: 6px 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+}
+
+.azimut-change-heading {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.azimut-change-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.azimut-arrow {
+  color: #555;
+  font-size: 16px;
+}
+
+.azimut-change-note {
+  flex-basis: 100%;
+  color: #666;
+  font-size: 11px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.azimut-change-details--simple .azimut-change-heading {
+  text-align: center;
+}
+
+.azimut-change-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.15);
+  font-size: 11px;
+}
+
+.azimut-change-row:last-child {
+  border-bottom: 0;
+}
+
+.azimut-change-frequency {
+  font-weight: 600;
+}
+
+.azimut-change-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.azimut-old {
+  color: #8a4b08;
+}
+
+.azimut-new {
+  color: #126b40;
+}
+
+.azimut-toggle {
+  width: 100%;
+  margin-top: 8px;
+  padding: 5px 8px;
+  border: 1px solid #999;
+  border-radius: 4px;
+  background: rgba(245, 245, 245, 0.9);
+  color: #333;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+}
+
+.azimut-toggle:hover {
+  background: rgba(225, 225, 225, 0.95);
+}
 .popup-operator-bg {
   position: relative;
   padding: 0;

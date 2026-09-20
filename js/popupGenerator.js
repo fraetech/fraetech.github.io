@@ -99,6 +99,197 @@ export class PopupGenerator {
     return `<div class="titre"><strong>${firstAction.adresse}</strong>${badgeHtml}</div>`;
   }
 
+  static escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, character => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[character]));
+  }
+
+  static formatDate(value) {
+    if (!value) return '';
+    return String(value)
+      .replace(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/g,
+        (_, year, month, day) => `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`)
+      .replace(/\b(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})\b/g,
+        (_, day, month, year) => `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`);
+  }
+
+  static parseAzimuths(value) {
+    if (!value) return [];
+    const matches = String(value).match(/-?\d+(?:\.\d+)?/g) || [];
+    return [...new Set(matches.map(item => Number.parseFloat(item))
+      .filter(angle => Number.isFinite(angle))
+      .map(angle => ((angle % 360) + 360) % 360))];
+  }
+
+  static formatAzimuthList(value) {
+    return this.parseAzimuths(value).map(angle => `${angle}°`).join(' · ');
+  }
+
+  static lightenColor(color, amount = 0.55) {
+    const match = String(color || '').match(/^#([\da-f]{6})$/i);
+    if (!match) return '#9aa4ad';
+    const channels = match[1].match(/[\da-f]{2}/gi).map(value => parseInt(value, 16));
+    return `#${channels.map(channel => Math.round(channel + (255 - channel) * amount).toString(16).padStart(2, '0')).join('')}`;
+  }
+
+  static azimuthEntries(value) {
+    return String(value || '').split(';').map(part => {
+      const separator = part.indexOf(':');
+      if (separator < 0) return { label: '', value: part.trim() };
+      return { label: part.slice(0, separator).trim(), value: part.slice(separator + 1).trim() };
+    }).filter(entry => entry.value);
+  }
+
+  static parseAzimuthChanges(actionsData) {
+    const changes = [];
+    const pattern = /CHZ\s*\((?:fréquences|frequences):\s*([^)]*)\)\s*:\s*([^;]+?)\s*->\s*([^;]+)/gi;
+    actionsData.filter(action => action.action === 'CHZ').forEach(action => {
+      let match;
+      const infos = String(action.infos || '');
+      while ((match = pattern.exec(infos)) !== null) {
+        changes.push({
+          frequency: match[1].trim(),
+          oldValue: match[2].trim(),
+          newValue: match[3].trim()
+        });
+      }
+      pattern.lastIndex = 0;
+    });
+    return changes;
+  }
+
+  static generateAzimuthChangeDetails(actionsData) {
+    const changes = this.parseAzimuthChanges(actionsData);
+    if (!changes.length) return '';
+    const changeSignatures = new Set(changes.map(change => [
+      this.parseAzimuths(change.oldValue).join('|'),
+      this.parseAzimuths(change.newValue).join('|')
+    ].join('->')));
+    if (changeSignatures.size === 1) {
+      const change = changes[0];
+      const oldValue = this.escapeHtml(this.formatAzimuthList(change.oldValue));
+      const newValue = this.escapeHtml(this.formatAzimuthList(change.newValue));
+      const oldAngles = this.parseAzimuths(change.oldValue);
+      const newAngles = this.parseAzimuths(change.newValue);
+      const oldSet = new Set(oldAngles);
+      const newSet = new Set(newAngles);
+      const noteText = oldAngles.length > newAngles.length
+        ? (oldAngles.length - newAngles.length > 1 ? 'Secteurs supprimés' : 'Secteur supprimé')
+        : oldAngles.length < newAngles.length
+          ? (newAngles.length - oldAngles.length > 1 ? 'Secteurs ajoutés' : 'Secteur ajouté')
+          : [...oldSet].some(angle => !newSet.has(angle))
+            ? 'Secteurs modifiés'
+            : '';
+      const note = noteText ? ` <span class="azimut-change-note">(${noteText})</span>` : '';
+      return `<div class="azimut-change-details azimut-change-details--simple">
+        <div class="azimut-change-heading">Changement d’azimut commun aux fréquences</div>
+        <div class="azimut-change-summary"><span class="azimut-old">${oldValue}</span><span class="azimut-arrow">→</span><span class="azimut-new">${newValue}</span>${note}</div>
+      </div>`;
+    }
+    const rows = (field, className) => changes.map(change => `
+      <div class="azimut-change-row">
+        <span class="azimut-change-frequency">${this.escapeHtml(change.frequency)}</span>
+        <span class="azimut-change-value ${className}">${this.escapeHtml(this.formatAzimuthList(change[field]))}</span>
+      </div>`).join('');
+    return `<div class="azimut-change-details">
+      <div class="azimut-change-heading">Azimuts concernés</div>
+      <div class="azimut-change-table" data-azimut-mode="old">${rows('oldValue', 'azimut-old')}</div>
+      <div class="azimut-change-table" data-azimut-mode="new" hidden>${rows('newValue', 'azimut-new')}</div>
+      <button type="button" class="azimut-toggle" data-azimut-mode="old" aria-pressed="false">Afficher les nouveaux azimuts</button>
+    </div>`;
+  }
+
+  static generateAzimuthDiagram(value) {
+    const entries = this.azimuthEntries(value);
+    if (!entries.length || !entries.some(entry => this.parseAzimuths(entry.value).length)) return '';
+    const size = 112;
+    const center = size / 2;
+    const radius = 42;
+    const sectors = [];
+    const arrows = [];
+    const colors = ['#1677b8', '#e67e22', '#2e9f5b', '#8e44ad', '#c0392b'];
+
+    const point = (angle, distance) => {
+      const radians = (angle - 90) * Math.PI / 180;
+      return [center + Math.cos(radians) * distance, center + Math.sin(radians) * distance];
+    };
+    const sectorPath = (angle, color) => {
+      const start = point(angle - 60, radius);
+      const end = point(angle + 60, radius);
+      return `<path class="azimut-secteur" d="M ${center} ${center} L ${start[0].toFixed(1)} ${start[1].toFixed(1)} A ${radius} ${radius} 0 0 1 ${end[0].toFixed(1)} ${end[1].toFixed(1)} Z" fill="${color}"/>`;
+    };
+
+    entries.forEach((entry, index) => {
+      const color = colors[index % colors.length];
+      this.parseAzimuths(entry.value).forEach(angle => {
+        sectors.push(sectorPath(angle, color));
+        const [x, y] = point(angle, radius + 5);
+        arrows.push(`<line class="azimut-fleche azimut-fleche-overlay" x1="${center}" y1="${center}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${color}"/>`);
+      });
+    });
+
+    const labels = entries.map((entry, index) => `<span class="azimut-legende"><i style="background:${colors[index % colors.length]}"></i>${this.escapeHtml(entry.label ? `${entry.label}: ` : '')}${this.escapeHtml(entry.value)}°</span>`).join('');
+    return `<div class="azimut-bloc"><div class="azimut-titre">Azimuts</div><div class="azimut-rendu"><svg class="azimut-diagramme" viewBox="0 0 ${size} ${size}" role="img" aria-label="Diagramme des azimuts"><defs><marker id="azimut-pointe" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M 0 0 L 5 2.5 L 0 5 z" fill="context-stroke"/></marker></defs><circle class="azimut-cercle" cx="${center}" cy="${center}" r="${radius}"/>${sectors.join('')}${arrows.join('')}<circle class="azimut-centre" cx="${center}" cy="${center}" r="2.5"/></svg><div class="azimut-valeurs">${labels}</div></div></div>`;
+  }
+
+  static generateAzimuthOverlay(actionsData) {
+    const changes = this.parseAzimuthChanges(actionsData);
+    const values = actionsData
+      .map(action => action.liste_azimut || action.list_azimut_last || '')
+      .filter(Boolean);
+    const value = values.find(item => item) || '';
+    const entries = this.azimuthEntries(value);
+    if (!entries.some(entry => this.parseAzimuths(entry.value).length)) return '';
+
+    const size = 120;
+    const center = size / 2;
+    const radius = 47;
+    const operatorColor = CONFIG.operators[actionsData[0]?.operateur]?.color || '#718096';
+    const unchangedColor = this.lightenColor(operatorColor);
+    const oldAngles = new Set(changes.flatMap(change => this.parseAzimuths(change.oldValue)));
+    const newAngles = new Set(changes.flatMap(change => this.parseAzimuths(change.newValue)));
+    const currentAngles = new Set(entries.flatMap(entry => this.parseAzimuths(entry.value)));
+    const angleStates = changes.length
+      ? new Map([...new Set([...oldAngles, ...newAngles, ...currentAngles])].map(angle => [
+        angle,
+        oldAngles.has(angle) && !newAngles.has(angle) ? { color: '#d64545', label: 'supprimé' } :
+        !oldAngles.has(angle) && newAngles.has(angle) ? { color: '#2e9f5b', label: 'ajouté' } :
+        { color: unchangedColor, label: 'inchangé' }
+      ]))
+      : new Map([...currentAngles].map(angle => [angle, { color: operatorColor, label: '' }]));
+    const point = (angle, distance) => {
+      const radians = (angle - 90) * Math.PI / 180;
+      return [center + Math.cos(radians) * distance, center + Math.sin(radians) * distance];
+    };
+    const sectors = [];
+    const arrows = [];
+    const labels = [];
+    [...angleStates.keys()].sort((a, b) => a - b).forEach(angle => {
+      const state = angleStates.get(angle);
+      const color = state.color;
+        const start = point(angle - 60, radius);
+        const end = point(angle + 60, radius);
+        sectors.push(`<path class="azimut-secteur" d="M ${center} ${center} L ${start[0].toFixed(1)} ${start[1].toFixed(1)} A ${radius} ${radius} 0 0 1 ${end[0].toFixed(1)} ${end[1].toFixed(1)} Z" fill="${color}" stroke="${color}"/>`);
+        const [x, y] = point(angle, radius + 9);
+        const [left, right] = [point(angle - 7, radius + 1), point(angle + 7, radius + 1)];
+        arrows.push(`<line class="azimut-fleche" x1="${center}" y1="${center}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${color}"/><polygon class="azimut-pointe" points="${x.toFixed(1)},${y.toFixed(1)} ${left[0].toFixed(1)},${left[1].toFixed(1)} ${right[0].toFixed(1)},${right[1].toFixed(1)}" fill="${color}"/>`);
+        const [labelX, labelY] = point(angle, radius + 19);
+        labels.push(`<text class="azimut-label" x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" fill="${color}">${angle}°</text>`);
+    });
+
+    return `<svg class="azimut-overlay" viewBox="0 0 ${size} ${size}" aria-hidden="true">${sectors.join('')}${arrows.join('')}${labels.join('')}<circle class="azimut-centre" cx="${center}" cy="${center}" r="2.5"/></svg>`;
+  }
+
+  static generateAzimuths(actionsData) {
+    if (actionsData.some(action => action.action === 'CHZ')) return '';
+    const value = actionsData.find(action => action.liste_azimut || action.list_azimut_last);
+    const entries = this.azimuthEntries(value?.liste_azimut || value?.list_azimut_last || '');
+    if (entries.length <= 1 || !entries.some(entry => entry.label)) return '';
+    const labels = entries.map(entry => `<span class="azimut-legende">${this.escapeHtml(entry.label)}: ${this.escapeHtml(this.formatAzimuthList(entry.value))}</span>`).join('');
+    return `<div class="azimut-actions"><div class="azimut-titre">Azimuts par fréquence</div><div class="azimut-valeurs">${labels}</div></div>`;
+  }
+
   static generateActions(actionsData) {
     const actionsByType = {};
     actionsData.forEach(action => {
@@ -113,7 +304,8 @@ export class PopupGenerator {
       'CHL': { label: 'Ancienne localisation', message: '' },
       'CHT': { label: 'Ancien type', message: 'Nouveau type de support ci-dessous.' },
       'CHH': { label: 'Ancienne hauteur', message: 'Nouvelle hauteur ci-dessous.' },
-      'CHP': { label: 'Ancien propriétaire', message: 'Nouveau propriétaire ci-dessous.' }
+      'CHP': { label: 'Ancien propriétaire', message: 'Nouveau propriétaire ci-dessous.' },
+      'CHZ': { label: 'Ancien azimut', message: 'Nouvel azimut représenté ci-dessous.' }
     };
 
     let html = '<div class="contenu">';
@@ -126,11 +318,8 @@ export class PopupGenerator {
           <div class="action-titre">Activation fréquence :</div>
           <div>${actions.map(a => {
             let dateBrackets = '';
-            if (a.date_activ) {
-              const [y, m, d] = a.date_activ.split('-');
-              dateBrackets = ` [Activation le : ${d}/${m}/${y}]`;
-            }
-            return `${a.technologie}<br>${dateBrackets}`;
+            if (a.date_activ) dateBrackets = ` [Activation le : ${this.formatDate(a.date_activ)}]`;
+            return `${this.escapeHtml(a.technologie)}<br>${dateBrackets}`;
           }).join('<br>')}</div>
         </div>`;
       }
@@ -140,11 +329,8 @@ export class PopupGenerator {
           <div class="action-titre">Activation prévisionnelle :</div>
           <div>${actions.map(a => {
             let dateBrackets = '';
-            if (a.date_activ) {
-              const [y, m, d] = a.date_activ.split('-');
-              dateBrackets = ` [Activation prévue le : ${d}/${m}/${y}]`;
-            }
-            return `${a.technologie}<br>${dateBrackets}`;
+            if (a.date_activ) dateBrackets = ` [Activation prévue le : ${this.formatDate(a.date_activ)}]`;
+            return `${this.escapeHtml(a.technologie)}<br>${dateBrackets}`;
           }).join('<br>')}</div>
         </div>`;
       }
@@ -154,11 +340,8 @@ export class PopupGenerator {
           <div class="action-titre">Ajout et activation rattrapée :</div>
           <div>${actions.map(a => {
             let dateBrackets = '';
-            if (a.date_activ) {
-              const [y, m, d] = a.date_activ.split('-');
-              dateBrackets = ` [Déclaré actif depuis le : ${d}/${m}/${y}]`;
-            }
-            return `${a.technologie}<br>${dateBrackets}`;
+            if (a.date_activ) dateBrackets = ` [Déclaré actif depuis le : ${this.formatDate(a.date_activ)}]`;
+            return `${this.escapeHtml(a.technologie)}<br>${dateBrackets}`;
           }).join('<br>')}</div>
         </div>`;
       }
@@ -168,13 +351,14 @@ export class PopupGenerator {
           <div class="action-titre">Activation rattrapée :</div>
           <div>${actions.map(a => {
             let dateBrackets = '';
-            if (a.date_activ) {
-              const [y, m, d] = a.date_activ.split('-');
-              dateBrackets = ` [Déclaré actif depuis le : ${d}/${m}/${y}]`;
-            }
-            return `${a.technologie}<br>${dateBrackets}`;
+            if (a.date_activ) dateBrackets = ` [Déclaré actif depuis le : ${this.formatDate(a.date_activ)}]`;
+            return `${this.escapeHtml(a.technologie)}<br>${dateBrackets}`;
           }).join('<br>')}</div>
         </div>`;
+      }
+
+      else if (actionType === 'CHZ') {
+        html += this.generateAzimuthChangeDetails(actions);
       }
 
       else if (infosActions[actionType]) {
@@ -186,7 +370,7 @@ export class PopupGenerator {
           <div>
             ${actions.map(a => `
               ${actionInfo.label} :<br>
-              <strong>${a.infos || 'N/A'}</strong>
+              <strong>${this.escapeHtml(a.infos || 'N/A')}</strong>
               ${actionInfo.message ? `<br><br><em>${actionInfo.message}</em>` : ``}
             `).join('<br>')}
           </div>
@@ -196,12 +380,13 @@ export class PopupGenerator {
       else {
         html += `<div class="action-groupe">
           <div class="action-titre">${actionTitle} :</div>
-          <div>${actions.map(a => a.technologie).join('<br>')}</div>
+          <div>${actions.map(a => this.escapeHtml(a.technologie)).join('<br>')}</div>
         </div>`;
       }
     }
 
     html += '</div>';
+    html += this.generateAzimuths(actionsData);
     return html;
   }
 
@@ -212,6 +397,20 @@ export class PopupGenerator {
 
 // Lazy load logos après insertion du popup
 document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('.azimut-toggle');
+    if (!button) return;
+    const container = button.closest('.azimut-change-details');
+    if (!container) return;
+    const currentMode = button.dataset.azimutMode === 'new' ? 'new' : 'old';
+    const nextMode = currentMode === 'old' ? 'new' : 'old';
+    container.querySelectorAll('.azimut-change-table').forEach(table => {
+      table.hidden = table.dataset.azimutMode !== nextMode;
+    });
+    button.dataset.azimutMode = nextMode;
+    button.setAttribute('aria-pressed', String(nextMode === 'new'));
+    button.textContent = nextMode === 'old' ? 'Afficher les nouveaux azimuts' : 'Afficher les anciens azimuts';
+  });
   document.addEventListener('popupopen', (e) => {
     const popupEl = e.popup.getElement();
     if (popupEl) {

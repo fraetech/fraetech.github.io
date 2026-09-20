@@ -36,7 +36,8 @@ export const CONFIG = {
     'CHL': 'Changement localisation',
     'CHT': 'Changement type support',
     'CHH': 'Changement hauteur support',
-    'CHP': 'Changement propriétaire support'
+    'CHP': 'Changement propriétaire support',
+    'CHZ': 'Changement d’azimut'
   },
   technologies: {
     'GSM': 'GSM (2G)',

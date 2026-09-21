@@ -48,8 +48,12 @@ export const Utils = {
       }
 
         const valueFor = (...names) => {
-          const name = names.find(candidate => columnMap[candidate] !== undefined);
-          return name === undefined ? '' : values[columnMap[name]] || '';
+          for (const name of names) {
+            if (columnMap[name] !== undefined && values[columnMap[name]]) {
+              return values[columnMap[name]];
+            }
+          }
+          return '';
         };
       return {
         id_support: values[columnMap['id_support']],

@@ -307,52 +307,30 @@ export class PopupGenerator {
       'CHP': { label: 'Ancien propriétaire', message: 'Nouveau propriétaire ci-dessous.' },
       'CHZ': { label: 'Ancien azimut', message: 'Nouvel azimut représenté ci-dessous.' }
     };
+    const activationDateLabels = {
+      'ALL': 'Activation le',
+      'ACT': 'Activation le',
+      'AAV': 'Activation prévue le',
+      'AJO': 'Activation le',
+      'AJA': 'Activation le',
+      'AJR': 'Déclaré actif depuis le',
+      'ART': 'Déclaré actif depuis le'
+    };
 
     let html = '<div class="contenu">';
 
     for (const [actionType, actions] of Object.entries(actionsByType)) {
       const actionTitle = CONFIG.actions[actionType] || actionType;
 
-      if (actionType === 'ALL') {
+      if (activationDateLabels[actionType]) {
+        const dateLabel = activationDateLabels[actionType];
         html += `<div class="action-groupe">
-          <div class="action-titre">Activation fréquence :</div>
+          <div class="action-titre">${actionType === 'ALL' || actionType === 'ACT' ? 'Activation fréquence' : actionTitle} :</div>
           <div>${actions.map(a => {
-            let dateBrackets = '';
-            if (a.date_activ) dateBrackets = ` [Activation le : ${this.formatDate(a.date_activ)}]`;
-            return `${this.escapeHtml(a.technologie)}<br>${dateBrackets}`;
-          }).join('<br>')}</div>
-        </div>`;
-      }
-
-      else if (actionType === 'AAV') {
-        html += `<div class="action-groupe">
-          <div class="action-titre">Activation prévisionnelle :</div>
-          <div>${actions.map(a => {
-            let dateBrackets = '';
-            if (a.date_activ) dateBrackets = ` [Activation prévue le : ${this.formatDate(a.date_activ)}]`;
-            return `${this.escapeHtml(a.technologie)}<br>${dateBrackets}`;
-          }).join('<br>')}</div>
-        </div>`;
-      }
-
-      else if (actionType === 'AJR') {
-        html += `<div class="action-groupe">
-          <div class="action-titre">Ajout et activation rattrapée :</div>
-          <div>${actions.map(a => {
-            let dateBrackets = '';
-            if (a.date_activ) dateBrackets = ` [Déclaré actif depuis le : ${this.formatDate(a.date_activ)}]`;
-            return `${this.escapeHtml(a.technologie)}<br>${dateBrackets}`;
-          }).join('<br>')}</div>
-        </div>`;
-      }
-      
-      else if (actionType === 'ART') {
-        html += `<div class="action-groupe">
-          <div class="action-titre">Activation rattrapée :</div>
-          <div>${actions.map(a => {
-            let dateBrackets = '';
-            if (a.date_activ) dateBrackets = ` [Déclaré actif depuis le : ${this.formatDate(a.date_activ)}]`;
-            return `${this.escapeHtml(a.technologie)}<br>${dateBrackets}`;
+            const dateBrackets = a.date_activ
+              ? ` [${dateLabel} : ${this.escapeHtml(this.formatDate(a.date_activ))}]`
+              : '';
+            return `${this.escapeHtml(a.technologie)}${dateBrackets ? `<br>${dateBrackets}` : ''}`;
           }).join('<br>')}</div>
         </div>`;
       }

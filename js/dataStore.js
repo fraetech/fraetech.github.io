@@ -164,7 +164,7 @@ export class DataStore {
     const matchZB = this.activeFilters.zb.has(row.is_zb);
     const matchNew = this.activeFilters.new.has(row.is_new);
 
-    const changeActions = new Set(['CHI', 'CHA', 'CHL', 'CHT', 'CHH', 'CHP', 'CHZ']);
+    const changeActions = new Set(['CHI', 'CHA', 'CHL', 'CHT', 'CHH', 'CHP']);
     let techFreqMatch = true;
 
     if (

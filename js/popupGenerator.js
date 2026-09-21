@@ -143,13 +143,13 @@ export class PopupGenerator {
 
   static parseAzimuthChanges(actionsData) {
     const changes = [];
-    const pattern = /CHZ\s*\((?:fréquences|frequences):\s*([^)]*)\)\s*:\s*([^;]+?)\s*->\s*([^;]+)/gi;
+    const pattern = /CHZ\s*\((?:(?:fréquences|frequences):\s*([^)]*)|site)\s*\)\s*:\s*([^;]+?)\s*->\s*([^;]+)/gi;
     actionsData.filter(action => action.action === 'CHZ').forEach(action => {
       let match;
       const infos = String(action.infos || '');
       while ((match = pattern.exec(infos)) !== null) {
         changes.push({
-          frequency: match[1].trim(),
+          frequency: (match[1] || 'Site').trim(),
           oldValue: match[2].trim(),
           newValue: match[3].trim()
         });

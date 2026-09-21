@@ -17,7 +17,36 @@ export const Utils = {
 
     
     return lines.map(line => {
-      const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, ''));
+      let values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, ''));
+
+      // Some generated rows leave commas in `infos` unquoted. Recover the
+      // expected columns by locating the standalone azimuth list near the end.
+      if (values.length > headers.length && columnMap.infos !== undefined) {
+        const fixedPrefix = values.slice(0, columnMap.infos);
+        const trailingFlags = values.slice(-2);
+        const middle = values.slice(columnMap.infos, -2);
+        const azimuthIndex = middle.findIndex(value =>
+          /^\s*-?\d+(?:\|\s*-?\d+)*\s*$/.test(value)
+        );
+
+        if (azimuthIndex > 0) {
+          values = [
+            ...fixedPrefix,
+            middle.slice(0, azimuthIndex).join(','),
+            middle[azimuthIndex],
+            ...middle.slice(azimuthIndex + 1),
+            ...trailingFlags
+          ];
+        } else {
+          values = [
+            ...fixedPrefix,
+            middle.slice(0, -2).join(','),
+            ...middle.slice(-2),
+            ...trailingFlags
+          ];
+        }
+      }
+
         const valueFor = (...names) => {
           const name = names.find(candidate => columnMap[candidate] !== undefined);
           return name === undefined ? '' : values[columnMap[name]] || '';

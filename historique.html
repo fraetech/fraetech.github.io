@@ -3,265 +3,200 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>Historique des MAJ ANFR</title>
 <meta name="description" content="Historique des cartes interactives des modifications hebdomadaires des antennes mobiles en France selon les données ANFR.">
-<link rel="preload" href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" as="style" onload="this.rel='stylesheet'">
+<script>
+/* Appliqué avant le rendu pour éviter un flash : thème choisi manuellement, sinon préférence système */
+try {
+  var t = localStorage.getItem('theme');
+  if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+} catch (e) {}
+</script>
 <style>
-* { font-family: "Didact Gothic", sans-serif !important; box-sizing: border-box; }
-body { margin: 0; padding: 20px; background: #f5f5f5; transition: background 0.3s; }
-h1 { text-align: center; color: #333; transition: color 0.3s; }
-.container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; align-items: flex-start; }
-.column { background: white; padding: 20px; width: 300px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: background 0.3s, box-shadow 0.3s; }
-
-/* Mode sombre */
+:root {
+  --bg: #fdfdfb;
+  --fg: #151515;
+  --muted: #666;
+  --link: #0645ad;
+  --visited: #6b3fa0;
+  --line: #151515;
+  --soft: #cfcfc8;
+  --panel: #f2f2ec;
+  --hl: #fff3a8;
+  color-scheme: light;
+}
+/* Sombre : préférence système (sauf si l'utilisateur a forcé le clair) ou choix manuel */
 @media (prefers-color-scheme: dark) {
-  body { background: #1a1a1a; }
-  h1 { color: #e0e0e0; }
-  .column { background: #2d2d2d; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+  :root:not([data-theme="light"]) {
+    --bg: #0e0e0e;
+    --fg: #d6d6d6;
+    --muted: #8a8a8a;
+    --link: #6ea8fe;
+    --visited: #b79cf0;
+    --line: #5a5a5a;
+    --soft: #2c2c2c;
+    --panel: #161616;
+    --hl: #3a3410;
+    color-scheme: dark;
+  }
 }
-.column h2 { 
-  text-align: center; padding: 12px 16px; margin: -20px -20px 0 -20px; cursor: pointer; user-select: none;
-  background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%); color: white; border-radius: 8px 8px 0 0;
-  font-size: 1.1em; transition: all 0.3s ease; position: relative;
+:root[data-theme="dark"] {
+  --bg: #0e0e0e;
+  --fg: #d6d6d6;
+  --muted: #8a8a8a;
+  --link: #6ea8fe;
+  --visited: #b79cf0;
+  --line: #5a5a5a;
+  --soft: #2c2c2c;
+  --panel: #161616;
+  --hl: #3a3410;
+  color-scheme: dark;
 }
-.column h2:hover { background: linear-gradient(135deg, #0056b3 0%, #003d82 100%); transform: translateY(-2px); }
-.column h2::after { content: "▼"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); transition: transform 0.3s; }
-.column.active h2::after { transform: translateY(-50%) rotate(180deg); }
-.years-wrapper { list-style: none; padding: 10px 0 0 0; margin: 0; display: none; flex-direction: column; gap: 12px; }
-.column.active .years-wrapper { display: flex; }
-.year-item, .month-item { border-radius: 4px; transition: background 0.2s; }
-.year-item { border-left: 4px solid #007BFF; background: #f9f9f9; }
-.year-item:hover { background: #f0f7ff; }
-.month-item { margin-left: 15px; background: #fff9f0; border-left: 3px solid #FF9800; }
-.month-item:hover { background: #ffe8d6; }
 
-@media (prefers-color-scheme: dark) {
-  .year-item { background: #3a3a3a; border-left-color: #4d9fff; }
-  .year-item:hover { background: #404040; }
-  .month-item { background: #3d3520; border-left-color: #ffb347; }
-  .month-item:hover { background: #4a3f28; }
+* { box-sizing: border-box; }
+html { font-size: 15px; }
+body {
+  margin: 0;
+  padding: 0 16px 40px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  line-height: 1.5;
 }
-.year-header, .month-header { 
-  font-weight: 600; cursor: pointer; user-select: none; padding: 10px 12px; display: flex; align-items: center; gap: 10px; transition: color 0.3s;
-}
-.year-header { color: #007BFF; font-size: 0.95em; padding-left: 16px; }
-.month-header { color: #FF9800; font-size: 0.9em; }
+a { color: var(--link); text-decoration: underline; }
+a:visited { color: var(--visited); }
+a:hover { background: var(--hl); color: var(--fg); }
 
-@media (prefers-color-scheme: dark) {
-  .year-header { color: #4d9fff; }
-  .month-header { color: #ffb347; }
-}
-.year-header::before, .month-header::before { content: "▶"; transition: transform 0.3s; font-size: 11px; flex-shrink: 0; }
-.year-item.expanded .year-header::before, .month-item.expanded .month-header::before { transform: rotate(90deg); }
-.items-list, .month-items-list { 
-  list-style: none; padding: 0 0 10px 15px; margin: 0; max-height: 0; overflow: hidden;
-  transition: max-height 0.3s, opacity 0.3s; opacity: 0; pointer-events: none;
-}
-.month-items-list { padding: 0 0 8px 20px; }
-.year-item.expanded .items-list, .month-item.expanded .month-items-list { max-height: none; opacity: 1; pointer-events: auto; overflow: visible; }
-.items-list li, .month-items-list li { margin: 5px 0; padding-left: 10px; font-size: 0.9em; }
-.column a { text-decoration: none; color: #007BFF; transition: color 0.2s; }
-.column a:hover { text-decoration: underline; }
+.wrap { max-width: 1060px; margin: 0 auto; }
 
-@media (prefers-color-scheme: dark) {
-  .column a { color: #4d9fff; }
-  .column a:hover { color: #80b3ff; }
+/* En-tête */
+.top {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 6px 20px; padding: 14px 0 8px; border-bottom: 2px solid var(--line);
 }
-.back-link { 
-  display: inline-block; margin: 20px 0; padding: 12px 24px;
-  background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%); color: white; text-decoration: none;
-  border-radius: 6px; transition: all 0.3s; font-weight: 600;
+.brand { font-weight: bold; font-size: 1.1rem; }
+.brand a, .brand a:visited { color: var(--fg); text-decoration: none; }
+.brand a:hover { background: var(--hl); }
+.brand .slash { color: var(--muted); }
+.top nav a { margin-left: 14px; }
+.top nav a:first-child { margin-left: 0; }
+#theme-toggle {
+  margin-left: 14px; padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: var(--link); text-decoration: underline;
 }
-.back-link:hover { background: linear-gradient(135deg, #0056b3 0%, #003d82 100%); transform: translateY(-2px); }
-.info-section { background: white; padding: 30px; border-radius: 8px; max-width: 800px; margin: 30px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: background 0.3s, box-shadow 0.3s; }
-.info-section h2 { border-bottom: 3px solid #007BFF; padding-bottom: 15px; margin-top: 0; color: #333; transition: color 0.3s, border-color 0.3s; }
-.info-section h3 { color: #007BFF; margin-top: 25px; margin-bottom: 15px; transition: color 0.3s; }
-.info-section p { line-height: 1.6; color: #555; transition: color 0.3s; }
-.info-section a { color: #007BFF; text-decoration: none; transition: color 0.2s; }
-.info-section a:hover { text-decoration: underline; }
+#theme-toggle:hover { background: var(--hl); color: var(--fg); }
 
-@media (prefers-color-scheme: dark) {
-  .info-section { background: #2d2d2d; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-  .info-section h2 { border-bottom-color: #4d9fff; color: #e0e0e0; }
-  .info-section h3 { color: #4d9fff; }
-  .info-section p { color: #b0b0b0; }
-  .info-section a { color: #4d9fff; }
-  .info-section a:hover { color: #80b3ff; }
+h1 { font-size: 1.25rem; margin: 22px 0 4px; }
+.lead { margin: 0 0 20px; color: var(--muted); max-width: 70ch; }
+
+/* Colonnes */
+.cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 800px) { .cols { grid-template-columns: 1fr; } }
+
+.panel { border: 1px solid var(--line); background: var(--panel); }
+.panel > header {
+  background: var(--fg); color: var(--bg);
+  padding: 4px 10px; font-weight: bold; letter-spacing: .04em; text-transform: uppercase;
+  display: flex; justify-content: space-between; gap: 8px; font-size: .9rem;
 }
-.sorry-message { text-align: center; font-size: 1.3em; color: #007BFF; font-weight: 600; margin-top: 40px; padding: 20px; }
-@media (max-width: 768px) {
-  .container { flex-direction: column; align-items: center; }
-  .column { width: 90%; max-width: 400px; }
+.panel > header .count { font-weight: normal; opacity: .75; text-transform: none; letter-spacing: 0; }
+.panel .body { padding: 8px 10px 10px; }
+.state { color: var(--muted); margin: 0; }
+
+/* Arborescence <details> */
+details { margin: 0; }
+summary {
+  cursor: pointer; list-style: none; user-select: none; padding: 1px 0;
 }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "[+] "; color: var(--muted); }
+details[open] > summary::before { content: "[−] "; }
+summary:hover { background: var(--hl); }
+summary.year { font-weight: bold; }
+.nest { margin: 2px 0 6px 1.2ch; padding-left: 1.4ch; border-left: 1px dotted var(--line); }
+details.month { margin: 2px 0; }
+ul.links { list-style: none; margin: 2px 0 4px 0; padding: 0 0 0 1.4ch; }
+ul.links li::before { content: "- "; color: var(--muted); }
+
+/* Infos */
+.info { margin-top: 36px; border-top: 2px solid var(--line); padding-top: 4px; }
+.info h2 { font-size: 1.05rem; margin: 18px 0 6px; }
+.info h3 { font-size: .95rem; margin: 16px 0 4px; }
+.info p { margin: 0 0 8px; max-width: 78ch; }
+.info ul { margin: 0 0 8px; padding-left: 2.2ch; }
+.info li { margin: 2px 0; }
+.info .tag { display: inline-block; min-width: 9ch; font-weight: bold; }
+.sorry { margin: 22px 0 0; color: var(--muted); }
+
+footer { margin-top: 30px; padding-top: 8px; border-top: 1px solid var(--soft); color: var(--muted); font-size: .85rem; }
 </style>
 </head>
 <body>
+<div class="wrap">
+
+<div class="top">
+  <div class="brand"><a href="https://fraetech.github.io/">fraetech.github.io</a><span class="slash"> / </span>historique</div>
+  <nav>
+    <a href="https://fraetech.github.io/">Carte principale</a>
+    <a href="#infos">Infos</a>
+    <button type="button" id="theme-toggle" aria-label="Changer de thème"></button>
+  </nav>
+</div>
 
 <h1>Historique des MAJ ANFR</h1>
-<div class="container" id="columns-container"></div>
+<p class="lead">Cartes interactives des modifications des antennes mobiles en France (données ANFR), par période de mise à jour.</p>
+
+<div class="cols" id="columns-container"></div>
+
+<section class="info" id="infos">
+  <h2>Informations</h2>
+
+  <h3>Note importante</h3>
+  <p>Certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte peuvent ne pas être présents sur celle-ci. Si une semaine devait être regénérée, n'hésitez pas à me le faire savoir.</p>
+
+  <h3>MAJ manquantes (et raison)</h3>
+
+  <h3>Hebdomadaires</h3>
+  <ul>
+    <li><span class="tag">S27-2025</span> Deux MAJs cette semaine (S27 et S28, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).</li>
+    <li><span class="tag">S22-2025</span> Deux MAJs cette semaine (S22 et S23, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).</li>
+    <li><span class="tag">S18-2025</span> MAJ en retard, mise sur S19.</li>
+    <li><span class="tag">S17-2025</span> Bug sur la MAJ.</li>
+    <li><span class="tag">S15-2025</span> Bug sur la MAJ.</li>
+    <li><span class="tag">S01-2025</span> Pas de MAJ, report sur S2.</li>
+    <li><span class="tag">S52-2024</span> Pas de MAJ, report sur S2-2025.</li>
+  </ul>
+
+  <h3>Mensuelles</h3>
+  <ul>
+    <li><span class="tag">04-2025</span> Bug sur la MAJ.</li>
+  </ul>
+
+  <h3>Trimestrielles</h3>
+  <ul>
+    <li><span class="tag">T2-2025</span> Bug sur la MAJ.</li>
+  </ul>
+
+  <p class="sorry">Sorry :/</p>
+</section>
+
+<footer>
+  <a href="https://fraetech.github.io/">&larr; Retour à la carte principale</a>
+</footer>
+
+</div>
 
 <script>
 const TITLES = { hebdo: 'Hebdomadaires', mensu: 'Mensuelles', trim: 'Trimestrielles' };
 const MONTH_NAMES = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
-// Fonction pour simplifier les labels
+/* ---------- Utilitaires ---------- */
+
+// Simplifie les labels affichés
 function simplifyLabel(label, type) {
-  if (type === 'hebdo') {
-    // "16/12 - 22/12 2024 (S51)" -> "16/12 - 22/12 (S51)"
-    return label.replace(/\s+\d{4}\s+\(S/, ' (S');
-  } else if (type === 'mensu') {
-    // "Janvier - 2025" -> "Janvier"
-    return label.replace(/\s*-\s*\d{4}/, '');
-  } else if (type === 'trim') {
-    // "Trimestre 1 - 2025" -> "Trimestre 1"
-    return label.replace(/\s*-\s*\d{4}/, '');
-  }
-  return label;
-}
-
-async function init() {
-  const res = await fetch('https://fraetech.github.io/files/history.csv?nocache=' + Date.now());
-  const csv = await res.text();
-  const data = csv.trim().split('\n').slice(1).map(row => {
-    const [type, label, path] = row.split(',');
-    return { type, label, path };
-  });
-
-  const grouped = { hebdo: [], mensu: [], trim: [] };
-  data.forEach(e => grouped[e.type]?.push(e));
-
-  const container = document.getElementById('columns-container');
-  ['hebdo', 'mensu', 'trim'].forEach(type => {
-    const col = createColumn(type, grouped[type]);
-    container.appendChild(col);
-  });
-
-  setupAccordions();
-}
-
-function createColumn(type, items) {
-  const col = document.createElement('div');
-  col.className = 'column';
-  col.innerHTML = `<h2>${TITLES[type]}</h2><ul class="years-wrapper"></ul>`;
-  
-  const wrapper = col.querySelector('.years-wrapper');
-  const sorted = items.sort((a, b) => compareDates(a.label, b.label));
-  
-  if (type === 'hebdo') buildHebdo(wrapper, sorted, type);
-  else buildOther(wrapper, sorted, type);
-  
-  return col;
-}
-
-function buildHebdo(wrapper, items, type) {
-  const byYear = groupBy(items, i => extractYear(i.label));
-  Object.keys(byYear).sort((a, b) => b - a).forEach(year => {
-    const yearLi = createExpandable('year', year);
-    const monthsUl = yearLi.querySelector('.items-list');
-    
-    const byMonth = {};
-    byYear[year].forEach(item => {
-      const m = item.label.match(/(\d+)\/(\d+)\s*-.*(\d{4})/);
-      if (m) {
-        const key = `${m[2]}-${m[3]}`;
-        if (!byMonth[key]) byMonth[key] = { items: [], display: `${MONTH_NAMES[+m[2]-1]} ${m[3]}` };
-        byMonth[key].items.push(item);
-      }
-    });
-    
-    Object.keys(byMonth).sort((a, b) => {
-      const [mA, yA] = a.split('-').map(Number);
-      const [mB, yB] = b.split('-').map(Number);
-      return yA !== yB ? yB - yA : mB - mA;
-    }).forEach(key => {
-      const monthLi = createExpandable('month', byMonth[key].display);
-      const itemsUl = monthLi.querySelector('.month-items-list');
-      byMonth[key].items.sort((a, b) => compareDates(b.label, a.label)).forEach(item => {
-        itemsUl.appendChild(createLink(item, type));
-      });
-      monthsUl.appendChild(monthLi);
-    });
-    
-    wrapper.appendChild(yearLi);
-  });
-}
-
-function buildOther(wrapper, items, type) {
-  const byYear = groupBy(items, i => extractYear(i.label));
-  Object.keys(byYear).sort((a, b) => b - a).forEach(year => {
-    const yearLi = createExpandable('year', year);
-    const itemsUl = yearLi.querySelector('.items-list');
-    
-    // Tri décroissant : inverser a et b
-    const sorted = byYear[year].sort((a, b) => compareDates(a.label, b.label));
-    
-    sorted.forEach(item => {
-      itemsUl.appendChild(createLink(item, type));
-    });
-    wrapper.appendChild(yearLi);
-  });
-}
-
-function createExpandable(type, text) {
-  const li = document.createElement('li');
-  li.className = `${type}-item`;
-  const header = document.createElement('div');
-  header.className = `${type}-header`;
-  header.textContent = text;
-  const ul = document.createElement('ul');
-  ul.className = type === 'year' ? 'items-list' : 'month-items-list';
-  
-  header.addEventListener('click', e => {
-    e.stopPropagation();
-    li.classList.toggle('expanded');
-    if (type === 'year' && !li.classList.contains('expanded')) {
-      ul.querySelectorAll('.month-item.expanded').forEach(m => {
-        m.classList.remove('expanded');
-        m.querySelector('.month-items-list').style.maxHeight = '0';
-      });
-    }
-  });
-  
-  li.append(header, ul);
-  return li;
-}
-
-function createLink(item, type) {
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  a.href = `https://fraetech.github.io/index.html?csv=${item.path}`;
-  a.textContent = simplifyLabel(item.label, type);
-  li.appendChild(a);
-  return li;
-}
-
-function setupAccordions() {
-  const isMobile = window.innerWidth <= 768;
-  document.querySelectorAll('.column').forEach(col => {
-    const h2 = col.querySelector('h2');
-    // Sur PC : ouvrir uniquement les tiroirs principaux (pas les années)
-    if (!isMobile) {
-      col.classList.add('active');
-    }
-    
-    h2.addEventListener('click', () => {
-      col.classList.toggle('active');
-      if (!col.classList.contains('active')) {
-        col.querySelectorAll('.year-item.expanded, .month-item.expanded').forEach(e => {
-          e.classList.remove('expanded');
-        });
-      }
-    });
-  });
-}
-
-function groupBy(arr, fn) {
-  return arr.reduce((acc, item) => {
-    const key = fn(item);
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(item);
-    return acc;
-  }, {});
+  if (type === 'hebdo') return label.replace(/\s+\d{4}\s+\(S/, ' (S');   // "16/12 - 22/12 2024 (S51)" -> "16/12 - 22/12 (S51)"
+  return label.replace(/\s*-\s*\d{4}/, '');                              // "Janvier - 2025" -> "Janvier"
 }
 
 function extractYear(label) {
@@ -269,61 +204,155 @@ function extractYear(label) {
   return m ? m[1] : '0000';
 }
 
-function compareDates(a, b) {
-  const parse = label => {
-    const nums = label.match(/\d+/g) || [];
-    if (label.includes('Semaine') || label.match(/^\d+\/\d+\s*-/)) {
-      return { year: +nums[nums.length-1], week: +nums[nums.length-2] || +nums[0], type: 'week' };
-    }
-    if (label.includes('Trimestre')) {
-      return { year: +nums[nums.length-1], val: +nums[0], type: 'trim' };
-    }
-    // Pour les mois en texte (Janvier, Février, etc.)
-    const monthIndex = MONTH_NAMES.findIndex(m => label.includes(m));
-    if (monthIndex !== -1) {
-      return { year: +nums[nums.length-1] || 0, val: monthIndex + 1, type: 'month' };
-    }
-    return { year: +nums[nums.length-1] || 0, val: +nums[0] || 0, type: 'month' };
-  };
-  
-  const pA = parse(a), pB = parse(b);
-  if (pA.year !== pB.year) return pB.year - pA.year;
-  return (pB.week || pB.val || 0) - (pA.week || pA.val || 0);
+// Clé numérique de tri (plus grand = plus récent)
+function sortKey(label) {
+  const year = +extractYear(label);
+  const week = label.match(/\(S(\d+)\)/);
+  if (week) return year * 100 + +week[1];
+  const trim = label.match(/Trimestre\s+(\d+)/);
+  if (trim) return year * 100 + +trim[1];
+  const mi = MONTH_NAMES.findIndex(m => label.includes(m));
+  if (mi !== -1) return year * 100 + mi + 1;
+  return year * 100;
+}
+const newestFirst = (a, b) => sortKey(b.label) - sortKey(a.label);
+
+function groupBy(arr, fn) {
+  return arr.reduce((acc, item) => {
+    const key = fn(item);
+    (acc[key] = acc[key] || []).push(item);
+    return acc;
+  }, {});
 }
 
-init().catch(console.error);
+/* ---------- Construction du DOM ---------- */
+
+function el(tag, className, text) {
+  const e = document.createElement(tag);
+  if (className) e.className = className;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function makeDetails(summaryText, cls, open) {
+  const d = el('details', cls === 'year' ? 'year-block' : 'month');
+  if (open) d.open = true;
+  d.appendChild(el('summary', cls, summaryText));
+  return d;
+}
+
+function linksList(items, type) {
+  const ul = el('ul', 'links');
+  items.forEach(item => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = 'https://fraetech.github.io/index.html?csv=' + item.path;
+    a.textContent = simplifyLabel(item.label, type);
+    li.appendChild(a);
+    ul.appendChild(li);
+  });
+  return ul;
+}
+
+function buildHebdo(body, items, type) {
+  const byYear = groupBy(items, i => extractYear(i.label));
+  Object.keys(byYear).sort((a, b) => b - a).forEach((year, yi) => {
+    const yd = makeDetails(year, 'year', yi === 0);
+    const nest = el('div', 'nest');
+
+    const byMonth = {};
+    byYear[year].forEach(item => {
+      const m = item.label.match(/(\d+)\/(\d+)\s*-.*(\d{4})/);
+      if (!m) return;
+      const key = m[3] + '-' + String(m[2]).padStart(2, '0');
+      if (!byMonth[key]) byMonth[key] = { items: [], display: MONTH_NAMES[+m[2] - 1] + ' ' + m[3] };
+      byMonth[key].items.push(item);
+    });
+
+    Object.keys(byMonth).sort().reverse().forEach((key, mi) => {
+      const md = makeDetails(byMonth[key].display, 'month-s', yi === 0 && mi === 0);
+      md.appendChild(linksList(byMonth[key].items.sort(newestFirst), type));
+      nest.appendChild(md);
+    });
+
+    yd.appendChild(nest);
+    body.appendChild(yd);
+  });
+}
+
+function buildOther(body, items, type) {
+  const byYear = groupBy(items, i => extractYear(i.label));
+  Object.keys(byYear).sort((a, b) => b - a).forEach((year, yi) => {
+    const yd = makeDetails(year, 'year', yi === 0);
+    const nest = el('div', 'nest');
+    nest.appendChild(linksList(byYear[year].sort(newestFirst), type));
+    yd.appendChild(nest);
+    body.appendChild(yd);
+  });
+}
+
+function createPanel(type, items) {
+  const panel = el('section', 'panel');
+  const head = el('header');
+  head.appendChild(el('span', '', TITLES[type]));
+  head.appendChild(el('span', 'count', items.length + ' cartes'));
+  const body = el('div', 'body');
+  panel.append(head, body);
+
+  if (!items.length) body.appendChild(el('p', 'state', 'Aucune entrée.'));
+  else if (type === 'hebdo') buildHebdo(body, items, type);
+  else buildOther(body, items, type);
+  return panel;
+}
+
+/* ---------- Chargement ---------- */
+
+async function init() {
+  const container = document.getElementById('columns-container');
+  const loading = el('p', 'state', 'Chargement de l\u2019historique\u2026');
+  container.appendChild(loading);
+
+  const res = await fetch('https://fraetech.github.io/files/history.csv?nocache=' + Date.now());
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const csv = await res.text();
+
+  const data = csv.trim().split(/\r?\n/).slice(1).map(row => {
+    const [type, label, path] = row.split(',');
+    return { type: (type || '').trim(), label: (label || '').trim(), path: (path || '').trim() };
+  }).filter(e => e.type && e.label && e.path);
+
+  const grouped = { hebdo: [], mensu: [], trim: [] };
+  data.forEach(e => { if (grouped[e.type]) grouped[e.type].push(e); });
+
+  container.textContent = '';
+  ['hebdo', 'mensu', 'trim'].forEach(type => container.appendChild(createPanel(type, grouped[type])));
+}
+
+/* ---------- Bouton thème ---------- */
+
+(function () {
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const current = () => root.getAttribute('data-theme') || (mq.matches ? 'dark' : 'light');
+  const refresh = () => { btn.textContent = current() === 'dark' ? '[ mode clair ]' : '[ mode sombre ]'; };
+
+  btn.addEventListener('click', () => {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+    refresh();
+  });
+  mq.addEventListener && mq.addEventListener('change', refresh);
+  refresh();
+})();
+
+init().catch(err => {
+  console.error(err);
+  const c = document.getElementById('columns-container');
+  c.textContent = '';
+  c.appendChild(el('p', 'state', 'Impossible de charger l\u2019historique (' + err.message + ').'));
+});
 </script>
-
-<div style="text-align: center; margin-top: 60px;">
-  <a href="https://fraetech.github.io/" class="back-link">← Retour à la carte principale</a>
-</div>
-
-<div class="info-section">
-  <h2>ℹ️ Informations</h2>
-  <h3>Note importante :</h3>
-  <p>Certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte peuvent ne pas être présents sur celle-ci. Si une semaine devait être regénérée, n'hésitez pas à me le faire savoir.</p>
-  
-  <h3>⚠️ MAJ manquantes (et raison)</h3>
-  
-  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Hebdomadaires :</h3>
-  <p style="margin: 5px 0; font-size: 0.9em;">
-    S27-2025 : Deux MAJs cette semaine (S27 et S28, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).<br>
-    S22-2025 : Deux MAJs cette semaine (S22 et S23, fix à venir - <a href="https://github.com/fraetech/anfr_hebdo/issues/55">issue 55</a>).<br>
-    S18-2025 : MAJ en retard, mise sur S19.<br>
-    S17-2025 : Bug sur la MAJ.<br>
-    S15-2025 : Bug sur la MAJ.<br>
-    S01-2025 : Pas de MAJ, report sur S2.<br>
-    S52-2024 : Pas de MAJ, report sur S2-2025.
-  </p>
-  
-  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Mensuelles :</h3>
-  <p style="margin: 5px 0; font-size: 0.9em;">04-2025 : Bug sur la MAJ.</p>
-  
-  <h3 style="color: #0056b3; font-size: 0.95em; margin-top: 20px;">Trimestrielles :</h3>
-  <p style="margin: 5px 0; font-size: 0.9em;">T2-2025 : Bug sur la MAJ.</p>
-  
-  <div class="sorry-message">Sorry :/</div>
-</div>
-
 </body>
 </html>

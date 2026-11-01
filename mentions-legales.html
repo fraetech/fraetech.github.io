@@ -1,117 +1,247 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mentions légales</title>
-  <meta name="robots" content="noindex,follow" />
-  <style>
-    :root { --max: 800px; }
-    html { box-sizing: border-box; }
-    *, *::before, *::after { box-sizing: inherit; }
-    body { margin: 0; font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color: #111; background: #fff; }
-    header, main, footer { padding: 1.25rem; }
-    header { background: #f6f7f8; border-bottom: 1px solid #e6e7e9; }
-    h1 { margin: 0; font-size: 1.75rem; }
-    main { max-width: var(--max); margin: 0 auto; }
-    section { margin: 1.5rem 0; }
-    h2 { font-size: 1.15rem; margin: 0 0 .25rem; }
-    address { font-style: normal; white-space: pre-line; }
-    ul { margin: .5rem 0 0 1.25rem; }
-    .muted { color: #555; font-size: .95rem; }
-    .small { font-size: .9rem; }
-    a { color: inherit; }
-    code { background: #f2f2f2; padding: .1rem .3rem; border-radius: .25rem; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex,follow">
+<title>Mentions légales</title>
+<meta name="description" content="Mentions légales du site fraetech.github.io, site non commercial affichant les mises à jour des antennes relais de téléphonie mobile en France.">
+<script>
+/* Appliqué avant le rendu pour éviter un flash : thème choisi manuellement, sinon préférence système */
+try {
+  var t = localStorage.getItem('theme');
+  if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+} catch (e) {}
+</script>
+<style>
+:root {
+  --bg: #fdfdfb;
+  --fg: #151515;
+  --muted: #666;
+  --link: #0645ad;
+  --visited: #6b3fa0;
+  --line: #151515;
+  --soft: #cfcfc8;
+  --panel: #f2f2ec;
+  --hl: #fff3a8;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0e0e;
+    --fg: #d6d6d6;
+    --muted: #8a8a8a;
+    --link: #6ea8fe;
+    --visited: #b79cf0;
+    --line: #5a5a5a;
+    --soft: #2c2c2c;
+    --panel: #161616;
+    --hl: #3a3410;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e0e0e;
+  --fg: #d6d6d6;
+  --muted: #8a8a8a;
+  --link: #6ea8fe;
+  --visited: #b79cf0;
+  --line: #5a5a5a;
+  --soft: #2c2c2c;
+  --panel: #161616;
+  --hl: #3a3410;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { font-size: clamp(15px, calc(8px + 0.55vw), 24px); }
+body {
+  margin: 0;
+  padding: 0 clamp(16px, 3vw, 4rem) 40px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  line-height: 1.6;
+}
+a { color: var(--link); text-decoration: underline; }
+a:visited { color: var(--visited); }
+a:hover { background: var(--hl); color: var(--fg); }
+a:focus-visible, button:focus-visible {
+  outline: 3px solid var(--fg); outline-offset: 2px; background: var(--hl); color: var(--fg);
+}
+
+.skip {
+  position: absolute; left: 8px; top: -100px; padding: 6px 10px;
+  background: var(--fg); color: var(--bg); text-decoration: none; z-index: 10;
+}
+.skip:focus { top: 8px; }
+.skip:visited { color: var(--bg); }
+
+.wrap { width: 100%; max-width: 120rem; margin: 0 auto; }
+
+/* En-tête */
+.top {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 6px 20px; padding: 14px 0 8px; border-bottom: 2px solid var(--line);
+}
+.brand { font-weight: bold; font-size: 1.1rem; }
+.brand a, .brand a:visited { color: var(--fg); text-decoration: none; }
+.brand a:hover { background: var(--hl); }
+.brand .slash { color: var(--muted); }
+.top nav a { margin-left: 14px; }
+.top nav a:first-child { margin-left: 0; }
+#theme-toggle {
+  margin-left: 14px; padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: var(--link); text-decoration: underline;
+}
+#theme-toggle:hover { background: var(--hl); color: var(--fg); }
+
+h1 { font-size: 1.25rem; margin: 22px 0 4px; }
+.lead { margin: 0 0 8px; color: var(--muted); }
+
+/* Sections */
+section { margin: 0; padding: 4px 0 6px; border-top: 1px solid var(--soft); }
+section:first-of-type { margin-top: 18px; }
+h2 { font-size: 1.05rem; margin: 16px 0 6px; }
+h2::before { content: "# "; color: var(--muted); }
+p { margin: 0 0 8px; }
+address { font-style: normal; white-space: pre-line; margin: 0 0 8px; }
+ul { margin: 0 0 8px; padding-left: 2.2ch; }
+li { margin: 3px 0; }
+.small { font-size: .93rem; }
+.muted { color: var(--muted); }
+
+footer { margin-top: 30px; padding-top: 8px; border-top: 2px solid var(--line); color: var(--muted); font-size: .9rem; }
+footer p { margin: 0 0 6px; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+/* Responsive */
+body { overflow-wrap: anywhere; }
+@media (max-width: 800px) {
+  html { font-size: 16px; }
+  .top nav { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+  .top nav a, #theme-toggle { margin-left: 0; padding: 6px 0; }
+  li { margin: 8px 0; }
+}
+</style>
 </head>
 <body>
-  <header role="banner">
-    <h1>Mentions légales</h1>
-    <p class="muted">Site non commercial affichant, chaque semaine, les mises à jour des antennes relais de téléphonie mobile en France.</p>
-  </header>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<div class="wrap">
 
-  <main role="main">
-    <section aria-labelledby="editeur">
-      <h2 id="editeur">Éditeur du site</h2>
-      <p><strong>Fraetech</strong><br>
-      <a href="mailto:fraetech@free.fr">fraetech@free.fr</a></p>
-      <p class="small">
-        Conformément à l’article 6, III, 2 de la loi n°2004-575 du 21 juin 2004 pour la confiance dans l’économie numérique (LCEN),
-        l’éditeur, personne physique et non professionnel, peut préserver son anonymat public. Ses coordonnées complètes ont été
-        communiquées à l’hébergeur et peuvent être transmises aux autorités compétentes sur réquisition.
-      </p>
-    </section>
+<header class="top">
+  <div class="brand"><a href="https://fraetech.github.io/">fraetech</a><span class="slash"> / </span>mentions légales</div>
+  <nav aria-label="Navigation principale">
+    <a href="https://fraetech.github.io/">Carte principale</a>
+    <button type="button" id="theme-toggle" aria-label="Changer de thème"></button>
+  </nav>
+</header>
 
-    <section aria-labelledby="hebergeur">
-      <h2 id="hebergeur">Hébergeur</h2>
-      <address>
-        GitHub, Inc. (service GitHub Pages)
-        88 Colin P. Kelly Jr. Street
-        San Francisco, CA 94107
-        États-Unis
-      </address>
-      <p class="small">Site de l’hébergeur : <a href="https://pages.github.com" rel="nofollow">pages.github.com</a></p>
-    </section>
+<main id="contenu">
+  <h1>Mentions légales</h1>
+  <p class="lead">Site non commercial affichant, chaque semaine, les mises à jour des antennes relais de téléphonie mobile en France.</p>
 
-    <section aria-labelledby="donnees">
-      <h2 id="donnees">Données &amp; sources</h2>
-      <p>
-        Les données présentées proviennent de l’Agence nationale des fréquences (ANFR).
-        Ce site agrège et met en forme ces informations à des fins d’illustration et d’information.
-      </p>
-      <p class="small">
-        <em>Note :</em> ce site n’a aucun but commercial&nbsp;: aucune publicité, aucun parrainage, aucun lien d’affiliation.
-      </p>
-    </section>
-
-    <section aria-labelledby="propriete">
-      <h2 id="propriete">Propriété intellectuelle – illustrations et marques</h2>
-      <p>
-        Les logos, marques et images reproduits sur ce site appartiennent à leurs propriétaires respectifs.
-        Ils sont utilisés uniquement à titre d’illustration et d’information. Ce site est indépendant et
-        n’entretient aucun lien commercial, partenariat ni affiliation avec ces marques.
-      </p>
-    </section>
-
-    <section aria-labelledby="cookies">
-      <h2 id="cookies">Données personnelles &amp; cookies</h2>
-      <ul>
-        <li>Ce site ne dépose aucun cookie et n’embarque aucun traqueur ou outil d’analytics.</li>
-        <li>Aucune donnée personnelle n’est collectée via ce site. Vous pouvez me contacter à l’adresse&nbsp;: <a href="mailto:fraetech@free.fr">fraetech@free.fr</a>.</li>
-      </ul>
-      <p class="small muted">
-        Des journaux techniques (logs) peuvent être générés par l’hébergeur pour l’exploitation et la sécurité du service.
-      </p>
-    </section>
-    
-    <section aria-labelledby="icones">
-      <h2 id="icones">Icônes utilisées</h2>
-      <ul>
-        <li>Antenna — Licence : CC0 — Uploader : SVG Repo</li>
-        <li>Demolition — Licence : CC0 — Uploader : SVG Repo</li>
-        <li>Plus 211 — Auteur : Orchid — Licence : MIT</li>
-        <li>On Rounded — Auteur : Iconoir — Licence : MIT</li>
-        <li>Off Rounded — Auteur : Iconoir — Licence : MIT</li>
-        <li>Timer 144 — Auteur : Dazzle UI — Licence : CC BY</li>
-      </ul>
-    </section>
-
-    <section aria-labelledby="contact">
-      <h2 id="contact">Contact</h2>
-      <p>Pour toute question liée au site ou à son contenu&nbsp;: <a href="mailto:fraetech@free.fr">fraetech@free.fr</a></p>
-    </section>
-
-    <section aria-labelledby="maj">
-      <h2 id="maj">Mise à jour</h2>
-      <p class="small">Dernière mise à jour&nbsp;: <time datetime="2025-08-21">21 août 2025</time></p>
-    </section>
-  </main>
-
-  <footer role="contentinfo">
-    <p class="small muted">
-      © Fraetech — Site non commercial, à but informatif.<br>
-      Code source distribué sous licence <a href="https://fraetech.github.io/maj-hebdo/LICENSE" rel="license">GNU GPL v3</a>.
+  <section aria-labelledby="editeur">
+    <h2 id="editeur">Éditeur du site</h2>
+    <p><strong>Fraetech</strong><br>
+    <a href="mailto:fraetech@free.fr">fraetech@free.fr</a></p>
+    <p class="small">
+      Conformément à l’article 6, III, 2 de la loi n°2004-575 du 21 juin 2004 pour la confiance dans l’économie numérique (LCEN),
+      l’éditeur, personne physique et non professionnel, peut préserver son anonymat public. Ses coordonnées complètes ont été
+      communiquées à l’hébergeur et peuvent être transmises aux autorités compétentes sur réquisition.
     </p>
-  </footer>
+  </section>
+
+  <section aria-labelledby="hebergeur">
+    <h2 id="hebergeur">Hébergeur</h2>
+    <address>GitHub, Inc. (service GitHub Pages)
+88 Colin P. Kelly Jr. Street
+San Francisco, CA 94107
+États-Unis</address>
+    <p class="small">Site de l’hébergeur : <a href="https://pages.github.com" rel="nofollow">pages.github.com</a></p>
+  </section>
+
+  <section aria-labelledby="donnees">
+    <h2 id="donnees">Données &amp; sources</h2>
+    <p>
+      Les données présentées proviennent de l’Agence nationale des fréquences (ANFR).
+      Ce site agrège et met en forme ces informations à des fins d’illustration et d’information.
+    </p>
+    <p class="small">
+      <em>Note :</em> ce site n’a aucun but commercial&nbsp;: aucune publicité, aucun parrainage, aucun lien d’affiliation.
+    </p>
+  </section>
+
+  <section aria-labelledby="propriete">
+    <h2 id="propriete">Propriété intellectuelle – illustrations et marques</h2>
+    <p>
+      Les logos, marques et images reproduits sur ce site appartiennent à leurs propriétaires respectifs.
+      Ils sont utilisés uniquement à titre d’illustration et d’information. Ce site est indépendant et
+      n’entretient aucun lien commercial, partenariat ni affiliation avec ces marques.
+    </p>
+  </section>
+
+  <section aria-labelledby="cookies">
+    <h2 id="cookies">Données personnelles &amp; cookies</h2>
+    <ul>
+      <li>Ce site ne dépose aucun cookie et n’embarque aucun traqueur ou outil d’analytics.</li>
+      <li>Aucune donnée personnelle n’est collectée via ce site. Vous pouvez me contacter à l’adresse&nbsp;: <a href="mailto:fraetech@free.fr">fraetech@free.fr</a>.</li>
+    </ul>
+    <p class="small muted">
+      Des journaux techniques (logs) peuvent être générés par l’hébergeur pour l’exploitation et la sécurité du service.
+    </p>
+  </section>
+
+  <section aria-labelledby="icones">
+    <h2 id="icones">Icônes utilisées</h2>
+    <ul>
+      <li>Antenna — Licence : CC0 — Uploader : SVG Repo</li>
+      <li>Demolition — Licence : CC0 — Uploader : SVG Repo</li>
+      <li>Plus 211 — Auteur : Orchid — Licence : MIT</li>
+      <li>On Rounded — Auteur : Iconoir — Licence : MIT</li>
+      <li>Off Rounded — Auteur : Iconoir — Licence : MIT</li>
+      <li>Timer 144 — Auteur : Dazzle UI — Licence : CC BY</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="contact">
+    <h2 id="contact">Contact</h2>
+    <p>Pour toute question liée au site ou à son contenu&nbsp;: <a href="mailto:fraetech@free.fr">fraetech@free.fr</a></p>
+  </section>
+
+  <section aria-labelledby="maj">
+    <h2 id="maj">Mise à jour</h2>
+    <p class="small">Dernière mise à jour&nbsp;: <time datetime="2025-08-21">21 août 2025</time></p>
+  </section>
+</main>
+
+<footer>
+  <p>© Fraetech — Site non commercial, à but informatif.<br>
+  Code source distribué sous licence <a href="https://fraetech.github.io/maj-hebdo/LICENSE" rel="license">GNU GPL v3</a>.</p>
+  <p><a href="https://fraetech.github.io/">&larr; Retour à la carte principale</a></p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const current = () => root.getAttribute('data-theme') || (mq.matches ? 'dark' : 'light');
+  const refresh = () => { btn.textContent = current() === 'dark' ? '[ mode clair ]' : '[ mode sombre ]'; };
+
+  btn.addEventListener('click', () => {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+    refresh();
+  });
+  mq.addEventListener && mq.addEventListener('change', refresh);
+  refresh();
+})();
+</script>
 </body>
 </html>

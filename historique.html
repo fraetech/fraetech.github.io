@@ -55,10 +55,10 @@ try {
 }
 
 * { box-sizing: border-box; }
-html { font-size: 15px; }
+html { font-size: clamp(15px, calc(8px + 0.55vw), 24px); }
 body {
   margin: 0;
-  padding: 0 16px 40px;
+  padding: 0 clamp(16px, 3vw, 4rem) 40px;
   background: var(--bg);
   color: var(--fg);
   font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -68,7 +68,7 @@ a { color: var(--link); text-decoration: underline; }
 a:visited { color: var(--visited); }
 a:hover { background: var(--hl); color: var(--fg); }
 
-.wrap { max-width: 1060px; margin: 0 auto; }
+.wrap { width: 100%; max-width: 120rem; margin: 0 auto; }
 
 /* En-tête */
 .top {
@@ -88,7 +88,7 @@ a:hover { background: var(--hl); color: var(--fg); }
 #theme-toggle:hover { background: var(--hl); color: var(--fg); }
 
 h1 { font-size: 1.25rem; margin: 22px 0 4px; }
-.lead { margin: 0 0 20px; color: var(--muted); max-width: 70ch; }
+.lead { margin: 0 0 20px; color: var(--muted); }
 
 /* Colonnes */
 .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; }
@@ -123,31 +123,58 @@ ul.links li::before { content: "- "; color: var(--muted); }
 .info { margin-top: 36px; border-top: 2px solid var(--line); padding-top: 4px; }
 .info h2 { font-size: 1.05rem; margin: 18px 0 6px; }
 .info h3 { font-size: .95rem; margin: 16px 0 4px; }
-.info p { margin: 0 0 8px; max-width: 78ch; }
+.info p { margin: 0 0 8px; }
 .info ul { margin: 0 0 8px; padding-left: 2.2ch; }
 .info li { margin: 2px 0; }
 .info .tag { display: inline-block; min-width: 9ch; font-weight: bold; }
 .sorry { margin: 22px 0 0; color: var(--muted); }
 
 footer { margin-top: 30px; padding-top: 8px; border-top: 1px solid var(--soft); color: var(--muted); font-size: .85rem; }
+
+/* Accessibilité */
+a:focus-visible, button:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--fg); outline-offset: 2px; background: var(--hl); color: var(--fg);
+}
+.skip {
+  position: absolute; left: 8px; top: -100px; padding: 6px 10px;
+  background: var(--fg); color: var(--bg); text-decoration: none; z-index: 10;
+}
+.skip:focus { top: 8px; }
+.skip:visited { color: var(--bg); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+/* Responsive */
+.cols > * { min-width: 0; }
+body { overflow-wrap: anywhere; }
+@media (max-width: 800px) {
+  html { font-size: 16px; }
+  .top nav { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+  .top nav a, #theme-toggle { margin-left: 0; padding: 6px 0; }
+  summary { padding: 6px 0; }
+  ul.links li { padding: 4px 0; }
+  .info .tag { display: block; min-width: 0; }
+  .info li { margin: 8px 0; }
+}
 </style>
 </head>
 <body>
+<a class="skip" href="#contenu">Aller au contenu</a>
 <div class="wrap">
 
-<div class="top">
-  <div class="brand"><a href="https://fraetech.github.io/">fraetech.github.io</a><span class="slash"> / </span>historique</div>
-  <nav>
+<header class="top">
+  <div class="brand"><a href="https://fraetech.github.io/">fraetech</a><span class="slash"> / </span>historique</div>
+  <nav aria-label="Navigation principale">
     <a href="https://fraetech.github.io/">Carte principale</a>
     <a href="#infos">Infos</a>
     <button type="button" id="theme-toggle" aria-label="Changer de thème"></button>
   </nav>
-</div>
+</header>
 
+<main id="contenu">
 <h1>Historique des MAJ ANFR</h1>
 <p class="lead">Cartes interactives des modifications des antennes mobiles en France (données ANFR), par période de mise à jour.</p>
 
-<div class="cols" id="columns-container"></div>
+<div class="cols" id="columns-container" aria-live="polite"></div>
 
 <section class="info" id="infos">
   <h2>Informations</h2>
@@ -180,6 +207,7 @@ footer { margin-top: 30px; padding-top: 8px; border-top: 1px solid var(--soft); 
 
   <p class="sorry">Sorry :/</p>
 </section>
+</main>
 
 <footer>
   <a href="https://fraetech.github.io/">&larr; Retour à la carte principale</a>

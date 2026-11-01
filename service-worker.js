@@ -11,6 +11,7 @@ const URLS_TO_CACHE = [
   '/',
   '/index.html',
   '/historique.html',
+  '/mentions-legales.html',
   '/css/styles.css',
   '/js/app.js',
   '/js/config.js',

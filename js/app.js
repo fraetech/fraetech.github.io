@@ -12,9 +12,13 @@ window.CONFIG = CONFIG;
 // Small helper to load Leaflet and MarkerCluster (with fallback local paths if needed)
 async function loadLeafletAndCluster() {
   // load CSS for leaflet & markercluster first (non-blocking)
-  const leafletCss = 'https://unpkg.com/leaflet/dist/leaflet.css';
-  const clusterCss = 'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css';
-  const clusterDefaultCss = 'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css';
+  // const leafletCss = 'https://unpkg.com/leaflet/dist/leaflet.css';
+  const leafletCss = 'css/leaflet/leaflet_v1.94.css';
+  // const clusterCss = 'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css';
+  const clusterCss = 'css/leaflet/MarkerCluster.Default_v1.5.3.css';
+  //const clusterDefaultCss = 'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css';
+  const clusterDefaultCss = 'css/leaflet/MarkerCluster.Default_v1.5.3.css';
+
   try {
     await Promise.all([
       Utils.loadCss(leafletCss),
@@ -27,8 +31,10 @@ async function loadLeafletAndCluster() {
 
   // Now load Leaflet and MarkerCluster JS sequentially
   try {
-    await Utils.loadScript('https://unpkg.com/leaflet/dist/leaflet.js', { fallback: 'vendor/leaflet.js' });
-    await Utils.loadScript('https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js', { fallback: 'vendor/leaflet.markercluster.js' });
+    // await Utils.loadScript('https://unpkg.com/leaflet/dist/leaflet.js', { fallback: 'vendor/leaflet.js' });
+    await Utils.loadScript('js/leaflet/leaflet_v1.94.js');
+    // await Utils.loadScript('https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js', { fallback: 'vendor/leaflet.markercluster.js' });
+    await Utils.loadScript('js/leaflet/leaflet.markercluster_v1.5.3.js');
   } catch (err) {
     console.error('Leaflet load failed:', err);
     throw err;

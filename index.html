@@ -26,16 +26,20 @@
 <meta name="twitter:image:alt" content="Logo MAJ-Hebdo ANFR">
 
 <!-- Préconnect & DNS -->
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://unpkg.com" crossorigin>
-<link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+<!-- <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin> -->
+<!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+<!-- <link rel="preconnect" href="https://unpkg.com" crossorigin> -->
+<link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
+<link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin>
+<link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin>
 <link rel="dns-prefetch" href="https://nominatim.openstreetmap.org">
 
 <!-- Google Font non-blocking -->
-<link rel="preload" href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" as="style" onload="this.rel='stylesheet'">
+<!-- <link rel="preload" href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" as="style" onload="this.rel='stylesheet'"> -->
+<link rel="preload" href="css/googlefont/css2.css" as="style" onload="this.rel='stylesheet'">
 <noscript>
-<link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet">
+<!-- <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet"> -->
+<link href="css/googlefont/css2.css" rel="stylesheet">
 </noscript>
 
 <!-- PWA Manifest -->
@@ -44,7 +48,8 @@
 
 <!-- Styles principaux (externalisés pour cache) -->
 <link rel="preload" href="css/styles.css" as="style">
-<link rel="preload" href="https://unpkg.com/leaflet/dist/leaflet.css" as="style">
+<!-- <link rel="preload" href="https://unpkg.com/leaflet/dist/leaflet.css" as="style"> -->
+<link rel="preload" href="css/leaflet/leaflet_v1.94.css" as="style">
 <link rel="stylesheet" href="css/styles.css">
 
 <!-- Favicon et icônes diverses tailles -->

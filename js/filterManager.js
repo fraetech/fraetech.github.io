@@ -330,16 +330,20 @@ export class FilterManager {
       .forEach(el => el.addEventListener('change', () => this.updateFilters()));
   }
 
-  applyOperatorFilter(operateur) {
+  applyOperatorFilter(operateurs) {
     const checkboxes = document.querySelectorAll('#opFilters input[type="checkbox"]');
     if (!checkboxes.length) return;
 
-    // Vérifier que l'opé demandé existe bien dans les filtres
-    const exists = [...checkboxes].some(cb => cb.value === operateur);
+    // Normaliser en tableau (permet de garder la compatibilité si une string est passée)
+    const opList = Array.isArray(operateurs) ? operateurs : [operateurs];
+
+    // Vérifier qu'au moins un des opérateurs demandés existe dans les filtres
+    const exists = [...checkboxes].some(cb => opList.includes(cb.value));
     if (!exists) return;
 
+    // Cocher toutes les cases présentes dans le tableau
     checkboxes.forEach(cb => {
-      cb.checked = (cb.value === operateur);
+      cb.checked = opList.includes(cb.value);
     });
 
     // Mettre à jour les labels "Tout cocher/décocher" des sous-catégories

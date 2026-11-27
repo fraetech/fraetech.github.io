@@ -162,9 +162,9 @@ body { overflow-wrap: anywhere; }
 <div class="wrap">
 
 <header class="top">
-  <div class="brand"><a href="https://fraetech.github.io/">fraetech.github.io</a><span class="slash"> / </span>historique</div>
+  <div class="brand"><a href="/">fraetech.github.io</a><span class="slash"> / </span>historique</div>
   <nav aria-label="Navigation principale">
-    <a href="https://fraetech.github.io/">Carte principale</a>
+    <a href="/">Carte principale</a>
     <a href="#infos">Infos</a>
     <button type="button" id="theme-toggle" aria-label="Changer de thème"></button>
   </nav>
@@ -210,7 +210,7 @@ body { overflow-wrap: anywhere; }
 </main>
 
 <footer>
-  <a href="https://fraetech.github.io/">&larr; Retour à la carte principale</a>
+  <a href="/">&larr; Retour à la carte principale</a>
 </footer>
 
 </div>
@@ -274,7 +274,7 @@ function linksList(items, type) {
   items.forEach(item => {
     const li = document.createElement('li');
     const a = document.createElement('a');
-    a.href = 'https://fraetech.github.io/index.html?csv=' + item.path;
+    a.href = '/index.html?csv=' + item.path;
     a.textContent = simplifyLabel(item.label, type);
     li.appendChild(a);
     ul.appendChild(li);
@@ -340,7 +340,7 @@ async function init() {
   const loading = el('p', 'state', 'Chargement de l\u2019historique\u2026');
   container.appendChild(loading);
 
-  const res = await fetch('https://fraetech.github.io/files/history.csv?nocache=' + Date.now());
+  const res = await fetch('./files/history.csv?nocache=' + Date.now());
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const csv = await res.text();
 

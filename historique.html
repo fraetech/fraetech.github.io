@@ -179,7 +179,9 @@ body { overflow-wrap: anywhere; }
 <section class="info" id="infos">
   <h2>Informations</h2>
 
-  <h3>Note importante</h3>
+  <h3>Notes importantes</h3>
+  <p>Une carte quadri-hebdomadaire correspond à l'agrégation de 4 cartes hebdomadaires (ce qui permet d'observer les modifications sur 1 mois).</p>
+  <p>Une carte duodéca-hebdomadaire correspond à l'agrégation de 12 cartes hebdomadaires (ce qui permet d'observer les modifications sur 3 mois).</p>
   <p>Certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte peuvent ne pas être présents sur celle-ci. Si une semaine devait être regénérée, n'hésitez pas à me le faire savoir.</p>
 
   <h3>MAJ manquantes (et raison)</h3>
@@ -195,12 +197,12 @@ body { overflow-wrap: anywhere; }
     <li><span class="tag">S52-2024</span> Pas de MAJ, report sur S2-2025.</li>
   </ul>
 
-  <h3>Mensuelles</h3>
+  <h3>Quadri-hebdomadaires (sur 1 mois)</h3>
   <ul>
     <li><span class="tag">04-2025</span> Bug sur la MAJ.</li>
   </ul>
 
-  <h3>Trimestrielles</h3>
+  <h3>Duodéca-hebdomadaires (sur 3 mois)</h3>
   <ul>
     <li><span class="tag">T2-2025</span> Bug sur la MAJ.</li>
   </ul>
@@ -216,7 +218,7 @@ body { overflow-wrap: anywhere; }
 </div>
 
 <script>
-const TITLES = { hebdo: 'Hebdomadaires', mensu: 'Mensuelles', trim: 'Trimestrielles' };
+const TITLES = { hebdo: 'Hebdomadaires', mensu: 'Quadri-hebdomadaires (sur 1 mois)', trim: 'Duodéca-hebdomadaires (sur 3 mois)' };
 const MONTH_NAMES = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
 /* ---------- Utilitaires ---------- */

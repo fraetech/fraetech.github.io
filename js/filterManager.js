@@ -139,18 +139,42 @@ export class FilterManager {
       .filter(a => !habituellesActions.includes(a) && !a.startsWith('CH') && !ALIAS_ACTIONS.has(a))
       .sort();
 
-    // Sous-catégorie Actions habituelles
+    // Sous-catégorie Actions standards
+    const habToggleBtn = document.createElement('button');
+    habToggleBtn.className = 'toggle-subcategory-btn';
+    habToggleBtn.textContent = 'Tout décocher';
+
+    const habHeader = this._createSubcategoryHeader('Standards', habToggleBtn);
+    actionContainer.appendChild(habHeader);
+
+    const habGroup = document.createElement('div');
+    habGroup.className = 'filter-subgroup';
+    habGroup.style.marginBottom = '10px';
+    actionContainer.appendChild(habGroup);
+
     const habCheckboxes = [];
     habituellesActions.forEach(action => {
       if (this.dataStore.filterValues.actions.has(action)) {
         const chk = this.createCheckbox(
-          actionContainer,
+          habGroup,
           action,
           'actions',
           window.CONFIG?.actions?.[action] || action
         );
         if (chk) habCheckboxes.push(chk);
       }
+    });
+
+    habToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const newState = !habCheckboxes.some(chk => chk.checked);
+      clearTimeout(this.updateTimeout);
+      habCheckboxes.forEach(chk => {
+        chk.checked = newState;
+        chk.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      this.updateFilters();
+      habToggleBtn.textContent = newState ? 'Tout décocher' : 'Tout cocher';
     });
 
     // Sous-catégorie Spéciales (CH…)
@@ -372,7 +396,7 @@ export class FilterManager {
       btn.textContent = anyChecked ? 'Tout décocher' : 'Tout cocher';
     });
 
-    // Boutons de sous-catégorie (France Métro, DROM/COM, Spéciales) — ont toggle-subcategory-btn
+    // Boutons de sous-catégorie (France Métro, DROM/COM, Standards, Spéciales)
     document.querySelectorAll('.toggle-subcategory-btn').forEach(btn => {
       const group = btn.closest('.filter-subcategory-header')?.nextElementSibling;
       if (!group) return;

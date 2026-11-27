@@ -116,7 +116,10 @@
 			});
 			window.updateAvailable = updateAvailablePromise;
 
-			navigator.serviceWorker.register('/service-worker.js', {scope: '/'}).then(function(registration) {
+			navigator.serviceWorker.register('/service-worker.js', {
+				scope: '/',
+				updateViaCache: 'none'
+			}).then(function(registration) {
 				console.log('SW registered successfully');
 
 				// Écoute les mises à jour
@@ -147,6 +150,10 @@
 							}
 						}
 					});
+				});
+
+				registration.update().catch(function(err) {
+					console.warn('SW update check failed:', err);
 				});
 			}, function(err) {
 				console.error('SW registration failed:', err);

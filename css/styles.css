@@ -207,6 +207,27 @@ html, body {
   border-radius: 4px;
 }
 
+.filter-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-actions button {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.filter-actions button:hover {
+  background-color: #f9f9f9;
+  border-color: #999;
+}
+
 .filter-category-header {
   font-weight: bold;
   margin-top: 10px;

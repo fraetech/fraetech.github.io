@@ -68,7 +68,7 @@
 <a href="https://github.com/fraetech/fraetech.github.io" target="_blank" rel="noopener">GitHub</a><br>
  L'historique (sur un an) des mises à jour : <br><a href="historique" target="_self">Historique des mises à jour</a><br>
 <script src="./js/version.js"></script>
-<b>Source :</b> <a href="https://data.anfr.fr/visualisation/information/?id=observatoire_2g_3g_4g" target="_blank" rel="noopener">OpenData ANFR</a> | <small id="app-version"></small> | <a href="mentions-legales" target="_self">Mentions légales</a>
+<b>Source :</b> <a href="https://www.data.gouv.fr/datasets/donnees-sur-les-reseaux-mobiles" target="_blank" rel="noopener">data.gouv.fr</a> | <small id="app-version"></small> | <a href="mentions-legales" target="_self">Mentions légales</a>
 <script>
   document.getElementById("app-version").textContent = "v" + self.APP_VERSION;
 </script>
@@ -116,7 +116,10 @@
 			});
 			window.updateAvailable = updateAvailablePromise;
 
-			navigator.serviceWorker.register('/service-worker.js', {scope: '/'}).then(function(registration) {
+			navigator.serviceWorker.register('/service-worker.js', {
+				scope: '/',
+				updateViaCache: 'none'
+			}).then(function(registration) {
 				console.log('SW registered successfully');
 
 				// Écoute les mises à jour
@@ -147,6 +150,10 @@
 							}
 						}
 					});
+				});
+
+				registration.update().catch(function(err) {
+					console.warn('SW update check failed:', err);
 				});
 			}, function(err) {
 				console.error('SW registration failed:', err);

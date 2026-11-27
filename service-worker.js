@@ -13,6 +13,9 @@ const URLS_TO_CACHE = [
   '/historique.html',
   '/mentions-legales.html',
   '/css/styles.css',
+  '/css/leaflet/leaflet_v1.94.css',
+  '/css/leaflet/MarkerCluster_v1.5.3.css',
+  '/css/leaflet/MarkerCluster.Default_v1.5.3.css',
   '/js/app.js',
   '/js/config.js',
   '/js/dataStore.js',
@@ -22,6 +25,8 @@ const URLS_TO_CACHE = [
   '/js/searchManager.js',
   '/js/utils.js',
   '/js/version.js',
+  '/js/leaflet/leaflet_v1.94.js',
+  '/js/leaflet/leaflet.markercluster_v1.5.3.js',
   '/favicon.png',
   '/favicon.ico',
   '/favicon.svg',
@@ -38,7 +43,8 @@ self.addEventListener('install', event => {
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
-          if (key !== STATIC_CACHE && key !== ICONS_CACHE) {
+          const isAppCache = key.startsWith('mh-static-') || key.startsWith('mh-icons-');
+          if (isAppCache && key !== STATIC_CACHE && key !== ICONS_CACHE) {
             console.log('SW install: Deleting old cache:', key);
             return caches.delete(key);
           }
@@ -76,12 +82,13 @@ self.addEventListener('activate', event => {
       console.log('Activating - existing caches:', keys);
       return Promise.all(
         keys.map(key => {
-          const isCurrentCache = (key === STATIC_CACHE || key === ICONS_CACHE);
-          if (!isCurrentCache) {
+          const isAppCache = key.startsWith('mh-static-') || key.startsWith('mh-icons-');
+          const isCurrentCache = key === STATIC_CACHE || key === ICONS_CACHE;
+          if (isAppCache && !isCurrentCache) {
             console.log('SW activate: Deleting old cache:', key);
             return caches.delete(key);
           }
-          console.log('SW activate: Keeping cache:', key);
+          if (isCurrentCache) console.log('SW activate: Keeping cache:', key);
           return Promise.resolve();
         })
       );

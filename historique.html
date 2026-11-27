@@ -162,9 +162,9 @@ body { overflow-wrap: anywhere; }
 <div class="wrap">
 
 <header class="top">
-  <div class="brand"><a href="https://fraetech.github.io/">fraetech.github.io</a><span class="slash"> / </span>historique</div>
+  <div class="brand"><a href="/">fraetech.github.io</a><span class="slash"> / </span>historique</div>
   <nav aria-label="Navigation principale">
-    <a href="https://fraetech.github.io/">Carte principale</a>
+    <a href="/">Carte principale</a>
     <a href="#infos">Infos</a>
     <button type="button" id="theme-toggle" aria-label="Changer de thème"></button>
   </nav>
@@ -179,7 +179,9 @@ body { overflow-wrap: anywhere; }
 <section class="info" id="infos">
   <h2>Informations</h2>
 
-  <h3>Note importante</h3>
+  <h3>Notes importantes</h3>
+  <p>Une carte quadri-hebdomadaire correspond à l'agrégation de 4 cartes hebdomadaires (ce qui permet d'observer les modifications sur 1 mois).</p>
+  <p>Une carte duodéca-hebdomadaire correspond à l'agrégation de 12 cartes hebdomadaires (ce qui permet d'observer les modifications sur 3 mois).</p>
   <p>Certaines fonctionnalités et bug fix ajoutés après la date de génération d'une carte peuvent ne pas être présents sur celle-ci. Si une semaine devait être regénérée, n'hésitez pas à me le faire savoir.</p>
 
   <h3>MAJ manquantes (et raison)</h3>
@@ -195,12 +197,12 @@ body { overflow-wrap: anywhere; }
     <li><span class="tag">S52-2024</span> Pas de MAJ, report sur S2-2025.</li>
   </ul>
 
-  <h3>Mensuelles</h3>
+  <h3>Quadri-hebdomadaires (sur 1 mois)</h3>
   <ul>
     <li><span class="tag">04-2025</span> Bug sur la MAJ.</li>
   </ul>
 
-  <h3>Trimestrielles</h3>
+  <h3>Duodéca-hebdomadaires (sur 3 mois)</h3>
   <ul>
     <li><span class="tag">T2-2025</span> Bug sur la MAJ.</li>
   </ul>
@@ -210,13 +212,13 @@ body { overflow-wrap: anywhere; }
 </main>
 
 <footer>
-  <a href="https://fraetech.github.io/">&larr; Retour à la carte principale</a>
+  <a href="/">&larr; Retour à la carte principale</a>
 </footer>
 
 </div>
 
 <script>
-const TITLES = { hebdo: 'Hebdomadaires', mensu: 'Mensuelles', trim: 'Trimestrielles' };
+const TITLES = { hebdo: 'Hebdomadaires', mensu: 'Quadri-hebdomadaires (sur 1 mois)', trim: 'Duodéca-hebdomadaires (sur 3 mois)' };
 const MONTH_NAMES = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
 /* ---------- Utilitaires ---------- */
@@ -274,7 +276,7 @@ function linksList(items, type) {
   items.forEach(item => {
     const li = document.createElement('li');
     const a = document.createElement('a');
-    a.href = 'https://fraetech.github.io/index.html?csv=' + item.path;
+    a.href = '/index.html?csv=' + item.path;
     a.textContent = simplifyLabel(item.label, type);
     li.appendChild(a);
     ul.appendChild(li);
@@ -340,7 +342,7 @@ async function init() {
   const loading = el('p', 'state', 'Chargement de l\u2019historique\u2026');
   container.appendChild(loading);
 
-  const res = await fetch('https://fraetech.github.io/files/history.csv?nocache=' + Date.now());
+  const res = await fetch('./files/history.csv?nocache=' + Date.now());
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const csv = await res.text();
 

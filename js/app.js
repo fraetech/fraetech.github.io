@@ -9,14 +9,29 @@ import { FilterManager } from './filterManager.js';
 // Make CONFIG global for plugins that read it (used in some modules)
 window.CONFIG = CONFIG;
 
-// Small helper to load Leaflet and MarkerCluster (with fallback local paths if needed)
+const AZIMUTHS_STORAGE_KEY = 'showAzimuths';
+
+function getAzimuthsPreference() {
+  try {
+    return window.localStorage.getItem(AZIMUTHS_STORAGE_KEY) !== 'false';
+  } catch (error) {
+    console.warn('Impossible de lire la préférence des azimuts :', error);
+    return true;
+  }
+}
+
+function saveAzimuthsPreference(enabled) {
+  try {
+    window.localStorage.setItem(AZIMUTHS_STORAGE_KEY, String(enabled));
+  } catch (error) {
+    console.warn('Impossible d’enregistrer la préférence des azimuts :', error);
+  }
+}
+
 async function loadLeafletAndCluster() {
   // load CSS for leaflet & markercluster first (non-blocking)
-  // const leafletCss = 'https://unpkg.com/leaflet/dist/leaflet.css';
   const leafletCss = 'css/leaflet/leaflet_v1.94.css';
-  // const clusterCss = 'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css';
-  const clusterCss = 'css/leaflet/MarkerCluster.Default_v1.5.3.css';
-  //const clusterDefaultCss = 'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css';
+  const clusterCss = 'css/leaflet/MarkerCluster_v1.5.3.css';
   const clusterDefaultCss = 'css/leaflet/MarkerCluster.Default_v1.5.3.css';
 
   try {
@@ -26,14 +41,12 @@ async function loadLeafletAndCluster() {
       Utils.loadCss(clusterDefaultCss)
     ]);
   } catch (e) {
-    console.warn('CDN CSS failed, continuing (expect local CSS fallback if provided).', e);
+    console.warn('Local Leaflet CSS failed.', e);
   }
 
   // Now load Leaflet and MarkerCluster JS sequentially
   try {
-    // await Utils.loadScript('https://unpkg.com/leaflet/dist/leaflet.js', { fallback: 'vendor/leaflet.js' });
     await Utils.loadScript('js/leaflet/leaflet_v1.94.js');
-    // await Utils.loadScript('https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js', { fallback: 'vendor/leaflet.markercluster.js' });
     await Utils.loadScript('js/leaflet/leaflet.markercluster_v1.5.3.js');
   } catch (err) {
     console.error('Leaflet load failed:', err);
@@ -82,7 +95,10 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
     onAdd: function() {
       const div = L.DomUtil.create('div', 'leaflet-control custom-filter-control collapsed');
       div.innerHTML = `<div class="filters-content" style="display:none;">
-              <button class="toggle-all-filters" id="toggleAllFilters" type="button">Tout décocher</button>
+              <div class="filter-actions">
+                <button class="toggle-all-filters" id="toggleAllFilters" type="button">Tout décocher</button>
+                <button class="toggle-azimuths" id="toggleAzimuths" type="button" aria-pressed="false">Désactiver azimuts</button>
+              </div>
               <div class="filter-category-header">Mode de filtrage</div>
               <div class="filter-group expanded">
               <label><input type="radio" name="filterMode" value="simple" checked>Simple</label>
@@ -239,6 +255,25 @@ function createMapControls(map, dataStore, searchManager, filterManager) {
         });
 
         updateToggleButton();
+      }
+
+      const toggleAzimuthsBtn = document.getElementById('toggleAzimuths');
+      if (toggleAzimuthsBtn) {
+        const updateAzimuthsButton = () => {
+          toggleAzimuthsBtn.setAttribute('aria-pressed', String(!dataStore.azimuthsEnabled));
+          toggleAzimuthsBtn.textContent = dataStore.azimuthsEnabled
+            ? 'Désactiver azimuts'
+            : 'Activer azimuts';
+        };
+
+        updateAzimuthsButton();
+        toggleAzimuthsBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const enabled = !dataStore.azimuthsEnabled;
+          dataStore.setAzimuthsEnabled(enabled);
+          saveAzimuthsPreference(enabled);
+          updateAzimuthsButton();
+        });
       }
 
       // Hide search on clicking outside
@@ -545,6 +580,7 @@ async function main() {
 
   // Data store and managers
   const dataStore = new DataStore(mapManager);
+  dataStore.setAzimuthsEnabled(getAzimuthsPreference());
   const searchManager = new (await import('./searchManager.js')).SearchManager(dataStore, mapManager);
   const filterManager = new (await import('./filterManager.js')).FilterManager(dataStore, mapManager);
 
@@ -558,11 +594,13 @@ async function main() {
   await loadCsvAndInit(dataStore, mapManager);
   filterManager.initFilters();
 
-  // Filtre opérateur via ?ope=
+  // Filtre opérateur via ?ope=op1&ope=op2
   const initParams = new URLSearchParams(window.location.search);
-  const opeParam = initParams.get('ope');
-  if (opeParam) {
-    filterManager.applyOperatorFilter(opeParam.toUpperCase());
+  const opeParams = initParams.getAll('ope');
+
+  if (opeParams.length > 0) {
+    const operators = opeParams.map(op => op.trim().toUpperCase());
+    filterManager.applyOperatorFilter(operators);
   }
 
   const urlManager = new URLManager(mapManager, dataStore);

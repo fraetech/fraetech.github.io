@@ -29,6 +29,27 @@ export class DataStore {
     this.advancedMatchMode = 'contains';
     this.activeAdvancedPairs = new Set();
     this.filterValues.techFreqPairs = new Set();
+    this.azimuthsEnabled = true;
+  }
+
+  createMarkerIcon(supportRows, iconUrl) {
+    const azimuthOverlay = this.azimuthsEnabled
+      ? PopupGenerator.generateAzimuthOverlay(supportRows)
+      : '';
+    return L.divIcon({
+      className: 'antenna-marker',
+      html: `${azimuthOverlay}<img src="${iconUrl}" alt="" aria-hidden="true">`,
+      iconSize: [120, 120],
+      iconAnchor: [60, 60],
+      popupAnchor: [0, -60]
+    });
+  }
+
+  setAzimuthsEnabled(enabled) {
+    this.azimuthsEnabled = enabled;
+    this.supports.forEach(({ marker, data, iconUrl }) => {
+      marker.setIcon(this.createMarkerIcon(data, iconUrl));
+    });
   }
 
   addSupport(supportKey, supportObj) {
@@ -212,18 +233,12 @@ export class DataStore {
             : `_${firstRow.action?.toLowerCase?.() || ''}`;
           const iconUrl = `${CONFIG.baseIconUrl}${opConfig.id}${actionId}.svg`;
 
-          const azimuthOverlay = PopupGenerator.generateAzimuthOverlay(supportRows);
-          const icon = L.divIcon({
-            className: 'antenna-marker',
-            html: `${azimuthOverlay}<img src="${iconUrl}" alt="" aria-hidden="true">`,
-            iconSize: [120, 120],
-            iconAnchor: [60, 60],
-            popupAnchor: [0, -60]
+          const marker = L.marker([lat, lon], {
+            icon: this.createMarkerIcon(supportRows, iconUrl),
+            title: firstRow.operateur
           });
-
-          const marker = L.marker([lat, lon], { icon, title: firstRow.operateur });
           marker.bindPopup(PopupGenerator.generate(supportRows, lat, lon), { maxWidth: 320 });
-          const storeObj = { marker, data: supportRows, coords: { lat, lon } };
+          const storeObj = { marker, data: supportRows, coords: { lat, lon }, iconUrl };
 
           this.addSupport(key, storeObj);
           this.mapManager.addMarkerToCluster(marker);
